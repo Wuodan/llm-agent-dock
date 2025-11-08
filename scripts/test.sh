@@ -30,8 +30,12 @@ log() {
 }
 
 require_cmd() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    log "Missing dependency: $1"
+  local bin=$1
+  if ! command -v "$bin" >/dev/null 2>&1; then
+    log "Missing dependency: $bin"
+    if [[ "$bin" == "bats" ]]; then
+      log "Install via 'npm install -g bats' or 'brew install bats-core'."
+    fi
     exit 1
   fi
 }
