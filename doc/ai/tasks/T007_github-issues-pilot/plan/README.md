@@ -35,6 +35,7 @@ Last updated: 2025-11-08T14:57Z by Codex
 - 2025-11-08T14:42Z — Created GitHub issue #1, seeded status labels, and mirrored prior log entries on GitHub (S003).
 - 2025-11-08T14:43Z — Linked local docs to issue #1 and documented sync workflow (S003 complete).
 - 2025-11-08T14:57Z — Closed GitHub issue #1, flipped labels to `status:completed`, and marked T007 as finished in the task catalog.
+- 2025-11-08T15:31Z — Added session hand-off guardrail (no token impact; compliance-only reminder) per owner request.
 
 ## References
 - `doc/ai/tasks/T007_github-issues-pilot/README.md`
