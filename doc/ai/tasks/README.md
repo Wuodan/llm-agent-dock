@@ -19,7 +19,7 @@
 | T005 | GHCR Auth & Release-Build Pipeline Readiness | Proposed | _(Plan pending)_ | — | `doc/ai/tasks/T005_ghcr-release-pipeline/README.md`
 | T006 | Deterministic Agent Auth Fixtures for Tests | Proposed | _(Plan pending)_ | — | `doc/ai/tasks/T006_agent-auth-fixtures/README.md`
 | T007 | Pilot GitHub-Issue Task Tracking | Completed | `doc/ai/tasks/T007_github-issues-pilot/plan/` | [Issue #1](https://github.com/Wuodan/llm-agent-dock/issues/1) | `doc/ai/tasks/T007_github-issues-pilot/README.md`
-| T008 | Workflow Cost Management Additions & Improvements | Completed | `doc/ai/tasks/T008_workflow-cost-management/plan/` | — | `doc/ai/tasks/T008_workflow-cost-management/README.md`
+| T008 | Workflow Cost Management Additions & Improvements | Completed | `doc/ai/tasks/T008_workflow-cost-management/plan/` | [Issue #2](https://github.com/Wuodan/llm-agent-dock/issues/2) | `doc/ai/tasks/T008_workflow-cost-management/README.md`
 | T009 | Project Kickstart Template | Proposed | `doc/ai/tasks/T009_kickstart-template/plan/` | — | `doc/ai/tasks/T009_kickstart-template/README.md`
 | T010 | Cost Reduction Tooling Analysis | Draft | `doc/ai/tasks/T010_cost-reduction-tooling/plan/` | — | `doc/ai/tasks/T010_cost-reduction-tooling/README.md`
 

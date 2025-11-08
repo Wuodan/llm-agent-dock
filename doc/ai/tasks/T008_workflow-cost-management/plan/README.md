@@ -9,9 +9,9 @@ Last updated: 2025-11-08T18:21Z by Codex
 - Scope deliberately focuses on process/doc updates and the first version of the audit doc; automation/MCP integrations remain out of scope (feed into later tasks).
 
 ## GitHub Issue
-- Not yet created (create via `.github/ISSUE_TEMPLATE/task.yml` once scope is approved).
-- Expected status label: `status:proposed` until work begins.
-- Planned branches: `task/T008_workflow-cost-management` plus per-subtask branches (`subtask/T008_S#_<slug>`).
+- [Issue #2](https://github.com/Wuodan/llm-agent-dock/issues/2)
+- Current label: `status:completed` (set after `T008/S000` merge on 2025-11-08). Historical flow: proposed → active → completed.
+- Planned/used branches: `task/T008_workflow-cost-management` plus `subtask/T008_S00{1-4}_<slug>`.
 
 ## Workflow Guardrails
 1. Keep token-awareness additions lightweight—prefer short estimate fields vs. long prose.

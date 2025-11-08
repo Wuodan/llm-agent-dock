@@ -3,7 +3,7 @@
 ## Status
 - Status: Completed (merged into `development` via `T008/S000` on 2025-11-08)
 - Owner: Codex (latest session)
-- Links: `doc/ai/tasks/T008_workflow-cost-management/plan/README.md`, `doc/ai/workflow/workflow_cost_audit.md`
+- Links: `doc/ai/tasks/T008_workflow-cost-management/plan/README.md`, `doc/ai/workflow/workflow_cost_audit.md`, [GitHub Issue #2](https://github.com/Wuodan/llm-agent-dock/issues/2)
 
 ## Background
 Token usage is becoming a limiting factor, so we need better visibility into estimated vs. actual cost for each task, plus clear workflows for flagging expensive changes. Existing plans lack structured estimates, and retros rarely capture accuracy data. Additionally, the workflow steps in `AGENTS.md` haven’t been analyzed end-to-end for cost impact.
