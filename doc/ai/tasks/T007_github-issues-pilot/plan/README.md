@@ -29,6 +29,7 @@ Last updated: 2025-11-08T14:31Z by Codex
 - 2025-11-08T14:31Z — Created task plan scaffold and initial checklist entries (Codex).
 - 2025-11-08T14:33Z — Drafted GitHub issue template plus label/linking policy (S001).
 - 2025-11-08T14:36Z — Committed S001 deliverables and recorded GitHub issue model references.
+- 2025-11-08T14:38Z — Updated AGENTS + plan templates with GitHub issue workflow (S002 in progress).
 - 2025-11-08T14:33Z — Drafted GitHub issue template plus label/linking policy (S001).
 
 ## References
