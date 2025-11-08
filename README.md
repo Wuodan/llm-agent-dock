@@ -51,6 +51,9 @@ scripts/build.sh cline ubuntu --platform linux/amd64
 scripts/test.sh ghcr.io/<org>/llm-agent-dock:cline-ubuntu-latest
 ```
 
+The bootstrap helper also writes a `.env` file with `LLM_AGENT_DOCK_*` defaults so the build/test
+scripts share registry, tag, and platform settings.
+
 ---
 
 ## Dockerfile Args
