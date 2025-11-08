@@ -38,6 +38,7 @@ Last updated: 2025-11-08T19:30Z by Codex
 - 2025-11-08T18:54Z — Initial S003 draft (later replaced): added README, AGENTS kickstart notice, AGENTS reference, task catalog scaffold, and supporting templates inside the `workflow-ready-template` submodule.
 - 2025-11-08T19:30Z — Reworked S003 per user feedback: replaced the human README instructions, removed AGENTS.reference, and copied the full AGENTS guardrails minus tech-specific sections into the submodule.
 - 2025-11-08T20:05Z — Updated template README per latest guidance: split flows (new project vs. existing project), documented `.venv` prerequisite, tarball commands, and the “help me update and complete AGENTS.md” prompt.
+- 2025-11-08T20:24Z — Simplified template README per user request (no tables, concise directions) and scrubbed `llm-agent-dock` references from the issue template.
 
 ## References
 - T008 outputs (workflow guardrails) for reuse.
