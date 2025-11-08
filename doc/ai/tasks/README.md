@@ -3,7 +3,7 @@
 ## Numbering Scheme
 - Tasks use identifiers `T###` (e.g., `T001`, `T002`).
 - Folder naming pattern: `doc/ai/tasks/T###_<slug>/`.
-- The task description **lives inside each folder’s `README.md`** and may include extra helper files for that task only.
+- The task description **lives inside each folder’s `README.md`** and may include extra helper files for that task only. Task READMEs define scope/instructions—planning and execution details belong in the task’s `plan/` folder.
 - Every `README.md` must link to:
   - Its plan folder under `doc/ai/tasks/T###_<slug>/plan/` (and related subtask checklists) for execution detail.
   - Relevant commits, research notes, or supporting artifacts.
@@ -13,7 +13,8 @@
 | Task ID | Title | Status | Plan Folder | Notes |
 |---------|-------|--------|-------------|-------|
 | T001 | Build the llm-agent-dock Matrix Builder | Completed | `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/plan/` | `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/README.md`
-| T002 | Validate llm-agent-dock Builds & Docker Access | Active | `doc/ai/tasks/T002_validate-builds-docker/plan/` | `doc/ai/tasks/T002_validate-builds-docker/README.md`
+| T002 | Validate llm-agent-dock Builds & Docker Access | Completed | `doc/ai/tasks/T002_validate-builds-docker/plan/` | `doc/ai/tasks/T002_validate-builds-docker/README.md`
+| T003 | Intensive Agent Startup & Prompt Capture | **Active** | _(Plan pending — create before execution)_ | `doc/ai/tasks/T003_intensive-startup-tests/README.md`
 
 Update this table as tasks finish or new ones start. Mark exactly one row as **Active** so the current folder is obvious.
 

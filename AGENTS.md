@@ -13,6 +13,7 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   only need the latest checklist state to resume.
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
   relevant subtask doc (or under `doc/ai/research/` if reused later). Avoid repeating lookups.
+- **Documentation hygiene**: Do not paste chat/discussion transcripts into repository documents; summarize outcomes and link to sanitized logs instead.
 - **Commits per subtask**: Finish each subtask with `[codex][subtask-name]: summary`. Never mix
   unrelated work in a single commit.
 - **Status visibility**: Keep a progress log in the root plan so new agents can inspect the latest
