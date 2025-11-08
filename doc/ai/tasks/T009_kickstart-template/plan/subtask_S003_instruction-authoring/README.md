@@ -17,10 +17,10 @@ Write the template’s README and AGENTS instructions so new users/agents can bo
 5. Commit `T009/S003: author kickstart instructions` once finished.
 
 ## Deliverable Notes
-- **README.md** — Human-facing instructions only: clone/fork the repo, how to replace the README in brand-new projects (plus starter AI prompts), and how to adopt the files alongside an existing README.
-- **AGENTS.md** — Full copy of this repository’s AGENTS guidelines with the project-specific tech sections removed so adopters get the workflow guardrails without docker/build references.
+- **README.md** — Human-facing instructions only with two explicit flows: (A) new project (fork or release tarball, rough README, prompt “help me improve README,” “help me update and complete AGENTS.md”), and (B) existing project (download tarball, copy everything except the README with sample Linux/macOS + Windows commands). Both paths finish with planning the first task and highlight the `.venv` prerequisite.
+- **AGENTS.md** — Full copy of this repository’s AGENTS guidelines with only repo-specific technology references trimmed where needed; Python `.venv` expectations remain since the template now requires it.
 - **doc/ai/tasks/README.md** — Task index scaffold with instructions for numbering, maintaining statuses, and mirroring progress to PRs.
-- **Supporting files** — `.github/ISSUE_TEMPLATE/task.yml`, plan templates, and `.gitignore` copied in so the template is repo-complete on first clone.
+- **Supporting files** — `.github/ISSUE_TEMPLATE/task.yml`, plan templates, `.gitignore`, and `devtools/check_commit_message.py` so teams can opt into the commit-subject hook immediately.
 
 ## File Touchpoints
 | File | Key Sections |
