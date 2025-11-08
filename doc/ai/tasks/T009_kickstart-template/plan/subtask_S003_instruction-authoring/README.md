@@ -16,12 +16,27 @@ Write the template’s README and AGENTS instructions so new users/agents can bo
 4. Cross-check instructions for clarity + brevity.
 5. Commit `T009/S003: author kickstart instructions` once finished.
 
+## Deliverable Notes
+- **README.md** — Describes template purpose, a five-step quickstart checklist, and a table of included files. Encourages copying plan templates, syncing GitHub issues, and logging research under `doc/ai/research/` when applicable.
+- **AGENTS.md** — Minimal “kickstart mode” guide that instructs agents to gather goals, create the first plan folder, customize docs, and remove the temporary guidance once a real AGENTS exists.
+- **AGENTS.reference.md** — Portable workflow rules covering planning, GitHub issues/PRs, branch discipline, catalog hygiene, tooling/testing expectations, and feedback loops. Designed for copy/paste into the eventual project AGENTS with light edits.
+- **doc/ai/tasks/README.md** — Task index scaffold with instructions for numbering, maintaining statuses, and mirroring progress to PRs.
+- **Supporting files** — `.github/ISSUE_TEMPLATE/task.yml`, plan templates, and `.gitignore` copied in so the template is repo-complete on first clone.
+
+## File Touchpoints
+| File | Key Sections |
+|------|--------------|
+| `submodules/workflow-ready-template/README.md` | Overview, Quickstart Checklist, Template Contents table, customization + research guidance. |
+| `submodules/workflow-ready-template/AGENTS.md` | Immediate actions for agents, working agreements, and hand-off expectations until a real AGENTS replaces it. |
+| `submodules/workflow-ready-template/AGENTS.reference.md` | Workflow hardening, branch/commit policy, catalog expectations, testing/tooling, and feedback norms. |
+| `submodules/workflow-ready-template/doc/ai/tasks/README.md` | Task table stub plus instructions for creating new task folders/issues. |
+
 ## Checklist
-- [ ] README drafted (template usage instructions).
-- [ ] Kickstart AGENTS.md drafted.
-- [ ] Template AGENTS reference drafted.
-- [ ] Feedback updated.
-- [ ] Commit `T009/S003: author kickstart instructions`.
+- [x] README drafted (template usage instructions).
+- [x] Kickstart AGENTS.md drafted.
+- [x] Template AGENTS reference drafted.
+- [x] Feedback updated.
+- [x] Commit `T009/S003: author kickstart instructions`.
 
 ## Inputs & References
 - S001/S002 decisions.
@@ -31,6 +46,6 @@ Write the template’s README and AGENTS instructions so new users/agents can bo
 - Template docs ready for inclusion in the new repo/submodule.
 
 ## Feedback & Learnings
-- **Open Problems**: _TBD_
-- **Questions**: _TBD_
-- **Learnings**: _TBD_
+- **Open Problems**: Consider adding a `doc/ai/research/README.md` stub in the template if multiple teams request it; for now the README simply suggests creating it ad hoc.
+- **Questions**: None; awaiting user review of the submodule files before iterating further.
+- **Learnings**: Keeping AGENTS in a two-layer approach (kickstart vs. reference) makes it obvious when the repo graduates from template mode.
