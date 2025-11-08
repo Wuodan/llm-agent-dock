@@ -1,6 +1,6 @@
 # Task T009 — Project Kickstart Template
 
-Last updated: 2025-11-08T17:44Z by Codex
+Last updated: 2025-11-08T18:06Z by Codex
 
 ## Context
 - We want to spin up a reusable template repo that captures our workflow best practices without project-specific details.
@@ -20,23 +20,24 @@ Last updated: 2025-11-08T17:44Z by Codex
 ## Subtask Directory Map (T009)
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
-| S001 | Repo naming & description alignment | ☐ pending | `plan/subtask_S001_repo-naming/README.md`
+| S001 | Repo naming & description alignment | ☑ done | `plan/subtask_S001_repo-naming/README.md`
 | S002 | Template structure & contents | ☐ pending | `plan/subtask_S002_template-structure/README.md`
 | S003 | Author README + AGENTS kickstart flow | ☐ pending | `plan/subtask_S003_instruction-authoring/README.md`
 | S004 | Submodule integration & wiring | ☐ pending | `plan/subtask_S004_submodule-integration/README.md`
 
 ## Master Checklist (T009)
-- [ ] S001 — Repo naming & description alignment
+- [x] S001 — Repo naming & description alignment
 - [ ] S002 — Template structure & contents
 - [ ] S003 — Author README + AGENTS kickstart flow
 - [ ] S004 — Submodule integration & wiring
 
 ## Progress Log (T009)
 - 2025-11-08T17:44Z — Drafted task plan scaffold pending naming discussion.
+- 2025-11-08T18:06Z — Completed S001: selected repo name `workflow-ready-template`, description "Kickstarts new repos with the documented AGENTS workflow baked in.", and submodule path `submodules/workflow-ready-template` to keep its Git nature obvious.
 
 ## References
 - T008 outputs (workflow guardrails) for reuse.
 - Existing AGENTS.md / README patterns from this repo.
 
 ## Notes
-- Leave actual repo creation + submodule addition until S001 decides the name/path.
+- Submodule will live at `submodules/workflow-ready-template`; wire it up during S004 after the repo exists.
