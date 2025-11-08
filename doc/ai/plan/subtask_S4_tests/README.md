@@ -23,11 +23,11 @@ agent CLI availability, and core OS packages on both amd64 and arm64 images.
 6. Commit `[codex][tests]: add smoke suites]`.
 
 ## Checklist
-- [ ] Helper script created with reusable assertions.
-- [ ] Per-tool Bats suites implement required tests.
-- [ ] Tests integrated with `scripts/test.sh`.
-- [ ] Sample test run recorded (log or note).
-- [ ] Plan updated; commit `[codex][tests]: add smoke suites]`.
+- [x] Helper script created with reusable assertions.
+- [x] Per-tool Bats suites implement required tests.
+- [x] Tests integrated with `scripts/test.sh`.
+- [x] Sample test run recorded (log or note).
+- [x] Plan updated; commit `[codex][tests]: add smoke suites]`.
 
 ## Inputs & References
 - Outputs from S2 (install locations) and S3 (image tags).
@@ -38,4 +38,9 @@ agent CLI availability, and core OS packages on both amd64 and arm64 images.
 - Tests pass (or documented limitations) for at least one matrix target.
 
 ## Feedback & Learnings
-- _Pending._
+- `tests/smoke/common.bash` centralizes `agent_exec` for all suites so each test only needs to pass
+  the command to run inside `docker run --rm ...`.
+- `scripts/test.sh` now hints at installing `bats` (`npm install -g bats` or `brew install
+  bats-core`) because the sample invocation
+  `scripts/test.sh ghcr.io/example/llm-agent-dock:cline-ubuntu --tool cline --no-pull` failed with
+  “Missing dependency: bats” on this host.

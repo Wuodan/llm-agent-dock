@@ -21,14 +21,14 @@ Last updated: 2025-11-08T02:30Z by Codex
 | S1 | Planning & Scaffolding | ✅ complete | `doc/ai/plan/subtask_S1_planning/README.md` |
 | S2 | Parameterized Dockerfile | ✅ complete | `doc/ai/plan/subtask_S2_dockerfile/README.md` |
 | S3 | Matrix & Scripts | ✅ complete | `doc/ai/plan/subtask_S3_matrix/README.md` |
-| S4 | Smoke Tests | ☐ pending | `doc/ai/plan/subtask_S4_tests/README.md` |
+| S4 | Smoke Tests | ✅ complete | `doc/ai/plan/subtask_S4_tests/README.md` |
 | S5 | Documentation & Polish | ☐ pending | `doc/ai/plan/subtask_S5_docs/README.md` |
 
 ## Master Checklist
 - [x] Establish planning structure (S1).
 - [x] Implement parameterized Dockerfile with agent installers (S2).
 - [x] Author matrix build configs and helper scripts (S3).
-- [ ] Create smoke tests and wire into scripts (S4).
+- [x] Create smoke tests and wire into scripts (S4).
 - [ ] Finalize documentation, extension guides, and sync references (S5).
 
 ## Dependencies & Flow
@@ -43,3 +43,4 @@ Last updated: 2025-11-08T02:30Z by Codex
 - 2025-11-08T02:30Z — README refocused on users; plan + subtasks updated to drop legacy references.
 - 2025-11-08T02:43Z — S2 complete: parameterized Dockerfile added; sample build command documented (docker socket access pending).
 - 2025-11-08T02:50Z — S3 complete: Bake matrix + helper scripts landed; bake --print validated.
+- 2025-11-08T02:53Z — S4 complete: Bats smoke tests + helper added; test script now guides Bats setup.

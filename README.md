@@ -52,7 +52,8 @@ scripts/test.sh ghcr.io/<org>/llm-agent-dock:cline-ubuntu-latest
 ```
 
 The bootstrap helper also writes a `.env` file with `LLM_AGENT_DOCK_*` defaults so the build/test
-scripts share registry, tag, and platform settings.
+scripts share registry, tag, and platform settings. Install `bats` (`brew install bats-core` or
+`npm install -g bats`) before running `scripts/test.sh`.
 
 ---
 
