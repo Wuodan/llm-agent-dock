@@ -9,7 +9,7 @@ run commands, extend bases/tools, and trace decisions via planning docs.
   - Concise overview + value prop.
   - Matrix table (bases/tools/platforms) and quick-start commands.
   - Extension guidance for adding bases/tools.
-  - Pointer to contributor docs (`AGENTS.md`, `doc/ai/plan/T001/README.md`) without embedding process detail.
+  - Pointer to contributor docs (`AGENTS.md`, `plan/README.md`) without embedding process detail.
 - Supporting contributor docs (if any) live under `doc/ai/` and reference the plan as needed.
 - Finalized plan docs reflecting completion (checklists + feedback).
 

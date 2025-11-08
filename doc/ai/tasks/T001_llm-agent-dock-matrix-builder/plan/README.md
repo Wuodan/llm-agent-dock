@@ -10,11 +10,11 @@ _Last updated: 2025-11-08T02:55Z_
 ## Subtask Directory Map
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
-| S1 | Planning & Scaffolding | ✅ complete | `doc/ai/plan/T001/subtask_S1_planning/README.md` |
-| S2 | Parameterized Dockerfile | ✅ complete | `doc/ai/plan/T001/subtask_S2_dockerfile/README.md` |
-| S3 | Matrix & Scripts | ✅ complete | `doc/ai/plan/T001/subtask_S3_matrix/README.md` |
-| S4 | Smoke Tests | ✅ complete | `doc/ai/plan/T001/subtask_S4_tests/README.md` |
-| S5 | Documentation & Polish | ✅ complete | `doc/ai/plan/T001/subtask_S5_docs/README.md` |
+| S1 | Planning & Scaffolding | ✅ complete | `plan/subtask_S1_planning/README.md` |
+| S2 | Parameterized Dockerfile | ✅ complete | `plan/subtask_S2_dockerfile/README.md` |
+| S3 | Matrix & Scripts | ✅ complete | `plan/subtask_S3_matrix/README.md` |
+| S4 | Smoke Tests | ✅ complete | `plan/subtask_S4_tests/README.md` |
+| S5 | Documentation & Polish | ✅ complete | `plan/subtask_S5_docs/README.md` |
 
 ## Progress Log
 - 2025-11-08T02:03Z — Initial roadmap drafted (S1 kick-off).
@@ -26,4 +26,4 @@ _Last updated: 2025-11-08T02:55Z_
 - 2025-11-08T02:55Z — S5 complete: README refreshed with config/build/test guidance; planning docs finalized.
 
 ## Notes
-- This folder is read-only history. Start new work in the folder for the active task (e.g., `doc/ai/plan/T002/`).
+- This folder is read-only history. Start new work in the folder for the active task (e.g., `doc/ai/tasks/T002_validate-builds-docker/plan/`).

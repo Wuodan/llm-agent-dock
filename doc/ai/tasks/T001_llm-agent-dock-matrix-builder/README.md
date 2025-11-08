@@ -1,8 +1,5 @@
 # Task T001 — Build the llm-agent-dock Matrix Builder
 
-> This README mirrors `doc/ai/TASK.md`. Edit both files together so the active task description stays
-> consistent regardless of entry point.
-
 ## Background
 This repository must evolve into a reusable multi-architecture Docker build system for agentic
 developer tools. The system combines “fat” public base images with thin tool-specific layers and
@@ -33,7 +30,7 @@ Platforms: `linux/amd64`, `linux/arm64`. Every combination base×tool×arch must
 single configuration.
 
 ## Required Workflow (non-negotiable)
-1. **Planning first**: Author `doc/ai/plan/T001/README.md` plus one subfolder per subtask (S1–S5). Each
+1. **Planning first**: Author `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/plan/README.md` plus one subfolder per subtask (S1–S5). Each
    file records objectives, deliverables, flow, checklist, and feedback.
 2. **Subtasks**:
    - S1 Planning & scaffolding.
@@ -58,7 +55,7 @@ single configuration.
 4. `tests/smoke/` — Bats suites per tool plus helpers; runnable via `scripts/test.sh`.
 5. `README.md` — intro, architecture description, matrix summary, quick-start commands, extension
    guide, testing instructions.
-6. `doc/ai/plan/T001/` — up-to-date plan, subtask logs, and feedback entries for each phase.
+6. `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/plan/` — up-to-date plan, subtask logs, and feedback entries for each phase.
 
 Definition of done:
 - Matrix builds succeed locally via `docker buildx bake ... --print` and at least one real build.

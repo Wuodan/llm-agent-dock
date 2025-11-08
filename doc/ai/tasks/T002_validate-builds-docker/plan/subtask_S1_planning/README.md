@@ -4,12 +4,12 @@
 Capture a restartable execution plan for T002 plus prerequisite tracking so future agents can pick up matrix validation work without re-discovery.
 
 ## Deliverables
-- Updated `doc/ai/plan/T002/README.md` scoped to T002 with guardrails, checklist, and progress log entries.
+- Updated `plan/README.md` scoped to T002 with guardrails, checklist, and progress log entries.
 - Recorded prerequisite state (Docker socket access, `bats`, network constraints) with timestamped notes.
 - Subtask folder stubs for S2–S5 cross-referencing their execution order.
 
 ## Flow
-1. Review `doc/ai/TASK.md`, `AGENTS.md`, and prior T001 plan history to confirm inherited guardrails.
+1. Review `doc/ai/tasks/T002_validate-builds-docker/README.md`, `AGENTS.md`, and prior T001 plan history to confirm inherited guardrails.
 2. Note environment constraints (sandboxing mode, approval policy, timestamps) and document any blockers to Docker/bats usage.
 3. Refresh the master plan (context, guardrails, checklist, progress log) and link each new subtask directory.
 4. Update S1 checklist + progress log immediately after actions so later agents understand current status.
@@ -18,11 +18,11 @@ Capture a restartable execution plan for T002 plus prerequisite tracking so futu
 - [x] Confirm task brief + AGENTS guardrails are reflected in the plan.
 - [x] Record current timestamp, sandbox/approval state, and prerequisite assumptions.
 - [x] Ensure subtask folders exist for S2–S5 with objectives/deliverables/checklists.
-- [x] Update `doc/ai/plan/T002/README.md` master checklist + progress log for T002.
+- [x] Update `plan/README.md` master checklist + progress log for T002.
 - [x] Capture open risks/questions in Feedback.
 
 ## Inputs & References
-- `doc/ai/TASK.md`
+- `doc/ai/tasks/T002_validate-builds-docker/README.md`
 - `doc/ai/tasks/T002_validate-builds-docker/README.md`
 - `AGENTS.md`
 

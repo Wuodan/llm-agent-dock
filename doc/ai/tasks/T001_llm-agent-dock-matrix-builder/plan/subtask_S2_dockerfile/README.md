@@ -33,7 +33,7 @@ agent.
 - [x] Plan + checklist updated; commit `[codex][dockerfile]: add parameterized build]`.
 
 ## Inputs & References
-- `doc/ai/TASK.md` — required bases/tools list.
+- `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/README.md` — required bases/tools list.
 - `AGENTS.md` — Dockerfile conventions.
 - External installer docs (cite URLs in Feedback).
 

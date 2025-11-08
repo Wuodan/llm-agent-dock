@@ -5,12 +5,12 @@ Establish a restart-friendly execution plan with explicit subtasks, checklists, 
 guardrails so future contributors can resume work after interruptions.
 
 ## Deliverables
-- Updated `doc/ai/plan/T001/README.md` with context, guardrails, master checklist, and progress log.
+- Updated `plan/README.md` with context, guardrails, master checklist, and progress log.
 - Subtask-specific folders (`subtask_Sx_*`) each containing a runnable checklist template.
 - Status updates recorded in the master checklist.
 
 ## Flow
-1. Review `doc/ai/TASK.md`, `AGENTS.md`, and the current `README.md` to capture structure
+1. Review `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/README.md`, `AGENTS.md`, and the current `README.md` to capture structure
    expectations.
 2. Draft the global plan (context, workflow rules, dependency map, progress log).
 3. Create per-subtask directories/files describing objectives, deliverables, flow, checklist, and
@@ -25,7 +25,7 @@ guardrails so future contributors can resume work after interruptions.
 - [x] Commit planning work (`[codex][plan]: scaffold roadmap`).
 
 ## Inputs & References
-- `doc/ai/TASK.md` — primary requirements.
+- `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/README.md` — primary requirements.
 - `AGENTS.md` — repository conventions.
 - `README.md` — user-facing overview to keep contributor docs aligned.
 

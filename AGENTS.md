@@ -4,7 +4,7 @@ These instructions are intentionally task-agnostic. Every future effort in this 
 the workflow hardening and coding conventions below to keep hand-offs simple and recoverable.
 
 ## Workflow Hardening
-- **Planning trail**: For every task `T###`, create `doc/ai/plan/T###/README.md` plus one subfolder per subtask. Each file
+- **Planning trail**: For every task `T###`, create `doc/ai/tasks/T###_<slug>/plan/README.md` plus one subfolder per subtask inside that folder. Each file
   needs objective, deliverables, flow, checklist, and a feedback section updated at completion.
 - **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
   only need the latest checklist state to resume.
@@ -16,9 +16,9 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   timestamp and continue confidently.
 - **Task catalog**: Number tasks as `T###` (e.g., `T001`) and track them under
   `doc/ai/tasks/README.md`. Each task owns a folder `doc/ai/tasks/T###_<slug>/` whose `README.md`
-  holds the canonical brief (mirrored in `doc/ai/TASK.md`). Mark the active task as `Status = Active`
-  in the index. Every task doc (and each subtask file) needs a Feedback section with open problems,
-  outstanding questions, and learnings for future sessions.
+  holds the canonical brief. Mark the active task as `Status = Active` in the index. Every task doc
+  (and each subtask file) needs a Feedback section with open problems, outstanding questions, and
+  learnings for future sessions.
 
 ## Project Structure & Ownership
 - Root `Dockerfile` stays parameterized via `BASE_IMAGE`, `TOOL`, and `TARGETARCH` so the same
@@ -29,8 +29,8 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - `scripts/` stores reproducible helpers (`dev/bootstrap.sh`, `build.sh`, `test.sh`, optional
   `lint.sh`). Any behavior change must be mirrored in README usage docs.
 - `tests/` (prefer `tests/smoke/*.bats`) validates container boot, agent binaries, and required CLIs.
-- `doc/ai/plan/` captures planning artifacts; never delete history—append timestamped entries so
-  other agents can replay decisions.
+- Each `doc/ai/tasks/T###_<slug>/plan/` folder captures planning artifacts; never delete history—append
+  timestamped entries so other agents can replay decisions.
 
 ## Build, Test, and Development Commands
 - Use `docker buildx bake -f docker-bake.hcl matrix --set "*.platform=linux/amd64,linux/arm64"` to
@@ -67,7 +67,7 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - Commit subject format: `[codex][subtask-name]: summary` with wrapped bodies ≤72 chars.
 - PR descriptions must list affected matrix slices, commands executed, and links to governing tasks
   or planning docs. Include logs or screenshots only when diagnosing failures.
-- Cross-reference planning docs (`doc/ai/plan/*.md`) whenever scope changes so reviewers can trace
+- Cross-reference planning docs (`doc/ai/tasks/T###_<slug>/plan/*.md`) whenever scope changes so reviewers can trace
   intent quickly.
 
 ## Security & Configuration Tips

@@ -31,7 +31,7 @@ Consolidate build/test findings into the README, AGENTS addenda, and task/plan f
 ## Findings
 - README now includes a “Prerequisites & Troubleshooting” section covering `docker info`, `bats --version`, local `--platform linux/amd64 --load` workflows, and Debian PEP 668 guidance.
 - AGENTS guidelines remind future agents to log prerequisite checks and to lean on the README troubleshooting steps before escalating.
-- Task brief + mirror (`doc/ai/tasks/T002_*` and `doc/ai/TASK.md`) summarize the build/test commands plus the fixes applied (pip flags, build-essential, factory wrapper) without committing raw logs.
+- Task brief + mirror (`doc/ai/tasks/T002_validate-builds-docker/README.md` and its `plan/` docs) summarize the build/test commands plus the fixes applied (pip flags, build-essential, factory wrapper) without committing raw logs.
 - Plan S3/S4 docs capture the command sequence + lessons learned so future operators can recreate the builds/tests without relying on committed log artifacts.
 
 ## Feedback & Learnings

@@ -37,7 +37,7 @@ Platforms: `linux/amd64`, `linux/arm64`.
 
 ## Quick Start
 
-> Scripts are introduced gradually; check `git log` or the active plan folder under `doc/ai/plan/T###/` for availability while the
+> Scripts are introduced gradually; check `git log` or the active plan folder under `doc/ai/tasks/T###_<slug>/plan/` for availability while the
 > project is under active development.
 
 ```bash
@@ -139,11 +139,11 @@ scripts/test.sh ghcr.io/<org>/llm-agent-dock:codex-ubuntu-latest --tool codex --
    - Extend the Dockerfile’s installer `case` block and comment where new agents should plug in.
    - Create a Bake target + smoke suite (`tests/smoke/<tool>.bats`).
    - Update scripts/tests to mention the new tool where validation is performed.
-3. **Share the process**: Update this README, `AGENTS.md`, and the active plan folder (e.g., `doc/ai/plan/T002/`) so future agents can
+3. **Share the process**: Update this README, `AGENTS.md`, and the active plan folder (e.g., `doc/ai/tasks/T002_validate-builds-docker/plan/`) so future agents can
    trace decisions and rerun commands.
 
-Need contributor details or current milestones? See `doc/ai/TASK.md` and the latest entries in the
-active task plan (e.g., `doc/ai/plan/T002/`).
+Need contributor details or current milestones? See the relevant task folder under
+`doc/ai/tasks/` and its `plan/` subdirectory (e.g., `doc/ai/tasks/T002_validate-builds-docker/plan/`).
 
 ---
 

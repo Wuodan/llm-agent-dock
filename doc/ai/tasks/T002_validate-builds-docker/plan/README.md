@@ -18,11 +18,11 @@ Last updated: 2025-11-08T04:27Z by Codex
 ## Subtask Directory Map (T002)
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
-| S1 | Planning & Environment Check | ✅ complete | `doc/ai/plan/T002/subtask_S1_planning/README.md` |
-| S2 | Docker Access Enablement | ✅ complete | `doc/ai/plan/T002/subtask_S2_docker_access/README.md` |
-| S3 | Matrix Builds | ✅ complete | `doc/ai/plan/T002/subtask_S3_builds/README.md` |
-| S4 | Smoke Tests | ✅ complete | `doc/ai/plan/T002/subtask_S4_tests/README.md` |
-| S5 | Documentation & Handoff | ✅ complete | `doc/ai/plan/T002/subtask_S5_docs/README.md` |
+| S1 | Planning & Environment Check | ✅ complete | `plan/subtask_S1_planning/README.md` |
+| S2 | Docker Access Enablement | ✅ complete | `plan/subtask_S2_docker_access/README.md` |
+| S3 | Matrix Builds | ✅ complete | `plan/subtask_S3_builds/README.md` |
+| S4 | Smoke Tests | ✅ complete | `plan/subtask_S4_tests/README.md` |
+| S5 | Documentation & Handoff | ✅ complete | `plan/subtask_S5_docs/README.md` |
 
 ## Master Checklist (T002)
 - [x] S1 — Planning & Environment Check
@@ -40,4 +40,4 @@ Last updated: 2025-11-08T04:27Z by Codex
 - 2025-11-08T04:27Z — README, AGENTS, task docs, and plan feedback updated with troubleshooting guidance plus log references; S5 closed (Codex).
 
 ## References
-- Historical plan for T001: `doc/ai/plan/T001/README.md`
+- Historical plan for T001: `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/plan/README.md`
