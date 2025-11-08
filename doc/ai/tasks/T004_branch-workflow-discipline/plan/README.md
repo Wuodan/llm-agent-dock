@@ -19,13 +19,13 @@ Last updated: 2025-11-08T15:20Z by Codex
 | S1 | Branch workflow policy decisions | ☑ complete | `plan/subtask_S1_branch-policy/README.md` |
 | S2 | Update AGENTS.md and related docs | ☑ complete (rev. 2) | `plan/subtask_S2_doc-updates/README.md` |
 | S3 | Checklist + template propagation | ☑ complete | `plan/subtask_S3_checklists/README.md` |
-| S4 | Commit prefix lint enforcement | ☑ complete | `plan/subtask_S4_commit-lint/README.md` |
+| S4 | Commit prefix lint enforcement | ☑ complete (lint v2) | `plan/subtask_S4_commit-lint/README.md` |
 
 ## Master Checklist (T004)
 - [x] S1 — Branch workflow policy decisions
 - [x] S2 — Update AGENTS.md and related docs (commit prefix + branch policy captured)
 - [x] S3 — Checklist + template propagation
-- [x] S4 — Commit prefix lint enforcement
+- [x] S4 — Commit prefix lint enforcement (python hook + .venv doc)
 
 ## Progress Log (T004)
 - 2025-11-08T15:15Z — Initialized task plan scaffolding and updated task index to mark T004 active.
@@ -38,6 +38,8 @@ Last updated: 2025-11-08T15:20Z by Codex
 - 2025-11-08T17:05Z — Added S4 subtask to implement commit-message lint + hook per user request; scope captured in new plan doc.
 - 2025-11-08T17:20Z — Implemented `scripts/check-commit-message.sh`, tracked `githooks/commit-msg`, and documented hook setup/tests; awaiting final review + commit for S4.
 - 2025-11-08T17:30Z — Completed S4 with docs + hook instructions and validated good/bad samples via the new script.
+- 2025-11-08T17:45Z — Requirement update: lint must live outside product `scripts/` tree and leverage `.venv` Python; re-opening S4 to migrate hook + docs.
+- 2025-11-08T17:55Z — Migrated lint to `devtools/check_commit_message.py`, updated hook + docs with `.venv` instructions, and revalidated good/bad samples.
 
 ## References
 - `AGENTS.md`
