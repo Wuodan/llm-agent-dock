@@ -20,6 +20,7 @@
 | T006 | Deterministic Agent Auth Fixtures for Tests | Proposed | _(Plan pending)_ | — | `doc/ai/tasks/T006_agent-auth-fixtures/README.md`
 | T007 | Pilot GitHub-Issue Task Tracking | Completed | `doc/ai/tasks/T007_github-issues-pilot/plan/` | [Issue #1](https://github.com/Wuodan/llm-agent-dock/issues/1) | `doc/ai/tasks/T007_github-issues-pilot/README.md`
 | T008 | Workflow Cost Management Additions & Improvements | Proposed | `doc/ai/tasks/T008_workflow-cost-management/plan/` | — | `doc/ai/tasks/T008_workflow-cost-management/README.md`
+| T009 | Project Kickstart Template | Proposed | `doc/ai/tasks/T009_kickstart-template/plan/` | — | `doc/ai/tasks/T009_kickstart-template/README.md`
 
 Update this table as tasks finish or new ones start. Mark exactly one row as **Active** so the current folder is obvious, and keep the GitHub Issue column in sync with the canonical tracker link (leave `—` until an issue exists).
 
