@@ -4,7 +4,7 @@ These instructions are intentionally task-agnostic. Every future effort in this 
 the workflow hardening and coding conventions below to keep hand-offs simple and recoverable.
 
 ## Workflow Hardening
-- **Planning trail**: Maintain `doc/ai/plan/README.md` plus one subfolder per subtask. Each file
+- **Planning trail**: For every task `T###`, create `doc/ai/plan/T###/README.md` plus one subfolder per subtask. Each file
   needs objective, deliverables, flow, checklist, and a feedback section updated at completion.
 - **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
   only need the latest checklist state to resume.

@@ -4,7 +4,7 @@
 Capture a restartable execution plan for T002 plus prerequisite tracking so future agents can pick up matrix validation work without re-discovery.
 
 ## Deliverables
-- Updated `doc/ai/plan/README.md` scoped to T002 with guardrails, checklist, and progress log entries.
+- Updated `doc/ai/plan/T002/README.md` scoped to T002 with guardrails, checklist, and progress log entries.
 - Recorded prerequisite state (Docker socket access, `bats`, network constraints) with timestamped notes.
 - Subtask folder stubs for S2–S5 cross-referencing their execution order.
 
@@ -18,7 +18,7 @@ Capture a restartable execution plan for T002 plus prerequisite tracking so futu
 - [x] Confirm task brief + AGENTS guardrails are reflected in the plan.
 - [x] Record current timestamp, sandbox/approval state, and prerequisite assumptions.
 - [x] Ensure subtask folders exist for S2–S5 with objectives/deliverables/checklists.
-- [x] Update `doc/ai/plan/README.md` master checklist + progress log for T002.
+- [x] Update `doc/ai/plan/T002/README.md` master checklist + progress log for T002.
 - [x] Capture open risks/questions in Feedback.
 
 ## Inputs & References

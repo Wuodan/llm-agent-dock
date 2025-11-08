@@ -6,7 +6,7 @@
 - The task description **lives inside each folder’s `README.md`** (same content mirrored in `doc/ai/TASK.md`
   for compatibility) and may include extra helper files for that task only.
 - Every `README.md` must link to:
-  - `doc/ai/plan/` (and subtask checklists) for execution detail.
+  - Its plan folder under `doc/ai/plan/T###/` (and related subtask checklists) for execution detail.
   - Relevant commits, research notes, or supporting artifacts.
   - A Feedback section with open problems, outstanding questions, and learnings.
 

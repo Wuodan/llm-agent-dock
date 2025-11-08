@@ -22,7 +22,7 @@
 - Provide build/test logs or summaries in the Feedback section and planning docs.
 
 ## Workflow Expectations
-1. **S1 Planning & Environment Check** — Create/refresh planning artifacts for T002 (new `doc/ai/plan/` entries or an addendum) capturing prerequisites and risks.
+1. **S1 Planning & Environment Check** — Create/refresh planning artifacts for T002 (new `doc/ai/plan/T002/` entries or an addendum) capturing prerequisites and risks.
 2. **S2 Docker Access Enablement** — Determine whether Docker socket access is already available; if not, outline the exact steps (group membership, rootless Docker, etc.) and work with the host to enable it.
 3. **S3 Matrix Builds** — Run `scripts/build.sh` for selected targets (start with `codex ubuntu amd64`) and expand coverage once stable.
 4. **S4 Smoke Tests** — Execute `scripts/test.sh <image>` for each tool; include `--tool` filtering to speed up iteration when necessary.
@@ -35,7 +35,7 @@
 
 ## References
 - Task T001 artifacts: `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/README.md`.
-- Planning/log context: `doc/ai/plan/README.md` and subtask folders S1–S5 (historical reference).
+- Planning/log context: `doc/ai/plan/T002/README.md` and its subtask folders (S1–S5).
 - Automation entry points: `scripts/dev/bootstrap.sh`, `scripts/build.sh`, `scripts/test.sh`.
 
 ## Execution Summary — 2025-11-08

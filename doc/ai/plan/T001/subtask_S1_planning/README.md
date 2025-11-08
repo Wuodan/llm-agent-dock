@@ -5,7 +5,7 @@ Establish a restart-friendly execution plan with explicit subtasks, checklists, 
 guardrails so future contributors can resume work after interruptions.
 
 ## Deliverables
-- Updated `doc/ai/plan/README.md` with context, guardrails, master checklist, and progress log.
+- Updated `doc/ai/plan/T001/README.md` with context, guardrails, master checklist, and progress log.
 - Subtask-specific folders (`subtask_Sx_*`) each containing a runnable checklist template.
 - Status updates recorded in the master checklist.
 
