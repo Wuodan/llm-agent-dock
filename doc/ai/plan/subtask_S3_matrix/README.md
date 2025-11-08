@@ -25,13 +25,13 @@ cover builder bootstrapping, matrix builds, and test execution.
 6. Update plan checklists and commit `[codex][matrix-build]: add bake + scripts`.
 
 ## Checklist
-- [ ] Registry/tag/platform variable scheme defined.
-- [ ] `docker-bake.hcl` implements matrix + documentation comments.
-- [ ] `scripts/dev/bootstrap.sh` provisions builder & QEMU.
-- [ ] `scripts/build.sh` wraps Bake with validation.
-- [ ] `scripts/test.sh` glues to smoke tests.
-- [ ] Dry-run bake succeeds (`--print`).
-- [ ] Plan updated; commit `[codex][matrix-build]: add bake + scripts]`.
+- [x] Registry/tag/platform variable scheme defined.
+- [x] `docker-bake.hcl` implements matrix + documentation comments.
+- [x] `scripts/dev/bootstrap.sh` provisions builder & QEMU.
+- [x] `scripts/build.sh` wraps Bake with validation.
+- [x] `scripts/test.sh` glues to smoke tests.
+- [x] Dry-run bake succeeds (`--print`).
+- [x] Plan updated; commit `[codex][matrix-build]: add bake + scripts]`.
 
 ## Inputs & References
 - Dockerfile from S2.
@@ -42,4 +42,9 @@ cover builder bootstrapping, matrix builds, and test execution.
 - Build/test scripts runnable end-to-end for at least one matrix target.
 
 ## Feedback & Learnings
-- _Pending._
+- `.env` now stores `LLM_AGENT_DOCK_*` defaults so scripts share registry (`REGISTRY`),
+  repository, version, and platform overrides without hard-coding secrets.
+- `docker buildx bake -f docker-bake.hcl matrix --print` succeeds and shows all 9 targets, even
+  though actual builds remain blocked by the Docker socket permission issue noted in S2.
+- `scripts/test.sh` enforces having `bats` + `docker`; it supports `--tool` to focus on a single
+  suite once S4 lands.
