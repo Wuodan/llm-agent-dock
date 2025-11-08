@@ -9,6 +9,12 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   `doc/ai/templates/subtask_plan_README.template.md`). Each plan file needs objective, deliverables,
   flow, checklist, explicit “commit `T###/S###: short summary`” step, and a Feedback section updated at
   completion.
+- **GitHub task issues**: Mirror every task in GitHub using `.github/ISSUE_TEMPLATE/task.yml`. Apply the
+  `task` label plus exactly one `status:*` label at a time (`status:proposed`, `status:active`,
+  `status:blocked`, `status:needs-review`, `status:completed`). Promote/demote the label whenever the
+  plan’s master checklist advances. Comment on the issue each time you add a Progress Log entry; if
+  offline, queue the text in the plan and post it once back online. Local docs must link to the
+  issue instead of duplicating its prose.
 - **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
   only need the latest checklist state to resume.
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
@@ -27,9 +33,10 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   timestamp and continue confidently.
 - **Task catalog**: Number tasks as `T###` (e.g., `T001`) and track them under
   `doc/ai/tasks/README.md`. Each task owns a folder `doc/ai/tasks/T###_<slug>/` whose `README.md`
-  holds the canonical brief. Mark the active task as `Status = Active` in the index. Every task doc
-  (and each subtask file) needs a Feedback section with open problems, outstanding questions, and
-  learnings for future sessions.
+  holds the canonical brief and links to the GitHub issue. Mark exactly one row as **Active** and
+  ensure it matches the GitHub issue’s `status:active` label. Every task doc (and each subtask file)
+  needs a Feedback section with open problems, outstanding questions, and learnings for future
+  sessions plus a link back to the GitHub issue.
 
 ### Branch Workflow (Tasks & Subtasks)
 1. **Start from `development`**: Before creating a task branch, run `git checkout development` and
@@ -60,6 +67,9 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - Subtask plan template: `doc/ai/templates/subtask_plan_README.template.md`
 - Always copy these templates when creating new task or subtask plan files and keep the commit +
   feedback checklist items intact.
+- The templates include a "GitHub Issue" section—populate it with the issue URL, current
+  `status:*` label, and sync expectations so anyone reviewing the plan can jump straight to the
+  canonical tracker.
 
 ## Project Structure & Ownership
 - Root `Dockerfile` stays parameterized via `BASE_IMAGE`, `TOOL`, and `TARGETARCH` so the same

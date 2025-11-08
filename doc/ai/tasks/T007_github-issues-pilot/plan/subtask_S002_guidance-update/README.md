@@ -17,9 +17,9 @@ Revise `AGENTS.md` and the planning templates so contributors follow the new Git
 5. Commit `T007/S002: refresh guidance for gh issues` once complete.
 
 ## Checklist
-- [ ] Captured required policy changes from S001.
-- [ ] Edited `AGENTS.md` to reflect GitHub issue workflow.
-- [ ] Updated task/subtask plan templates to link GitHub issues.
+- [x] Captured required policy changes from S001.
+- [x] Edited `AGENTS.md` to reflect GitHub issue workflow.
+- [x] Updated task/subtask plan templates to link GitHub issues.
 - [ ] Documented findings in Feedback.
 - [ ] Commit `T007/S002: refresh guidance for gh issues`.
 
@@ -31,6 +31,6 @@ Revise `AGENTS.md` and the planning templates so contributors follow the new Git
 - All relevant docs updated, checklist checked, Feedback section notes outstanding work (if any).
 
 ## Feedback & Learnings
-- **Open Problems**: _TBD_
-- **Questions**: _TBD_
-- **Learnings**: _TBD_
+- **Open Problems**: Need to actually create the new `task` and `status:*` labels in GitHub—documented expectations assume they exist.
+- **Questions**: Should we enforce GitHub issue comment cadence via automation (e.g., linting for missing links) or rely on plan reviews?
+- **Learnings**: Existing docs already separated user- vs contributor-facing content, so adding GitHub issue guidance fit naturally under Workflow Hardening + templates.
