@@ -55,6 +55,14 @@ The bootstrap helper also writes a `.env` file with `LLM_AGENT_DOCK_*` defaults 
 scripts share registry, tag, and platform settings. Install `bats` (`brew install bats-core` or
 `npm install -g bats`) before running `scripts/test.sh`.
 
+### Prerequisites & Troubleshooting
+
+1. **Docker socket access** — run `docker info` first. If you see `permission denied ... /var/run/docker.sock`, either add your user to the `docker` group (`sudo usermod -aG docker $USER && newgrp docker`), enable rootless Docker (`dockerd-rootless-setuptool.sh install`), or point Buildx at a remote builder (`docker context create ...` + `docker buildx create ... --use`).
+2. **Bats availability** — `bats --version` must succeed on the host before invoking `scripts/test.sh` (install via Homebrew or npm as noted above).
+3. **Local image testing** — when you want to run smoke tests without pushing images, call `scripts/build.sh <tool> <base> --platform linux/amd64 --load` so the result lands in the local Docker image store, then run `scripts/test.sh <tag> --tool <name> --no-pull`.
+4. **Pip on Debian/Ubuntu** — these bases enforce [PEP 668](https://peps.python.org/pep-0668/); use `python3 -m pip install --break-system-packages --ignore-installed ...` when upgrading core Python tooling inside the image.
+5. **Node CLIs with native modules** — the Dockerfile installs `build-essential` so packages like `cline` (which depends on `better-sqlite3`) have `make`/`g++` available. If you trim dependencies later, keep that requirement in mind.
+
 ---
 
 ## Configuration Defaults

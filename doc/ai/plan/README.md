@@ -1,47 +1,56 @@
-# Task T001 — llm-agent-dock Execution Plan
+# Task T002 — llm-agent-dock Execution Plan
 
-Last updated: 2025-11-08T02:30Z by Codex
+Last updated: 2025-11-08T04:27Z by Codex
 
 ## Context
-- Build a reusable, multi-arch Docker image matrix combining base OS variants with agentic developer tools.
-- Deliverables: parameterized `Dockerfile`, `docker-bake.hcl` matrix, helper scripts, smoke tests, and synced documentation.
-- Constraints: follow AGENTS.md conventions (scripts foldering, planning history, commit naming).
+- Task T002 validates the Docker build/test automation delivered in T001 by running it end-to-end with real images.
+- Primary goals: verify Docker socket + `bats` prerequisites, build at least ubuntu variants for every tool, execute smoke tests, and document Docker access guidance.
+- Active environment: sandbox mode `workspace-write`, approval mode `on-request`, network access `restricted`. All commands + checklists must reflect these constraints.
 
 ## Workflow Guardrails
-1. Keep this plan and each subtask checklist up to date after every change.
-2. Before implementing: review the relevant subtask doc, note prerequisites, and mark checklist items as work progresses.
-3. After completing a subtask: update its **Feedback** section, mark its checklist complete, and record progress in the log below.
-4. For agent installer details, research official instructions; if missing, use MCP `brave-search` followed by `fetch`, and summarize findings in the subtask doc.
-5. Keep user-facing docs (e.g., `README.md`) focused on end users; park contributor/process notes in this plan or `AGENTS.md`.
-6. Every subtask finishes with two required actions: update planning docs and make a commit `[codex][subtask-name]: summary`.
+1. Maintain this plan plus one subfolder per subtask (S1–S5). Update checklists immediately after progress; laptop restarts should rely solely on the latest checklist.
+2. Log every meaningful timestamp + agent in the Progress Log. Reference stored logs/outputs so others can replay steps quickly.
+3. When using MCP search/fetch, add URL + summary snippets to the relevant subtask doc (or `doc/ai/research/`) to avoid duplicate research.
+4. Keep AGENTS.md conventions in mind: parameterized Dockerfile, docker-bake matrix ownership, scripts mirroring README usage, tests under `tests/smoke/`.
+5. Each subtask concludes with documentation + Feedback updates before handing off or committing (`[codex][subtask-name]: summary`).
+6. Never delete historical records (including T001 artifacts); append new entries/sections as needed.
 
-## Subtask Directory Map
+## Subtask Directory Map (T002)
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
-| S1 | Planning & Scaffolding | ✅ complete | `doc/ai/plan/subtask_S1_planning/README.md` |
-| S2 | Parameterized Dockerfile | ✅ complete | `doc/ai/plan/subtask_S2_dockerfile/README.md` |
-| S3 | Matrix & Scripts | ✅ complete | `doc/ai/plan/subtask_S3_matrix/README.md` |
-| S4 | Smoke Tests | ✅ complete | `doc/ai/plan/subtask_S4_tests/README.md` |
-| S5 | Documentation & Polish | ✅ complete | `doc/ai/plan/subtask_S5_docs/README.md` |
+| S1 | Planning & Environment Check | ✅ complete | `doc/ai/plan/subtask_T002_S1_planning/README.md` |
+| S2 | Docker Access Enablement | ✅ complete | `doc/ai/plan/subtask_T002_S2_docker_access/README.md` |
+| S3 | Matrix Builds | ✅ complete | `doc/ai/plan/subtask_T002_S3_builds/README.md` |
+| S4 | Smoke Tests | ✅ complete | `doc/ai/plan/subtask_T002_S4_tests/README.md` |
+| S5 | Documentation & Handoff | ✅ complete | `doc/ai/plan/subtask_T002_S5_docs/README.md` |
 
-## Master Checklist
-- [x] Establish planning structure (S1).
-- [x] Implement parameterized Dockerfile with agent installers (S2).
-- [x] Author matrix build configs and helper scripts (S3).
-- [x] Create smoke tests and wire into scripts (S4).
-- [x] Finalize documentation, extension guides, and sync references (S5).
+## Master Checklist (T002)
+- [x] S1 — Planning & Environment Check
+- [x] S2 — Docker Access Enablement
+- [x] S3 — Matrix Builds
+- [x] S4 — Smoke Tests
+- [x] S5 — Documentation & Handoff
 
-## Dependencies & Flow
-1. **S2** depends on the scaffolding from **S1**.
-2. **S3** consumes Dockerfile outputs; scripts expect build args defined in S2.
-3. **S4** needs runnable images from S2/S3.
-4. **S5** references artifacts from all earlier subtasks.
+## Progress Log (T002)
+- 2025-11-08T03:31Z — T002 planning rebooted; new subtask directories created, guardrails refreshed, and S1 checklist completed (Codex).
+- 2025-11-08T03:32Z — S2 prerequisite check failed: `docker info` denied access to `/var/run/docker.sock`; documented remediation paths and awaiting host action before builds (Codex).
+- 2025-11-08T03:36Z — Docker access restored under danger-full-access sandbox; `docker info` successful, S2 checklist closed (Codex).
+- 2025-11-08T04:21Z — Built ubuntu images for codex, cline, factory_ai_droid with `scripts/build.sh … --platform linux/amd64 --load`; logged outputs + captured earlier pip/node-gyp fixes (Codex).
+- 2025-11-08T04:25Z — Ran `scripts/test.sh` per tool (codex/cline/factory_ai_droid) and archived Bats logs; all smoke suites passing (Codex).
+- 2025-11-08T04:27Z — README, AGENTS, task docs, and plan feedback updated with troubleshooting guidance plus log references; S5 closed (Codex).
 
-## Progress Log
-- 2025-11-08T02:03Z — Initial roadmap drafted (S1 kick-off).
-- 2025-11-08T02:15Z — Plan reorganized with per-subtask checklists and guardrails (S1 complete).
-- 2025-11-08T02:30Z — README refocused on users; plan + subtasks updated to drop legacy references.
-- 2025-11-08T02:43Z — S2 complete: parameterized Dockerfile added; sample build command documented (docker socket access pending).
-- 2025-11-08T02:50Z — S3 complete: Bake matrix + helper scripts landed; bake --print validated.
-- 2025-11-08T02:53Z — S4 complete: Bats smoke tests + helper added; test script now guides Bats setup.
-- 2025-11-08T02:55Z — S5 complete: README refreshed with config/build/test guidance; planning docs finalized.
+## Historical Reference (T001)
+- Completed subtasks and legacy docs remain under:
+  - `doc/ai/plan/subtask_S1_planning/`
+  - `doc/ai/plan/subtask_S2_dockerfile/`
+  - `doc/ai/plan/subtask_S3_matrix/`
+  - `doc/ai/plan/subtask_S4_tests/`
+  - `doc/ai/plan/subtask_S5_docs/`
+- Archived progress log:
+  - 2025-11-08T02:03Z — Initial roadmap drafted (S1 kick-off).
+  - 2025-11-08T02:15Z — Plan reorganized with per-subtask checklists and guardrails (S1 complete).
+  - 2025-11-08T02:30Z — README refocused on users; plan + subtasks updated to drop legacy references.
+  - 2025-11-08T02:43Z — S2 complete: parameterized Dockerfile added; sample build command documented (docker socket access pending).
+  - 2025-11-08T02:50Z — S3 complete: Bake matrix + helper scripts landed; bake --print validated.
+  - 2025-11-08T02:53Z — S4 complete: Bats smoke tests + helper added; test script now guides Bats setup.
+  - 2025-11-08T02:55Z — S5 complete: README refreshed with config/build/test guidance; planning docs finalized.
