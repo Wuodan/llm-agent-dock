@@ -22,12 +22,12 @@ run commands, extend bases/tools, and trace decisions via planning docs.
 5. Commit `[codex][docs]: refresh usage + extension guide]`.
 
 ## Checklist
-- [ ] Architecture + matrix documentation refreshed.
-- [ ] Commands section synced with `scripts/`.
-- [ ] Extension guidance updated (add base/tool instructions).
-- [ ] Testing instructions reference `scripts/test.sh` and smoke suites.
-- [ ] Plan + feedback sections finalized.
-- [ ] Commit `[codex][docs]: refresh usage + extension guide]`.
+- [x] Architecture + matrix documentation refreshed.
+- [x] Commands section synced with `scripts/`.
+- [x] Extension guidance updated (add base/tool instructions).
+- [x] Testing instructions reference `scripts/test.sh` and smoke suites.
+- [x] Plan + feedback sections finalized.
+- [x] Commit `[codex][docs]: refresh usage + extension guide]`.
 
 ## Inputs & References
 - Outputs of S2–S4.
@@ -37,4 +37,7 @@ run commands, extend bases/tools, and trace decisions via planning docs.
 - Documentation matches repo state and guides future contributors.
 
 ## Feedback & Learnings
-- _Pending._
+- README now highlights configuration defaults, Bake automation, and smoke-test usage so operators
+  can move from bootstrap → build → test without digging through scripts.
+- Testing guidance calls out the `bats` dependency up front, preventing the missing-binary issue
+  encountered during S4 verification attempts.
