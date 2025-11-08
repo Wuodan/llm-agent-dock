@@ -1,9 +1,9 @@
 # Task T008 — Workflow Cost Management Additions & Improvements
 
 ## Status
-- Status: Proposed (plan drafted, pending approval)
-- Owner: TBD
-- Links: `doc/ai/tasks/T008_workflow-cost-management/plan/README.md`
+- Status: Completed (merged into `development` via `T008/S000` on 2025-11-08)
+- Owner: Codex (latest session)
+- Links: `doc/ai/tasks/T008_workflow-cost-management/plan/README.md`, `doc/ai/workflow/workflow_cost_audit.md`
 
 ## Background
 Token usage is becoming a limiting factor, so we need better visibility into estimated vs. actual cost for each task, plus clear workflows for flagging expensive changes. Existing plans lack structured estimates, and retros rarely capture accuracy data. Additionally, the workflow steps in `AGENTS.md` haven’t been analyzed end-to-end for cost impact.
@@ -24,9 +24,15 @@ Token usage is becoming a limiting factor, so we need better visibility into est
 - Observed process from prior tasks (e.g., T007).
 
 ## Open Questions
-- Should token estimates be numeric (targets) or bucketed (e.g., S/M/L)?
-- What’s the minimal data precision we can collect post-task without adding more overhead than benefit?
-- How will we ingest actual token metrics if/when MCP access to the ChatGPT dashboard exists (future work)?
+- Can we automate Estimate Snapshot + Retro field population once MCP exposes per-thread token
+  counts (ties into Task T010)?
+- Should we refresh the workflow cost audit on a rolling basis or publish quarterly snapshots?
+- What is the lightest-weight method to capture real GitHub issue linkage for legacy tasks (GitHub
+  issue for T008 still pending per guardrails)?
 
 ## Next Steps
-- Approve this scope, then create the GitHub issue + task branch `task/T008_workflow-cost-management` to start S001.
+- Adopt the updated templates + AGENTS instructions across new tasks immediately.
+- Create and backfill the GitHub issue (per `.github/ISSUE_TEMPLATE/task.yml`) so future references
+  link to the canonical tracker.
+- Schedule the first workflow cost audit refresh once another 2–3 tasks land to validate the savings
+  backlog and feed Task C.

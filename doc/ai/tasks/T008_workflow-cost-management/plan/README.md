@@ -1,6 +1,6 @@
 # Task T008 — Workflow Cost Management Additions & Improvements
 
-Last updated: 2025-11-08T18:19Z by Codex
+Last updated: 2025-11-08T18:21Z by Codex
 
 ## Context
 - We want every task/subtask plan to estimate cost, complexity, and work-type tags so token-heavy efforts are visible early.
@@ -39,6 +39,7 @@ Last updated: 2025-11-08T18:19Z by Codex
 - 2025-11-08T18:14Z — Embedded Estimate Snapshot + Retro placeholders in templates and AGENTS per S002 on branch `subtask/T008_S002_instruction-updates` (Codex).
 - 2025-11-08T18:16Z — Defined retro fields, precision guidance, and example entries on branch `subtask/T008_S003_retros-metrics` (Codex).
 - 2025-11-08T18:19Z — Drafted workflow cost audit doc + backlog on branch `subtask/T008_S004_workflow-audit` (Codex).
+- 2025-11-08T18:21Z — Merged `task/T008_workflow-cost-management` into `development` via `T008/S000` commit (Codex).
 
 ## References
 - `AGENTS.md` cost guardrails.
