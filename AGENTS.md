@@ -15,10 +15,20 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   plan’s master checklist advances. Comment on the issue each time you add a Progress Log entry; if
   offline, queue the text in the plan and post it once back online. Local docs must link to the
   issue instead of duplicating its prose.
- - **Workflow cost check**: For any workflow/process change, jot a quick token-cost note. If the
+- **Workflow cost check**: For any workflow/process change, jot a quick token-cost note. If the
   change nudges spend, verify the benefit; if it pushes ≥5% more tokens per task (or a higher tier),
   stop and get project-owner approval first. Log the analysis in the plan so the decision is
   traceable.
+- **Estimate snapshot**: Every task + subtask plan must include the Estimate Snapshot block (token
+  bucket XS/XL, complexity 1–5, ≤3 work-type tags, LLM tier recommendation, confidence, optional
+  dependencies + risk hotspots). Update it whenever scope changes or projected usage jumps ≥1
+  bucket (≈≥5% cost). If confidence drops to Low or bucket increases, call it out in the Progress
+  Log + GitHub issue comment before continuing.
+- **Retro metrics**: Populate the plan’s Retro Metrics section within one session of finishing a
+  task/subtask. Record the actual token bucket plus variance, token source + confidence,
+  nearest-0.5h time spent (note calendar days if useful), estimate accuracy rating (On target /
+  Under / Over), LLM tier actually used, and variance drivers/learnings. Escalate in the Progress Log
+  + GitHub issue if variance ≥1 bucket or confidence drops to Low.
 - **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
   only need the latest checklist state to resume.
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
