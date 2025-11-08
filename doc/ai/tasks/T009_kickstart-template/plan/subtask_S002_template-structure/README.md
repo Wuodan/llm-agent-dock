@@ -39,7 +39,7 @@ Decide which files/folders belong in the kickstart template (README, minimal AGE
 - [x] File/folder plan drafted.
 - [x] Tooling decisions recorded.
 - [x] Feedback updated.
-- [ ] Commit `T009/S002: define template structure`.
+- [x] Commit `T009/S002: define template structure`.
 
 ## Inputs & References
 - Outputs from S001.
