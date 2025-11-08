@@ -24,6 +24,7 @@
 | T010 | Cost Reduction Tooling Analysis | Draft | `doc/ai/tasks/T010_cost-reduction-tooling/plan/` | — | `doc/ai/tasks/T010_cost-reduction-tooling/README.md`
 
 Update this table as tasks finish or new ones start. Mark exactly one row as **Active** so the current folder is obvious, and keep the GitHub Issue column in sync with the canonical tracker link (leave `—` until an issue exists).
+Open the matching draft PR (`task/T###_<slug>` → `development`) as soon as the task branch exists and mention “Closes #<issue>” in the description so the issue auto-closes when the PR merges.
 
 ## Plan Usage
 - Planning artifacts live inside each task’s `plan/` directory (see the table above for quick links).
