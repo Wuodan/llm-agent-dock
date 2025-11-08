@@ -53,6 +53,24 @@ scripts/test.sh ghcr.io/<org>/llm-agent-dock:cline-ubuntu-latest
 
 ---
 
+## Dockerfile Args
+
+The root `Dockerfile` accepts `BASE_IMAGE`, `TOOL`, and `TARGETARCH` build args so every base × tool
+variant shares the same definition. You can dry-run it directly while the helper scripts are still
+under construction:
+
+```bash
+docker build \\
+  --build-arg BASE_IMAGE=ubuntu:24.04 \\
+  --build-arg TOOL=codex \\
+  --build-arg TARGETARCH=amd64 \\
+  -t llm-agent-dock:codex-ubuntu .
+```
+
+Use `TOOL=cline|codex|factory_ai_droid` and swap `BASE_IMAGE` with any alias from the matrix.
+
+---
+
 ## Extending the Catalog
 
 1. **Add a base**: Register the image alias in `docker-bake.hcl`, tweak the Dockerfile’s base-prep
