@@ -1,6 +1,6 @@
 # Task T007 — Pilot GitHub-Issue Task Tracking
 
-Last updated: 2025-11-08T14:43Z by Codex
+Last updated: 2025-11-08T14:57Z by Codex
 
 ## Context
 - Experiment with shifting task briefs from repo-only markdown to canonical GitHub issues so async contributors can track work without cloning.
@@ -34,6 +34,7 @@ Last updated: 2025-11-08T14:43Z by Codex
 - 2025-11-08T14:39Z — Committed S002 guidance changes and logged outstanding label/automation questions.
 - 2025-11-08T14:42Z — Created GitHub issue #1, seeded status labels, and mirrored prior log entries on GitHub (S003).
 - 2025-11-08T14:43Z — Linked local docs to issue #1 and documented sync workflow (S003 complete).
+- 2025-11-08T14:57Z — Closed GitHub issue #1, flipped labels to `status:completed`, and marked T007 as finished in the task catalog.
 
 ## References
 - `doc/ai/tasks/T007_github-issues-pilot/README.md`

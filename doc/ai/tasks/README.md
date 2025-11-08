@@ -18,7 +18,7 @@
 | T004 | Enforce Branch Workflow & Merge Discipline | Completed | `doc/ai/tasks/T004_branch-workflow-discipline/plan/` | `doc/ai/tasks/T004_branch-workflow-discipline/README.md`
 | T005 | GHCR Auth & Release-Build Pipeline Readiness | Proposed | _(Plan pending)_ | `doc/ai/tasks/T005_ghcr-release-pipeline/README.md`
 | T006 | Deterministic Agent Auth Fixtures for Tests | Proposed | _(Plan pending)_ | `doc/ai/tasks/T006_agent-auth-fixtures/README.md`
-| T007 | Pilot GitHub-Issue Task Tracking | **Active** | `doc/ai/tasks/T007_github-issues-pilot/plan/` | `doc/ai/tasks/T007_github-issues-pilot/README.md`, [GitHub issue #1](https://github.com/Wuodan/llm-agent-dock/issues/1)
+| T007 | Pilot GitHub-Issue Task Tracking | Completed | `doc/ai/tasks/T007_github-issues-pilot/plan/` | `doc/ai/tasks/T007_github-issues-pilot/README.md`, [GitHub issue #1](https://github.com/Wuodan/llm-agent-dock/issues/1)
 
 Update this table as tasks finish or new ones start. Mark exactly one row as **Active** so the current folder is obvious. (No task is active at the moment; set the next task to **Active** when assigned.)
 
