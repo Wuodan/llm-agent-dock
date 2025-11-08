@@ -23,13 +23,13 @@ Last updated: 2025-11-08T19:30Z by Codex
 | S001 | Repo naming & description alignment | ☑ done | `plan/subtask_S001_repo-naming/README.md`
 | S002 | Template structure & contents | ☑ done | `plan/subtask_S002_template-structure/README.md`
 | S003 | Author README + AGENTS kickstart flow | ☑ done | `plan/subtask_S003_instruction-authoring/README.md`
-| S004 | Submodule integration & wiring | ☐ pending | `plan/subtask_S004_submodule-integration/README.md`
+| S004 | Submodule integration & wiring | ☑ done | `plan/subtask_S004_submodule-integration/README.md`
 
 ## Master Checklist (T009)
 - [x] S001 — Repo naming & description alignment
 - [x] S002 — Template structure & contents
 - [x] S003 — Author README + AGENTS kickstart flow
-- [ ] S004 — Submodule integration & wiring
+- [x] S004 — Submodule integration & wiring
 
 ## Progress Log (T009)
 - 2025-11-08T17:44Z — Drafted task plan scaffold pending naming discussion.
@@ -39,6 +39,7 @@ Last updated: 2025-11-08T19:30Z by Codex
 - 2025-11-08T19:30Z — Reworked S003 per user feedback: replaced the human README instructions, removed AGENTS.reference, and copied the full AGENTS guardrails minus tech-specific sections into the submodule.
 - 2025-11-08T20:05Z — Updated template README per latest guidance: split flows (new project vs. existing project), documented `.venv` prerequisite, tarball commands, and the “help me update and complete AGENTS.md” prompt.
 - 2025-11-08T20:24Z — Simplified template README per user request (no tables, concise directions) and scrubbed `llm-agent-dock` references from the issue template.
+- 2025-11-08T20:38Z — Completed S004: documented the template submodule workflow in `AGENTS.md` and recorded how to update the submodule pointer.
 
 ## References
 - T008 outputs (workflow guardrails) for reuse.
