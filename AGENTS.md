@@ -17,9 +17,11 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - **Commits per subtask**: Finish each subtask with `T###/S###: short summary`, where `S###` is the
   zero-padded subtask index (use `S000` for task-level commits when no subtask exists). Never mix
   unrelated work in a single commit.
+- **Python tooling**: Activate the repo venv (`source .venv/bin/activate`) whenever you need the
+  `python` command; the commit hook depends on `.venv/bin/python` being available.
 - **Commit lint hook**: Run `git config core.hooksPath githooks` once per clone to enable the tracked
-  `commit-msg` hook. It calls `scripts/check-commit-message.sh` to block subjects that do not match
-  `T###/S###: short summary`.
+  `commit-msg` hook. It calls `devtools/check_commit_message.py` (via `.venv/bin/python`) to block
+  subjects that do not match `T###/S###: short summary`.
 - **Status visibility**: Keep a progress log in the root plan so new agents can inspect the latest
   timestamp and continue confidently.
 - **Task catalog**: Number tasks as `T###` (e.g., `T001`) and track them under
@@ -105,8 +107,9 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - Commit subject format: `T###/S###: short summary` (≤72 chars). Example: `T004/S001: Add branch
   workflow policy`. `S###` is zero-padded (`S001`, `S002`, …); use `S000` for task-wide commits if no
   subtask applies.
-- Use `scripts/check-commit-message.sh --message "T123/S045: Example"` (or pass a commit message
-  file) to lint manually; the `githooks/commit-msg` hook runs the same script automatically.
+- Use `.venv/bin/python devtools/check_commit_message.py --message "T123/S045: Example"` (or pass a
+  commit message file) to lint manually; the `githooks/commit-msg` hook runs the same script
+  automatically.
 - PR descriptions must list affected matrix slices, commands executed, and links to governing tasks
   or planning docs. Include logs or screenshots only when diagnosing failures.
 - Cross-reference planning docs (`doc/ai/tasks/T###_<slug>/plan/*.md`) whenever scope changes so
