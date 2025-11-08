@@ -1,6 +1,6 @@
 # Task T008 — Workflow Cost Management Additions & Improvements
 
-Last updated: 2025-11-08T17:29Z by Codex
+Last updated: 2025-11-08T18:05Z by Codex
 
 ## Context
 - We want every task/subtask plan to estimate cost, complexity, and work-type tags so token-heavy efforts are visible early.
@@ -22,19 +22,20 @@ Last updated: 2025-11-08T17:29Z by Codex
 ## Subtask Directory Map (T008)
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
-| S001 | Define estimation attributes & taxonomies | ☐ pending | `plan/subtask_S001_estimation-fields/README.md`
+| S001 | Define estimation attributes & taxonomies | ☑ complete | `plan/subtask_S001_estimation-fields/README.md`
 | S002 | Update templates & AGENTS.md instructions | ☐ pending | `plan/subtask_S002_instruction-updates/README.md`
 | S003 | Add post-task retrospective metrics | ☐ pending | `plan/subtask_S003_retros-metrics/README.md`
 | S004 | Draft workflow cost audit doc | ☐ pending | `plan/subtask_S004_workflow-audit/README.md`
 
 ## Master Checklist (T008)
-- [ ] S001 — Define estimation attributes & taxonomies
+- [x] S001 — Define estimation attributes & taxonomies
 - [ ] S002 — Update templates & AGENTS.md instructions
 - [ ] S003 — Add post-task retrospective metrics
 - [ ] S004 — Draft workflow cost audit doc
 
 ## Progress Log (T008)
 - 2025-11-08T17:29Z — Drafted T008 plan scaffold and subtask structure (Codex).
+- 2025-11-08T18:05Z — Completed S001 attribute catalog + guidance on branch `subtask/T008_S001_estimation-fields` (Codex).
 
 ## References
 - `AGENTS.md` cost guardrails.
