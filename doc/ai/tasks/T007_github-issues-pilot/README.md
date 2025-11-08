@@ -1,9 +1,9 @@
 # Task T007 — Pilot GitHub-Issue Task Tracking
 
 ## Status
-- Status: Proposed (plan pending)
-- Owner: TBD
-- Links: _(Plan folder will be created once scheduled)_
+- Status: Active (plan live)
+- Owner: Codex (current agent)
+- Links: `doc/ai/tasks/T007_github-issues-pilot/plan/README.md`
 
 ## Background
 All planning currently lives in repo files. We want to experiment with managing tasks at the GitHub
