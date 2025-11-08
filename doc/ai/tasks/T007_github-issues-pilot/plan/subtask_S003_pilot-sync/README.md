@@ -21,7 +21,7 @@ Create the GitHub issue representing T007, align local docs to reference it, and
 - [x] Task index/README updated to reference issue + Active status.
 - [x] Sync + offline guidance documented.
 - [x] Documented findings in Feedback.
-- [ ] Commit `T007/S003: wire pilot gh issue sync`.
+- [x] Commit `T007/S003: wire pilot gh issue sync`.
 
 ## Inputs & References
 - GitHub issue template + policies from S001 and docs from S002.
