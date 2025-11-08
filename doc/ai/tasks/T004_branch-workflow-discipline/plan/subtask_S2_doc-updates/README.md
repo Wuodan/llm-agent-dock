@@ -26,7 +26,7 @@ Propagate the approved branch workflow policies into AGENTS.md and any other con
 - [x] Apply edits to AGENTS.md (and other docs, if needed) with consistent naming + flow instructions.
 - [x] Self-review for clarity/formatting; capture summary in plan Feedback.
 - [x] Document findings in Feedback.
-- [ ] Commit `[codex][subtask_S2_doc-updates]: summary`.
+- [x] Commit `[codex][subtask_S2_doc-updates]: summary`.
 
 ## Inputs & References
 - `doc/ai/tasks/T004_branch-workflow-discipline/README.md`

@@ -17,18 +17,19 @@ Last updated: 2025-11-08T15:20Z by Codex
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
 | S1 | Branch workflow policy decisions | ☑ complete | `plan/subtask_S1_branch-policy/README.md` |
-| S2 | Update AGENTS.md and related docs | ◐ in-progress | `plan/subtask_S2_doc-updates/README.md` |
+| S2 | Update AGENTS.md and related docs | ☑ complete | `plan/subtask_S2_doc-updates/README.md` |
 | S3 | Checklist + template propagation | ☐ pending | `plan/subtask_S3_checklists/README.md` |
 
 ## Master Checklist (T004)
 - [x] S1 — Branch workflow policy decisions
-- [ ] S2 — Update AGENTS.md and related docs
+- [x] S2 — Update AGENTS.md and related docs
 - [ ] S3 — Checklist + template propagation
 
 ## Progress Log (T004)
 - 2025-11-08T15:15Z — Initialized task plan scaffolding and updated task index to mark T004 active.
 - 2025-11-08T15:45Z — Completed S1 policy decisions; branching rules + merge/force-push guidance captured in subtask doc for downstream docs.
 - 2025-11-08T16:00Z — Began S2; inserted branch workflow rules + merge expectations into AGENTS.md per S1 decisions.
+- 2025-11-08T16:10Z — Finished S2; AGENTS.md now documents branch naming, push cadence, merge/deletion checks, and force-push policy.
 
 ## References
 - `AGENTS.md`
