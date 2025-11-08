@@ -14,6 +14,7 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
   relevant subtask doc (or under `doc/ai/research/` if reused later). Avoid repeating lookups.
 - **Documentation hygiene**: Do not paste chat/discussion transcripts into repository documents; summarize outcomes and link to sanitized logs instead.
+- **Documentation scope**: Keep user-facing docs (e.g., root `README.md`) focused on product usage. Capture developer workflow/process details here in `AGENTS.md` or contributor guides, and reserve AI-only instructions for `doc/ai/**` so audiences stay separated.
 - **Commits per subtask**: Finish each subtask with `T###/S###: short summary`, where `S###` is the
   zero-padded subtask index (use `S000` for task-level commits when no subtask exists). Never mix
   unrelated work in a single commit.
