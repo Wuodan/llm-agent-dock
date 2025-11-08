@@ -13,7 +13,7 @@ Verify the local environment (docker, buildx, bats, QEMU) and scripts required f
 2. Inspect `scripts/dev/bootstrap.sh`, `scripts/build.sh`, and `scripts/test.sh` to confirm required arguments/env vars; document how to invoke them per base/tool.
 3. Validate BuildKit/bake availability (dry-run or `docker buildx bake --print`) without launching long builds yet.
 4. Capture any credential or network requirements for agent CLIs; prepare placeholder env vars/secrets list.
-5. Update plan checklists + Feedback, then commit `[codex][subtask-S2_env_enablement]: summary` once done.
+5. Update plan checklists + Feedback, then commit `T003/S002: summary` once done.
 
 ## Observations & Logs
 - 2025-11-08T17:50Z — `docker info` confirms Engine 28.5.1 on Debian 13 with buildx v0.29.1 plugin available; containerd+runc present and binfmt already configured previously.
@@ -32,7 +32,7 @@ Verify the local environment (docker, buildx, bats, QEMU) and scripts required f
 - [x] Script entrypoints + required flags documented.
 - [x] Builder/bake readiness confirmed (or blockers recorded).
 - [x] Document findings in Feedback.
-- [x] Commit `[codex][subtask-S2_env_enablement]: summary`.
+- [x] Commit `T003/S002: summary`.
 
 ## Inputs & References
 - `scripts/dev/bootstrap.sh`, `scripts/build.sh`, `scripts/test.sh`

@@ -43,8 +43,8 @@ single configuration.
 4. **Research logging**: When agent installer details are unclear, use MCP `brave-search` followed by
    `fetch`; summarize findings and URLs inside the relevant subtask doc (or `doc/ai/research/` if
    shared).
-5. **Commits**: Complete each subtask with a dedicated commit using `[codex][subtask-name]: summary`
-   and include references to the updated plan docs.
+5. **Commits**: Complete each subtask with a dedicated commit using `T001/S###: short summary`
+   (or `T001/S000` for task-level commits) and include references to the updated plan docs.
 
 ## Deliverables & Acceptance Criteria
 1. `Dockerfile` — uses `ARG BASE_IMAGE`, `ARG TOOL`, `ARG TARGETARCH`; includes shared base prep,
