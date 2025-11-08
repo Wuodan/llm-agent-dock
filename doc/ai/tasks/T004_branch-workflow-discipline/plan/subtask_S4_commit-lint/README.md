@@ -18,7 +18,7 @@ Provide an automated guardrail (hook + script) that blocks commits whose subject
 ## Implementation Notes
 - Added `devtools/check_commit_message.py` (Python, runs under `.venv`) that can read either a file path or a `--message` arg; pattern enforced is `^T[0-9]{3}/S[0-9]{3}: ` with trailing text required.
 - Tracked `githooks/commit-msg` invokes `.venv/bin/python devtools/check_commit_message.py`; contributors enable it with `git config core.hooksPath githooks` and by activating `.venv` beforehand.
-- Documentation refreshed: AGENTS.md now explains the hook + manual command, while README simply points contributors back to AGENTS and notes that helper tooling expects `.venv` to be active.
+- Documentation refreshed: AGENTS.md now explains the hook + manual command, and product docs stay clean (no commit-hook callouts in README).
 
 ### 2025-11-08 Scope Update
 - User requested the linter move out of `scripts/` (reserved for production helpers/tests) and leverage the new `.venv` Python interpreter. Need to re-implement the checker in Python under a tooling-specific directory (e.g., `devtools/`), update hooks/docs to reference `.venv/bin/python`, and expand README/AGENTS with venv instructions.

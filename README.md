@@ -63,7 +63,6 @@ scripts share registry, tag, and platform settings. Install `bats` (`brew instal
 4. **Pip on Debian/Ubuntu** — these bases enforce [PEP 668](https://peps.python.org/pep-0668/); use `python3 -m pip install --break-system-packages --ignore-installed ...` when upgrading core Python tooling inside the image.
 5. **Node CLIs with native modules** — the Dockerfile installs `build-essential` so packages like `cline` (which depends on `better-sqlite3`) have `make`/`g++` available. If you trim dependencies later, keep that requirement in mind.
 6. **GitHub Container Registry auth for `universal` base** — `ghcr.io/devcontainers/images/universal:2-linux` returns `403 Forbidden` unless you run `docker login ghcr.io -u <github-username> -p <PAT with read:packages>`. Do this before building any `*-universal` target.
-7. **Python tooling venv** — Internal development tooling expects `.venv` to be activated before running helper scripts. See `AGENTS.md` for contributor workflow requirements.
 
 ---
 
