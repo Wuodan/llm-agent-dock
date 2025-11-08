@@ -64,6 +64,15 @@ scripts share registry, tag, and platform settings. Install `bats` (`brew instal
 5. **Node CLIs with native modules** — the Dockerfile installs `build-essential` so packages like `cline` (which depends on `better-sqlite3`) have `make`/`g++` available. If you trim dependencies later, keep that requirement in mind.
 6. **GitHub Container Registry auth for `universal` base** — `ghcr.io/devcontainers/images/universal:2-linux` returns `403 Forbidden` unless you run `docker login ghcr.io -u <github-username> -p <PAT with read:packages>`. Do this before building any `*-universal` target.
 
+### Commit Prefix Hook
+- Enable the tracked commit-message hook once per clone so the `T###/S###: short summary` rule is enforced locally:
+  ```bash
+  git config core.hooksPath githooks
+  ```
+- The hook runs `scripts/check-commit-message.sh`. You can lint manually via
+  `scripts/check-commit-message.sh --message "T004/S001: Describe change"` before committing or use
+  the script in CI if desired.
+
 ---
 
 ## Configuration Defaults

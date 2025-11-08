@@ -38,6 +38,6 @@ Propagate the approved branch workflow policies into AGENTS.md and any other con
 - All targeted docs mention the new workflow, references are updated, and plan feedback reflects completion.
 
 ## Feedback & Learnings
-- **Open Problems**: Consider adding an automated lint (pre-commit or CI) to enforce the `T###/S###` prefix so reviewers don’t have to police it manually.
+- **Open Problems**: (moved to S4) implement automated lint to enforce the `T###/S###` prefix so reviewers don’t have to police it manually.
 - **Questions**: For rare task-level commits without subtasks, should we require `S000` explicitly in AGENTS examples? (Currently documented but needs verification during validation.)
 - **Learnings**: A short `T###/S###` prefix keeps commit subjects searchable without reintroducing long agent tags; AGENTS.md is now the single reference for both branching and commit policy.
