@@ -14,7 +14,7 @@ Select and document the authoritative branching workflow (naming, creation, push
 3. Decide on branch naming conventions (task vs subtask), merge mechanism (GitHub PR vs local `git merge --no-ff`), push/force-push cadence, and deletion requirements.
 4. Validate decisions against repository constraints (single active task, commit format, multi-agent hand-offs) and capture rationale.
 5. Update this plan’s checklist and Feedback field each time progress is made; no automated tests required for this documentation-only subtask.
-6. Commit `[codex][subtask_S1_branch-policy]: summary` once all checklist items are complete.
+6. Commit `T004/S001: summary` once all checklist items are complete.
 
 ## Current Guidance Audit
 - `AGENTS.md` documents planning, testing, and commit-format rules but omits branch naming, push cadence, force-push restrictions, and merge mechanics, which has allowed contributors to work directly on `development`.
@@ -47,7 +47,7 @@ Select and document the authoritative branching workflow (naming, creation, push
 - [x] Define naming + merge + push policies with rationale recorded here.
 - [x] Provide draft wording / bullets for downstream docs.
 - [x] Document findings in Feedback.
-- [x] Commit `[codex][subtask_S1_branch-policy]: summary`.
+- [x] Commit `T004/S001: summary`.
 
 ## Inputs & References
 - `doc/ai/tasks/T004_branch-workflow-discipline/README.md`

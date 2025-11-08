@@ -7,14 +7,15 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - **Planning trail**: For every task `T###`, scaffold `doc/ai/tasks/T###_<slug>/plan/README.md` (start from
   `doc/ai/templates/task_plan_README.template.md`) plus one subfolder per subtask (copy
   `doc/ai/templates/subtask_plan_README.template.md`). Each plan file needs objective, deliverables,
-  flow, checklist, explicit “commit `[codex][subtask-name]: summary`” step, and a Feedback section
-  updated at completion.
+  flow, checklist, explicit “commit `T###/S###: short summary`” step, and a Feedback section updated at
+  completion.
 - **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
   only need the latest checklist state to resume.
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
   relevant subtask doc (or under `doc/ai/research/` if reused later). Avoid repeating lookups.
 - **Documentation hygiene**: Do not paste chat/discussion transcripts into repository documents; summarize outcomes and link to sanitized logs instead.
-- **Commits per subtask**: Finish each subtask with `[codex][subtask-name]: summary`. Never mix
+- **Commits per subtask**: Finish each subtask with `T###/S###: short summary`, where `S###` is the
+  zero-padded subtask index (use `S000` for task-level commits when no subtask exists). Never mix
   unrelated work in a single commit.
 - **Status visibility**: Keep a progress log in the root plan so new agents can inspect the latest
   timestamp and continue confidently.
@@ -98,7 +99,9 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   least weekly.
 
 ## Commit, PR, and Review Expectations
-- Commit subject format: `[codex][subtask-name]: summary` with wrapped bodies ≤72 chars.
+- Commit subject format: `T###/S###: short summary` (≤72 chars). Example: `T004/S001: Add branch
+  workflow policy`. `S###` is zero-padded (`S001`, `S002`, …); use `S000` for task-wide commits if no
+  subtask applies.
 - PR descriptions must list affected matrix slices, commands executed, and links to governing tasks
   or planning docs. Include logs or screenshots only when diagnosing failures.
 - Cross-reference planning docs (`doc/ai/tasks/T###_<slug>/plan/*.md`) whenever scope changes so

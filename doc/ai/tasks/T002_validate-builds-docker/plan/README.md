@@ -12,7 +12,7 @@ Last updated: 2025-11-08T04:27Z by Codex
 2. Log every meaningful timestamp + agent in the Progress Log. Reference stored logs/outputs so others can replay steps quickly.
 3. When using MCP search/fetch, add URL + summary snippets to the relevant subtask doc (or `doc/ai/research/`) to avoid duplicate research.
 4. Keep AGENTS.md conventions in mind: parameterized Dockerfile, docker-bake matrix ownership, scripts mirroring README usage, tests under `tests/smoke/`.
-5. Each subtask concludes with documentation + Feedback updates before handing off or committing (`[codex][subtask-name]: summary`).
+5. Each subtask concludes with documentation + Feedback updates before handing off or committing (`T002/S###: short summary`).
 6. Never delete historical records (including T001 artifacts); append new entries/sections as needed.
 
 ## Subtask Directory Map (T002)

@@ -7,14 +7,14 @@ Consolidate findings from S1–S3 into actionable recommendations, propose Docke
 - Summary of startup observations + required fixes within this subtask README (and referenced artifacts under `plan/`).
 - List of proposed patches (Dockerfiles, tests, docs) with prioritization, including any quick fixes implemented during this task.
 - Updated Feedback sections across task + subtasks, plus any new research notes or troubleshooting guides.
-- Commit `[codex][subtask-S4_recommendations]: summary` capturing doc/code updates.
+- Commit `T003/S004: summary` capturing doc/code updates.
 
 ## Flow
 1. Aggregate logs + notes from S3 to identify recurring issues (auth prompts, missing deps, log streaming blockers).
 2. Draft recommended changes (Dockerfile tweaks, test harness updates, env var docs) and implement low-risk patches if in scope.
 3. Update task-level Notes/Progress/References with links to new artifacts; ensure sanitized logs are referenced.
 4. Review entire plan for completeness, fill Feedback with lessons + open problems, and capture follow-on tasks if needed.
-5. Commit `[codex][subtask-S4_recommendations]: summary` after verifying documentation + code changes.
+5. Commit `T003/S004: summary` after verifying documentation + code changes.
 
 ## Actions & Recommendations
 - **Node 20 for Cline**: Switched the Dockerfile to download Node.js v20.17.0 tarballs per architecture so the Cline core boots without `Node.js version 20+ is required` errors. Keep this upgrade in mind when adding new bases.
@@ -32,7 +32,7 @@ Consolidate findings from S1–S3 into actionable recommendations, propose Docke
 - [x] Plan + Feedback sections updated across task + subtasks.
 - [x] Required doc/code patches applied or queued with clear follow-up steps.
 - [x] Document findings in Feedback.
-- [x] Commit `[codex][subtask-S4_recommendations]: summary`.
+- [x] Commit `T003/S004: summary`.
 
 ## Inputs & References
 - Outputs from S1–S3.

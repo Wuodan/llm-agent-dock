@@ -14,7 +14,7 @@ Launch each agent CLI (`cline`, `codex`, `factory_ai_droid`) inside every suppor
 2. Start each container with non-interactive wrappers (e.g., `docker run --rm -i` with `script`/`stdbuf` or `pexpect` helper) to capture stdout/stderr asynchronously; log command + location of saved logs.
 3. Document prompts/auth flows encountered; attempt bypass via env vars or placeholders without entering real credentials.
 4. Note any missing dependencies or file paths; triage whether Dockerfile/test updates are needed.
-5. Update checklists + Feedback, then commit `[codex][subtask-S3_agent_startup_tests]: summary` once all combos are covered or blockers recorded.
+5. Update checklists + Feedback, then commit `T003/S003: summary` once all combos are covered or blockers recorded.
 
 ## Observations & Logs
 - Harness: added `scripts/dev/capture_agent_startup.py` (async stdout/stderr taps, optional PTY support, env injection, log fan-out into `doc/ai/tasks/T003_intensive-startup-tests/plan/logs/`). Example: `scripts/dev/capture_agent_startup.py codex ubuntu --pty --timeout 10` stores `startup_codex_ubuntu_<timestamp>.log`.
@@ -59,7 +59,7 @@ Launch each agent CLI (`cline`, `codex`, `factory_ai_droid`) inside every suppor
 - [x] Auth prompt handling + env var strategy documented.
 - [x] Missing dependency list captured.
 - [x] Document findings in Feedback.
-- [x] Commit `[codex][subtask-S3_agent_startup_tests]: summary`.
+- [x] Commit `T003/S003: summary`.
 
 ## Inputs & References
 - Scripts under `scripts/`.

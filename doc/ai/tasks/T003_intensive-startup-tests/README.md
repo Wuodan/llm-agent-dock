@@ -23,7 +23,7 @@
 ## Workflow Expectations
 1. Kick off by creating `doc/ai/tasks/T003_intensive-startup-tests/plan/` using the standard templates (task + subtasks).
 2. Track subtasks similar to earlier tasks (S1 planning, S2 env enablement, S3 per-agent startup tests, etc.).
-3. Each subtask must finish with feedback + `[codex][subtask-name]: summary` commit—no exceptions.
+3. Each subtask must finish with feedback + `T003/S###: short summary` commit—no exceptions (use the matching subtask index or `S000` for task-level commits).
 4. Avoid embedding chat logs or raw interactive transcripts; summarize observations and store sanitized logs if needed.
 5. Escalate blockers (missing credentials, rate limits, sandbox issues) via the plan feedback section before proceeding.
 

@@ -9,7 +9,7 @@ Last updated: 2025-11-08T19:05Z by Codex
 
 ## Workflow Guardrails
 1. Maintain live checklists in every plan/subtask README; update immediately after progress so a restart can follow the latest box states.
-2. Follow AGENTS.md conventions (templated plans, commit format `[codex][subtask-name]: summary`, Docker build guidance, doc hygiene).
+2. Follow AGENTS.md conventions (templated plans, commit format `T003/S###: short summary`, Docker build guidance, doc hygiene).
 3. Log any MCP `brave-search`/`fetch` usage with URL + summary inside the relevant subtask plan (or `doc/ai/research/` if reused).
 4. Each subtask closes only after Feedback is updated and the dedicated commit is made; no mixing of subtasks in one commit.
 

@@ -15,14 +15,14 @@ Stand up the planning scaffolding for T003, confirm scope boundaries, and outlin
 3. Define subtask objectives/flows/deliverables in each subtask README, ensuring the commit requirement is explicit.
 4. Update `doc/ai/tasks/README.md` to point to the new plan and mark T003 as Active with no “plan pending”.
 5. Review the plan for completeness, fill in Feedback, and prepare commit message outline.
-6. Commit `[codex][subtask-S1_planning]: summary` once the checklist and Feedback are done.
+6. Commit `T003/S001: summary` once the checklist and Feedback are done.
 
 ## Checklist
 - [x] Plan README context, guardrails, checklists, and progress log populated.
 - [x] Subtask S1–S4 README files customized with objectives, flows, deliverables, and exit criteria.
 - [x] Task index updated with T003 plan path + status confirmation.
 - [x] Document findings in Feedback.
-- [x] Commit `[codex][subtask-S1_planning]: summary`.
+- [x] Commit `T003/S001: summary`.
 
 ## Inputs & References
 - `doc/ai/tasks/T003_intensive-startup-tests/README.md`
