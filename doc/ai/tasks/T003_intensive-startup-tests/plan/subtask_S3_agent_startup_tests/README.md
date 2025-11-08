@@ -43,7 +43,7 @@ Launch each agent CLI (`cline`, `codex`, `factory_ai_droid`) inside every suppor
 - **Codex**
   - `codex` (no args) launches a full-screen TUI that only emits control codes; log capture requires PTY mode plus Device Status Report (DSR) replies. Without PTY the CLI exits with `stdout is not a terminal`.
   - `codex login` opens a local HTTP server on `http://localhost:1455` and prints a browser OAuth URL (see `startup_codex_*_...1341Z.log`). This flow cannot complete inside CI unless we preload credentials (e.g., `~/.codex/config.toml`) or stub the HTTP callback.
-  - Suggestion: leverage `codex exec` with `--oss` or env-provided API tokens instead of the interactive TUI for smoke coverage.
+  - Suggestion: pipe an API key via `printf "$OPENAI_API_KEY" | codex login --with-api-key` before automation, then run `codex exec`/`codex task` non-interactively.
 - **Factory AI Droid**
   - Command runs non-interactively, emits success banner, and writes templates into `~/.factory/{commands,droids}`. No auth prompt.
   - Re-running duplicates work unless `--dry-run` or `--force` toggles are supplied. Tests need to run in disposable HOME directories to avoid residue.

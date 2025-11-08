@@ -2,11 +2,13 @@
 ARG BASE_IMAGE=ubuntu:24.04
 ARG TOOL=codex
 ARG TARGETARCH=amd64
+ARG NODEJS_VERSION=20.17.0
 
 FROM ${BASE_IMAGE} AS runtime
 
 ARG TOOL
 ARG TARGETARCH
+ARG NODEJS_VERSION
 
 LABEL org.opencontainers.image.title="llm-agent-dock" \
       org.opencontainers.image.description="Multi-base build for agentic developer CLIs" \
@@ -36,8 +38,6 @@ RUN set -euxo pipefail \
            jq \
            locales \
            nano \
-           nodejs \
-           npm \
            openssh-client \
            pipx \
            python3 \
@@ -56,6 +56,19 @@ RUN set -euxo pipefail \
          exit 1; \
        fi \
     && locale-gen en_US.UTF-8 || true
+
+# Install Node.js 20.x (cline core requires >=20).
+RUN set -euxo pipefail \
+    && case "${TARGETARCH}" in \
+         amd64) NODE_DIST_ARCH="x64" ;; \
+         arm64) NODE_DIST_ARCH="arm64" ;; \
+         *) echo "Unsupported TARGETARCH ${TARGETARCH}" >&2; exit 1 ;; \
+       esac \
+    && curl -fsSL "https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-${NODE_DIST_ARCH}.tar.xz" \
+      | tar -xJ -C /usr/local --strip-components=1 \
+    && ln -sf /usr/local/bin/node /usr/bin/node \
+    && ln -sf /usr/local/bin/npm /usr/bin/npm \
+    && ln -sf /usr/local/bin/npx /usr/bin/npx
 
 # Add new base tweaks here (e.g., base-specific packages or config overrides).
 

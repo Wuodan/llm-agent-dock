@@ -18,19 +18,20 @@ Last updated: 2025-11-08T17:45Z by Codex
 |----|-------|--------|-----------|
 | S1 | Scope & planning alignment | ☑ done | `plan/subtask_S1_planning/README.md` |
 | S2 | Environment + tooling readiness | ☑ done | `plan/subtask_S2_env_enablement/README.md` |
-| S3 | Agent startup capture (`cline`, `codex`, `factory_ai_droid`) | ◔ in-progress | `plan/subtask_S3_agent_startup_tests/README.md` |
-| S4 | Recommendations & documentation updates | ☐ pending | `plan/subtask_S4_recommendations/README.md` |
+| S3 | Agent startup capture (`cline`, `codex`, `factory_ai_droid`) | ☑ done | `plan/subtask_S3_agent_startup_tests/README.md` |
+| S4 | Recommendations & documentation updates | ☑ done | `plan/subtask_S4_recommendations/README.md` |
 
 ## Master Checklist (T003)
 - [x] S1 — Scope & planning alignment
 - [x] S2 — Environment + tooling readiness
-- [ ] S3 — Agent startup capture
-- [ ] S4 — Recommendations & documentation updates
+- [x] S3 — Agent startup capture
+- [x] S4 — Recommendations & documentation updates
 
 ## Progress Log (T003)
 - 2025-11-08T17:45Z — Initialized plan scaffolding and subtask folders per AGENTS.md.
 - 2025-11-08T17:52Z — Ran docker/bats diagnostics and reviewed build/test scripts for S2 prep.
 - 2025-11-08T18:15Z — Built act/ubuntu images, documented GHCR 403 for universal base, and captured startup logs via the new capture script.
+- 2025-11-08T18:50Z — Upgraded images to Node.js 20.17, added codex/API-key guidance, and published the capture helper + troubleshooting docs.
 
 ## References
 - `doc/ai/tasks/T003_intensive-startup-tests/README.md`

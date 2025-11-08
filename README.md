@@ -62,6 +62,7 @@ scripts share registry, tag, and platform settings. Install `bats` (`brew instal
 3. **Local image testing** — when you want to run smoke tests without pushing images, call `scripts/build.sh <tool> <base> --platform linux/amd64 --load` so the result lands in the local Docker image store, then run `scripts/test.sh <tag> --tool <name> --no-pull`.
 4. **Pip on Debian/Ubuntu** — these bases enforce [PEP 668](https://peps.python.org/pep-0668/); use `python3 -m pip install --break-system-packages --ignore-installed ...` when upgrading core Python tooling inside the image.
 5. **Node CLIs with native modules** — the Dockerfile installs `build-essential` so packages like `cline` (which depends on `better-sqlite3`) have `make`/`g++` available. If you trim dependencies later, keep that requirement in mind.
+6. **GitHub Container Registry auth for `universal` base** — `ghcr.io/devcontainers/images/universal:2-linux` returns `403 Forbidden` unless you run `docker login ghcr.io -u <github-username> -p <PAT with read:packages>`. Do this before building any `*-universal` target.
 
 ---
 
@@ -126,6 +127,37 @@ scripts/test.sh ghcr.io/<org>/llm-agent-dock:codex-ubuntu-latest --tool codex --
 - `--pull` is enabled by default; pass `--no-pull` to use a local image.
 - When running Bats manually, export `LLM_AGENT_IMAGE=<tag>` so `tests/smoke/common.bash` knows
   which image to start.
+
+## Agent Startup Notes
+
+### Cline
+- Images now ship Node.js 20.17.0 so the bundled "core" process launches cleanly. If you derive
+  your own Dockerfile, keep Node ≥20 or Cline will emit `Node.js version 20+ is required` and exit.
+- Provider auth happens on first launch. Export `OPENAI_API_KEY` (or run `cline auth ...`) before
+  invoking unattended workflows.
+
+### Codex
+- Avoid the interactive OAuth dance by streaming an API key into the CLI: `printf "$OPENAI_API_KEY" |
+  codex login --with-api-key`. The key is stored under `~/.codex/config.toml` inside the container.
+- Codex expects a TTY; when capturing startup logs in CI, run it via
+  `scripts/dev/capture_agent_startup.py codex ubuntu --pty --timeout 10` so stdout/stderr are drained
+  asynchronously.
+
+### Factory AI Droid
+- Running `factory_ai_droid` populates `~/.factory/{commands,droids}`. Set `HOME=/tmp/droid`
+  (or mount a throwaway volume) when running smoke tests to avoid writing into the image layer.
+
+## Startup Capture Helper
+
+`scripts/dev/capture_agent_startup.py` wraps `docker run` with async stdout/stderr readers, optional
+PTY allocation, and per-run log files under `doc/ai/tasks/<task>/plan/logs/`. Example:
+
+```bash
+scripts/dev/capture_agent_startup.py codex act --pty \
+  --timeout 15 --env OPENAI_API_KEY=dummy-token
+```
+
+The script prints a log path upon completion so you can staple sanitized output into task plans.
 
 ---
 
