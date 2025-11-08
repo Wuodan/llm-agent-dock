@@ -28,6 +28,7 @@ RUN set -euxo pipefail \
          apt-get install -y --no-install-recommends \
            bash \
            bash-completion \
+           build-essential \
            ca-certificates \
            curl \
            git \
@@ -59,75 +60,98 @@ RUN set -euxo pipefail \
 # Add new base tweaks here (e.g., base-specific packages or config overrides).
 
 RUN pipx ensurepath >/dev/null 2>&1 || true
-RUN python3 -m pip install --upgrade pip setuptools wheel
+RUN python3 -m pip install --break-system-packages --ignore-installed --upgrade pip setuptools wheel
 RUN npm config set prefix /usr/local
 
 # Shared workspace directory and convenience symlinks.
 RUN mkdir -p /workspace && ln -sf /workspace /root/workspace
 
 # Tool installers -----------------------------------------------------------
-RUN set -euxo pipefail \
-    && install_cline() { \
-         if npm install -g cline; then \
-           return; \
-         fi; \
-         cat <<'SHIM' >/usr/local/bin/cline; \
+RUN /bin/bash <<'EOS'
+set -euxo pipefail
+
+install_cline() {
+  if npm install -g cline; then
+    return
+  fi
+  cat <<'SHIM' >/usr/local/bin/cline
 #!/usr/bin/env bash
 set -euo pipefail
 echo "cline npm install failed during image build." >&2
 echo "Install it inside the container via: npm install -g cline" >&2
 exit 1
 SHIM
-         chmod +x /usr/local/bin/cline; \
-       }; \
-    install_codex() { \
-         if npm install -g @openai/codex; then \
-           return; \
-         fi; \
-         cat <<'SHIM' >/usr/local/bin/codex; \
+  chmod +x /usr/local/bin/cline
+}
+
+install_codex() {
+  if npm install -g @openai/codex; then
+    return
+  fi
+  cat <<'SHIM' >/usr/local/bin/codex
 #!/usr/bin/env bash
 set -euo pipefail
 echo "Codex CLI failed to install during build." >&2
 echo "Install manually via: npm install -g @openai/codex" >&2
 exit 1
 SHIM
-         chmod +x /usr/local/bin/codex; \
-       }; \
-    install_factory_ai_droid() { \
-         local pkg=""; \
-         for candidate in "@factory-ai/droid" "@factoryai/droid-cli" "droid-factory"; do \
-           if npm install -g "$candidate"; then \
-             pkg="$candidate"; \
-             break; \
-           fi; \
-         done; \
-         if [[ -n "$pkg" ]]; then \
-           if command -v droid >/dev/null; then \
-             cat <<'WRAP' >/usr/local/bin/factory_ai_droid; \
+  chmod +x /usr/local/bin/codex
+}
+
+install_factory_ai_droid() {
+  local pkg=""
+  for candidate in "@factory-ai/droid" "@factoryai/droid-cli" "droid-factory"; do
+    if npm install -g "$candidate"; then
+      pkg="$candidate"
+      break
+    fi
+  done
+  if [[ -n "$pkg" ]]; then
+    local target=""
+    if command -v droid >/dev/null; then
+      target="droid"
+    elif command -v factory-ai >/dev/null; then
+      target="factory-ai"
+    elif command -v droid-factory >/dev/null; then
+      target="droid-factory"
+    fi
+    if [[ -n "$target" ]]; then
+      cat <<'WRAP' >/usr/local/bin/factory_ai_droid
 #!/usr/bin/env bash
 set -euo pipefail
-exec droid "$@"
+exec TARGET_CMD "$@"
 WRAP
-             chmod +x /usr/local/bin/factory_ai_droid; \
-           fi; \
-           return; \
-         fi; \
-         cat <<'SHIM' >/usr/local/bin/factory_ai_droid; \
+      sed -i "s/TARGET_CMD/${target}/" /usr/local/bin/factory_ai_droid
+    else
+      cat <<'SHIM' >/usr/local/bin/factory_ai_droid
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Factory Droid CLI installed via ${pkg}, but no executable was detected." >&2
+echo "Check package docs or install manually inside the container." >&2
+exit 1
+SHIM
+    fi
+    chmod +x /usr/local/bin/factory_ai_droid
+    return
+  fi
+  cat <<'SHIM' >/usr/local/bin/factory_ai_droid
 #!/usr/bin/env bash
 set -euo pipefail
 echo "Factory Droid CLI was unavailable during build." >&2
 echo "Install via npm (package: @factory-ai/droid) once network access is available." >&2
 exit 1
 SHIM
-         chmod +x /usr/local/bin/factory_ai_droid; \
-       }; \
-    # Add new agent installers below.
-    case "${TOOL}" in \
-      cline) install_cline ;; \
-      codex) install_codex ;; \
-      factory_ai_droid) install_factory_ai_droid ;; \
-      *) echo "Unsupported TOOL '${TOOL}'." >&2; exit 1 ;; \
-    esac
+  chmod +x /usr/local/bin/factory_ai_droid
+}
+
+# Add new agent installers below.
+case "${TOOL}" in
+  cline) install_cline ;;
+  codex) install_codex ;;
+  factory_ai_droid) install_factory_ai_droid ;;
+  *) echo "Unsupported TOOL '${TOOL}'." >&2; exit 1 ;;
+esac
+EOS
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["bash"]

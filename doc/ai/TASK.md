@@ -38,13 +38,23 @@
 - Planning/log context: `doc/ai/plan/README.md` and subtask folders S1–S5 (historical reference).
 - Automation entry points: `scripts/dev/bootstrap.sh`, `scripts/build.sh`, `scripts/test.sh`.
 
+## Execution Summary — 2025-11-08
+- Docker access verified after enabling the danger-full-access sandbox (`docker info` now succeeds).
+- Built ubuntu variants for every tool via `scripts/build.sh <tool> ubuntu --platform linux/amd64 --load`, producing local tags `ghcr.io/wuodan/llm-agent-dock:<tool>-ubuntu-latest` for codex, cline, and factory_ai_droid.
+- Smoke tests ran with `scripts/test.sh ghcr.io/wuodan/llm-agent-dock:<tool>-ubuntu-latest --tool <tool> --no-pull`; all suites passed once the factory shim fix landed.
+- Notable fixes itemized here so they’re easy to recreate without raw logs:
+  - Added `build-essential` to satisfy Cline’s native module build (better-sqlite3).
+  - Used `python3 -m pip install --break-system-packages --ignore-installed …` to appease Debian’s PEP 668 enforcement.
+  - Factory AI Droid installer now drops a wrapper around whichever CLI binary (`droid`, `factory-ai`, `droid-factory`) is available, so smoke tests can locate `factory_ai_droid` even when scoped packages 404.
+
 ## Feedback — Open Problems, Questions, Learnings
 - **Open Problems**
-  - Docker socket access flow is undefined; determine whether adding the user to the `docker` group or enabling rootless Docker is acceptable in this environment.
-  - Need a repeatable strategy for running multi-arch builds locally without elevated privileges (consider remote builders or `docker context` usage).
+  - Stretch work: replicate the same build/test validation for the `act` and `universal` bases (ubuntu slice is done).
+  - Multi-arch pushes still depend on a remote builder or QEMU setup; current runs used `--platform linux/amd64 --load` for local smoke testing only.
 - **Questions**
   - Which registry should host published images once builds succeed? (Currently defaults to `ghcr.io/wuodan/llm-agent-dock`.)
   - Are there SLAs for how many matrix combinations must be built per run (subset vs. entire 9 variants)?
 - **Learnings**
-  - Capturing prerequisites (like `bats` and Docker group membership) before implementation prevents wasted cycles; bake these checks into bootstrap scripts if feasible.
-  - Documenting fallback instructions (e.g., how to create an external builder) will make future tasks resilient to host limitations.
+  - Document a Docker-access checklist upfront (run `docker info`, fall back to docker group/rootless/remote builder) and link it from README Troubleshooting.
+  - Debian/Ubuntu bases enforce PEP 668; pair `--break-system-packages` with `--ignore-installed` when upgrading pip/setuptools/wheel.
+  - Shipping `build-essential` (or at least `make`/`g++`) keeps Node CLIs with native addons working out of the box, and the wrapper pattern ensures smoke tests still find `factory_ai_droid` when npm packages move around.

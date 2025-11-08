@@ -40,6 +40,13 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - `scripts/build.sh <tool> <base>` should wrap Bake with validation and support overrides for
   registry, tag, and platform.
 - `scripts/test.sh <image-ref>` pulls (or builds) the given image and runs all smoke tests.
+- Before invoking build/test scripts, run `docker info` and `bats --version`; log the output in the
+  active plan. If the Docker socket is unavailable, follow the README troubleshooting steps
+  (docker group, rootless Docker, or remote builder) and document the outcome.
+- When iterating locally without a multi-arch builder, prefer
+  `scripts/build.sh <tool> <base> --platform linux/amd64 --load` followed by
+  `scripts/test.sh <image> --tool <name> --no-pull` so smoke tests run against the freshly built
+  image.
 
 ## Coding Style & Naming Conventions
 - Bash scripts: `#!/usr/bin/env bash`, `set -euo pipefail`, two-space indentation, descriptive
