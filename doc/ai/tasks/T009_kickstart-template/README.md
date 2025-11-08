@@ -10,7 +10,7 @@ We want to capture our workflow in a reusable GitHub template so new projects ca
 
 ## Goals & Deliverables
 1. Collaboratively choose the template repo name, one-line GitHub description, and submodule path.
-2. Define which files belong in the template (initial README, minimal AGENTS.md, template AGENTS reference, any helper scripts).
+2. Define which files belong in the template (initial README, AGENTS copy, any helper scripts).
 3. Author the template README + AGENTS instructions so users (and their agents) can bootstrap their real project using the AGENTS.md flow—no parallel fallback path required.
 4. Add the new repo as a submodule inside this repo and document how to keep it updated.
 

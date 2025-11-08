@@ -4,10 +4,10 @@
 Work with the user to select the GitHub repo name, one-line description, and submodule path for the kickstart template.
 
 ## Deliverables
-- Shortlist of name candidates + pros/cons.
-- Agreed repo name + description text.
-- Chosen submodule path in this repo (e.g., `templates/<name>`).
-- Updated plan log + Feedback.
+- Shortlist captured with quick pros/cons for each option.
+- Final repo name + one-line description text.
+- Selected submodule path called out explicitly.
+- Plan log + Feedback updated to reflect the decision.
 
 ## Flow
 1. Brainstorm naming options (reflecting workflow/kickstart purpose).
@@ -16,11 +16,20 @@ Work with the user to select the GitHub repo name, one-line description, and sub
 4. Record decisions in plan + Feedback.
 5. Commit `T009/S001: finalize template naming` once done.
 
+## Decisions
+- **Candidates Evaluated**
+  - `llm-project-kickstart` — highlights the LLM scope explicitly; slightly long and niche.
+  - `agent-ops-starter` — concise and emphasizes operational guardrails; "ops" may feel narrow.
+  - `workflow-ready-template` — communicates completeness/readiness; more general but still accurate.
+- **Selected Repo Name**: `workflow-ready-template`.
+- **GitHub Description**: "Kickstarts new repos with the documented AGENTS workflow baked in."
+- **Submodule Path**: `submodules/workflow-ready-template` (prefix makes it obvious it is a Git submodule for both humans and agents).
+
 ## Checklist
-- [ ] Candidate names documented.
-- [ ] Final name + description agreed.
-- [ ] Submodule path decided.
-- [ ] Feedback updated.
+- [x] Candidate names documented.
+- [x] Final name + description agreed.
+- [x] Submodule path decided.
+- [x] Feedback updated.
 - [ ] Commit `T009/S001: finalize template naming`.
 
 ## Inputs & References
@@ -31,6 +40,6 @@ Work with the user to select the GitHub repo name, one-line description, and sub
 - Clear instructions for which repo to create and where to mount the submodule.
 
 ## Feedback & Learnings
-- **Open Problems**: _TBD_
-- **Questions**: _TBD_
-- **Learnings**: _TBD_
+- **Open Problems**: Need to create/publish the `workflow-ready-template` repo and link it once S002–S004 progress begins.
+- **Questions**: None right now; naming settled.
+- **Learnings**: Candidate summary format sped up alignment; reuse for future naming subtasks.

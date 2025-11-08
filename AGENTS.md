@@ -44,8 +44,15 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   only need the latest checklist state to resume.
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
   relevant subtask doc (or under `doc/ai/research/` if reused later). Avoid repeating lookups.
-- **Documentation hygiene**: Do not paste chat/discussion transcripts into repository documents; summarize outcomes and link to sanitized logs instead.
-- **Documentation scope**: Keep user-facing docs (e.g., root `README.md`) focused on product usage. Capture developer workflow/process details here in `AGENTS.md` or contributor guides, and reserve AI-only instructions for `doc/ai/**` so audiences stay separated.
+- **Documentation hygiene**: Do not paste chat/discussion transcripts into repository documents; summarize outcomes and
+  link to sanitized logs instead.
+- **Documentation scope**: Keep user-facing docs (e.g., root `README.md`) focused on product usage. Capture developer
+  workflow/process details here in `AGENTS.md` or contributor guides, and reserve AI-only instructions for `doc/ai/**`
+  so audiences stay separated.
+- **Template submodule**: The reusable workflow template lives at `submodules/workflow-ready-template`. After cloning,
+  run `git submodule update --init --recursive`. To pull upstream template changes, update inside the submodule
+  (`cd submodules/workflow-ready-template && git fetch && git checkout <tag-or-branch> && git pull`) then commit the
+  new submodule pointer with a `T009/S000: update template submodule` message.
 - **Commits per subtask**: Finish each subtask with `T###/S###: short summary`, where `S###` is the
   zero-padded subtask index (use `S000` for task-level commits when no subtask exists). Never mix
   unrelated work in a single commit.
@@ -163,8 +170,8 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   merge in the plan progress log.
 
 ## Security & Configuration Tips
-- Keep secrets (registry tokens, SSH keys) out of Bake variables; inject via `docker buildx bake
-  --set *.secrets` or CI secrets managers.
+- Keep secrets (registry tokens, SSH keys, API keys) out of source control and Bake variables; inject
+  via `docker buildx bake --set *.secrets` or CI secrets managers.
 - Pin base images to digests during releases to avoid upstream drift; refresh digests quarterly or
   when security advisories land.
 - Validate licenses and telemetry defaults before merging new agents or tooling. Document any

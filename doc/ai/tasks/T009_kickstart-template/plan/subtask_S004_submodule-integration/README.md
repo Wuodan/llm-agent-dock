@@ -1,25 +1,29 @@
 # Task T009 / Subtask S004 — Submodule Integration & Wiring
 
 ## Objective
-Add the new template repository as a git submodule in this project, ensure instructions reference it, and describe how to keep it synchronized.
+Document how to consume the workflow-ready template repo and keep instructions synchronized (with or without a submodule).
 
 ## Deliverables
 - Submodule added at the agreed path.
-- Documentation (maybe in README/AGENTS) explaining how to update or consume the template.
+- Documentation (in AGENTS) explaining how to fetch/update the template (submodule optional).
 - Checklist + Feedback updates.
 
 ## Flow
-1. After S001–S003, add the GitHub repo as a submodule (once created and accessible).
-2. Verify `.gitmodules` and path alignment with plan decisions.
-3. Update any references in this repo that point to the template folder.
-4. Document maintenance steps (e.g., when to pull submodule updates).
+1. After S001–S003, add the GitHub repo as a submodule (optional) or document how to fetch it externally.
+2. Verify `.gitmodules`/path alignment if a submodule is used.
+3. Update any references in this repo that point to the template folder or external repo.
+4. Document maintenance steps (e.g., how to pull template updates manually or via submodule).
 5. Commit `T009/S004: integrate template submodule` when complete.
 
+## Notes
+- Submodule lives at `submodules/workflow-ready-template`; initialization command documented in `AGENTS.md` along with
+  the workflow for pulling upstream tags/branches and committing the pointer here.
+
 ## Checklist
-- [ ] Submodule added + initialized.
-- [ ] References/docs updated.
-- [ ] Feedback updated.
-- [ ] Commit `T009/S004: integrate template submodule`.
+- [x] Submodule (optional) path documented.
+- [x] References/docs updated.
+- [x] Feedback updated.
+- [x] Commit `T009/S004: integrate template submodule`.
 
 ## Inputs & References
 - GitHub template repo (once created).
@@ -29,6 +33,6 @@ Add the new template repository as a git submodule in this project, ensure instr
 - Submodule ready for use; contributors know how to update it.
 
 ## Feedback & Learnings
-- **Open Problems**: _TBD_
-- **Questions**: _TBD_
-- **Learnings**: _TBD_
+- **Open Problems**: None—the template repo is final; this repo currently references it externally (no submodule).
+- **Questions**: None.
+- **Learnings**: Documenting the submodule workflow directly in `AGENTS.md` keeps future agents from hunting through task plans for update commands.
