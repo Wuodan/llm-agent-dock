@@ -37,7 +37,7 @@ Provide an automated guardrail (hook + script) that blocks commits whose subject
 - [x] Migrate checker to Python under non-production tooling dir.
 - [x] Update hook/docs to reference `.venv/bin/python` + new location.
 - [x] Re-run manual tests and record results.
-- [ ] Commit `T004/S004: python lint update`.
+- [x] Commit `T004/S004: python lint update`.
 
 ## Inputs & References
 - `AGENTS.md`
