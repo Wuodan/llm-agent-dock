@@ -1,0 +1,45 @@
+# Task T008 — Workflow Cost Management Additions & Improvements
+
+Last updated: 2025-11-08T17:29Z by Codex
+
+## Context
+- We want every task/subtask plan to estimate cost, complexity, and work-type tags so token-heavy efforts are visible early.
+- Need lightweight post-task tracking (actuals, accuracy) to calibrate future estimates without bloating the workflow.
+- Need a shared workflow cost audit document (`doc/ai/workflow/workflow_cost_audit.md`) that lists current steps, their expected token/time footprint, and candidates for future optimization (inputs for Task C).
+- Scope deliberately focuses on process/doc updates and the first version of the audit doc; automation/MCP integrations remain out of scope (feed into later tasks).
+
+## GitHub Issue
+- Not yet created (create via `.github/ISSUE_TEMPLATE/task.yml` once scope is approved).
+- Expected status label: `status:proposed` until work begins.
+- Planned branches: `task/T008_workflow-cost-management` plus per-subtask branches (`subtask/T008_S#_<slug>`).
+
+## Workflow Guardrails
+1. Keep token-awareness additions lightweight—prefer short estimate fields vs. long prose.
+2. Record any external research (e.g., token-metric references) under this plan’s subtasks or `doc/ai/workflow/workflow_cost_audit.md` as appropriate.
+3. Ensure every new template/guardrail includes instructions about when to escalate cost concerns (ties into the 5% approval rule added in T007).
+4. For each subtask, end with the usual checklist + commit `T008/S###: short summary`; mirror Progress Log updates to the future GitHub issue once created.
+
+## Subtask Directory Map (T008)
+| ID | Title | Status | Checklist |
+|----|-------|--------|-----------|
+| S001 | Define estimation attributes & taxonomies | ☐ pending | `plan/subtask_S001_estimation-fields/README.md`
+| S002 | Update templates & AGENTS.md instructions | ☐ pending | `plan/subtask_S002_instruction-updates/README.md`
+| S003 | Add post-task retrospective metrics | ☐ pending | `plan/subtask_S003_retros-metrics/README.md`
+| S004 | Draft workflow cost audit doc | ☐ pending | `plan/subtask_S004_workflow-audit/README.md`
+
+## Master Checklist (T008)
+- [ ] S001 — Define estimation attributes & taxonomies
+- [ ] S002 — Update templates & AGENTS.md instructions
+- [ ] S003 — Add post-task retrospective metrics
+- [ ] S004 — Draft workflow cost audit doc
+
+## Progress Log (T008)
+- 2025-11-08T17:29Z — Drafted T008 plan scaffold and subtask structure (Codex).
+
+## References
+- `AGENTS.md` cost guardrails.
+- `doc/ai/templates/task_plan_README.template.md` and `doc/ai/templates/subtask_plan_README.template.md`.
+- Planned audit doc: `doc/ai/workflow/workflow_cost_audit.md`.
+
+## Notes
+- Token tracking automation is deferred to future tasks (likely Task C). Document placeholders for where real metrics would plug in later.
