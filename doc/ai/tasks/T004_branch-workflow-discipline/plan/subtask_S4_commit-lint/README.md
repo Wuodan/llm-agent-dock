@@ -50,4 +50,4 @@ Provide an automated guardrail (hook + script) that blocks commits whose subject
 ## Feedback & Learnings
 - **Open Problems**: Could add a CI job to run `.venv/bin/python devtools/check_commit_message.py --message "$(git log -1 --pretty=%s)"` on PR heads to double-check remote pushes; future work if CI hooks become available.
 - **Questions**: For contributors unable to change `core.hooksPath`, should we document running the script via `prepare-commit-msg` alternative? Pending feedback from users of platforms with restricted hooks.
-- **Learnings**: Keeping the script under `scripts/` lets both hooks and CI share logic, avoiding divergence.
+- **Learnings**: Housing the checker under `devtools/` keeps it separate from production `scripts/` while still letting hooks + CI share a single implementation.
