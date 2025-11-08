@@ -4,8 +4,11 @@ These instructions are intentionally task-agnostic. Every future effort in this 
 the workflow hardening and coding conventions below to keep hand-offs simple and recoverable.
 
 ## Workflow Hardening
-- **Planning trail**: For every task `T###`, create `doc/ai/tasks/T###_<slug>/plan/README.md` plus one subfolder per subtask inside that folder. Each file
-  needs objective, deliverables, flow, checklist, and a feedback section updated at completion.
+- **Planning trail**: For every task `T###`, scaffold `doc/ai/tasks/T###_<slug>/plan/README.md` (start from
+  `doc/ai/templates/task_plan_README.template.md`) plus one subfolder per subtask (copy
+  `doc/ai/templates/subtask_plan_README.template.md`). Each plan file needs objective, deliverables,
+  flow, checklist, explicit “commit `[codex][subtask-name]: summary`” step, and a Feedback section
+  updated at completion.
 - **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
   only need the latest checklist state to resume.
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
@@ -19,6 +22,12 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   holds the canonical brief. Mark the active task as `Status = Active` in the index. Every task doc
   (and each subtask file) needs a Feedback section with open problems, outstanding questions, and
   learnings for future sessions.
+
+### Planning Templates
+- Task-level plan template: `doc/ai/templates/task_plan_README.template.md`
+- Subtask plan template: `doc/ai/templates/subtask_plan_README.template.md`
+- Always copy these templates when creating new task or subtask plan files and keep the commit +
+  feedback checklist items intact.
 
 ## Project Structure & Ownership
 - Root `Dockerfile` stays parameterized via `BASE_IMAGE`, `TOOL`, and `TARGETARCH` so the same
