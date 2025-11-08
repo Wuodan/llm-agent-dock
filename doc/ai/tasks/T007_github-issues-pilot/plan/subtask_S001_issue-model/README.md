@@ -21,7 +21,7 @@ Design a lightweight yet explicit model for representing llm-agent-dock tasks as
 - [x] Authored or updated GitHub issue template draft.
 - [x] Defined label + linking policy and documented locally.
 - [x] Documented findings in Feedback.
-- [ ] Commit `T007/S001: define github issue model`.
+- [x] Commit `T007/S001: define github issue model`.
 
 ## Inputs & References
 - `doc/ai/tasks/T007_github-issues-pilot/README.md`
