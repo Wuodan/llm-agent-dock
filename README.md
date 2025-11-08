@@ -57,6 +57,23 @@ scripts share registry, tag, and platform settings. Install `bats` (`brew instal
 
 ---
 
+## Configuration Defaults
+
+`scripts/dev/bootstrap.sh` seeds a `.env` file in the repo root so every command agrees on image
+coordinates:
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `LLM_AGENT_DOCK_REGISTRY` | Registry hostname used for tags. | `ghcr.io` |
+| `LLM_AGENT_DOCK_REPOSITORY` | Namespace/repo appended to the registry. | `wuodan/llm-agent-dock` |
+| `LLM_AGENT_DOCK_VERSION` | Tag suffix (format: `<tool>-<base>-<version>`). | `latest` |
+| `LLM_AGENT_DOCK_PLATFORMS` | Comma-separated build platforms for Buildx. | `linux/amd64,linux/arm64` |
+
+Override any value via environment variables (`export LLM_AGENT_DOCK_VERSION=dev`) or by editing the
+generated `.env`.
+
+---
+
 ## Dockerfile Args
 
 The root `Dockerfile` accepts `BASE_IMAGE`, `TOOL`, and `TARGETARCH` build args so every base × tool
@@ -75,13 +92,47 @@ Use `TOOL=cline|codex|factory_ai_droid` and swap `BASE_IMAGE` with any alias fro
 
 ---
 
+## Build Automation
+
+- `docker-bake.hcl` defines one target per base × tool combination plus a `matrix` group so
+  `docker buildx bake -f docker-bake.hcl matrix --print` shows the full grid.
+- `scripts/build.sh <tool> <base>` wraps Bake with guardrails. Useful flags:
+  - `--platform <list>` overrides `LLM_AGENT_DOCK_PLATFORMS`.
+  - `--push` / `--load` toggle Buildx outputs.
+  - `--print` previews the Bake config for the selected target.
+  - `--set key=value` forwards arbitrary Bake overrides (for example, `--set REGISTRY=example.com`).
+- All builds tag images as `${LLM_AGENT_DOCK_REGISTRY}/${LLM_AGENT_DOCK_REPOSITORY}:<tool>-<base>-<version>`.
+
+---
+
+## Testing
+
+Smoke tests live under `tests/smoke/` (one Bats suite per tool) and rely on Docker to run each image
+under test. Use `scripts/test.sh` to orchestrate them:
+
+```bash
+scripts/test.sh ghcr.io/<org>/llm-agent-dock:codex-ubuntu-latest --tool codex --no-pull
+```
+
+- `--tool <name>` limits execution to a single suite; omit it to run all suites.
+- `--pull` is enabled by default; pass `--no-pull` to use a local image.
+- When running Bats manually, export `LLM_AGENT_IMAGE=<tag>` so `tests/smoke/common.bash` knows
+  which image to start.
+
+---
+
 ## Extending the Catalog
 
-1. **Add a base**: Register the image alias in `docker-bake.hcl`, tweak the Dockerfile’s base-prep
-   section if required, and document it in the matrix table above.
-2. **Add a tool**: Implement an installer block inside the Dockerfile, extend the Bake matrix,
-   and create `tests/smoke/<tool>.bats`.
-3. **Share the process**: Update this README and any relevant plan docs so others can follow along.
+1. **Add a base**:
+   - Append the image reference to `docker-bake.hcl` (new target + `matrix` group entry).
+   - Adjust the Dockerfile’s base-prep section if the OS needs extra packages.
+   - Document the alias in the matrix table.
+2. **Add a tool**:
+   - Extend the Dockerfile’s installer `case` block and comment where new agents should plug in.
+   - Create a Bake target + smoke suite (`tests/smoke/<tool>.bats`).
+   - Update scripts/tests to mention the new tool where validation is performed.
+3. **Share the process**: Update this README, `AGENTS.md`, and `doc/ai/plan/` so future agents can
+   trace decisions and rerun commands.
 
 Need contributor details or current milestones? See `doc/ai/TASK.md` and the latest entries in
 `doc/ai/plan/`.
