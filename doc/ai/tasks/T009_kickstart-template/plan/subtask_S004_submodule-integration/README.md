@@ -5,7 +5,7 @@ Add the new template repository as a git submodule in this project, ensure instr
 
 ## Deliverables
 - Submodule added at the agreed path.
-- Documentation (maybe in README/AGENTS) explaining how to update or consume the template.
+- Documentation (in AGENTS) explaining how to initialize/update the template.
 - Checklist + Feedback updates.
 
 ## Flow
@@ -15,10 +15,14 @@ Add the new template repository as a git submodule in this project, ensure instr
 4. Document maintenance steps (e.g., when to pull submodule updates).
 5. Commit `T009/S004: integrate template submodule` when complete.
 
+## Notes
+- Submodule lives at `submodules/workflow-ready-template`; initialization command documented in `AGENTS.md` along with
+  the workflow for pulling upstream tags/branches and committing the pointer here.
+
 ## Checklist
-- [ ] Submodule added + initialized.
-- [ ] References/docs updated.
-- [ ] Feedback updated.
+- [x] Submodule added + initialized.
+- [x] References/docs updated.
+- [x] Feedback updated.
 - [ ] Commit `T009/S004: integrate template submodule`.
 
 ## Inputs & References
@@ -29,6 +33,6 @@ Add the new template repository as a git submodule in this project, ensure instr
 - Submodule ready for use; contributors know how to update it.
 
 ## Feedback & Learnings
-- **Open Problems**: _TBD_
-- **Questions**: _TBD_
-- **Learnings**: _TBD_
+- **Open Problems**: None—the template repo is now final per user direction.
+- **Questions**: None.
+- **Learnings**: Documenting the submodule workflow directly in `AGENTS.md` keeps future agents from hunting through task plans for update commands.

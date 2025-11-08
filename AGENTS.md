@@ -49,6 +49,10 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
 - **Documentation scope**: Keep user-facing docs (e.g., root `README.md`) focused on product usage. Capture developer
   workflow/process details here in `AGENTS.md` or contributor guides, and reserve AI-only instructions for `doc/ai/**`
   so audiences stay separated.
+- **Template submodule**: The reusable workflow template lives at `submodules/workflow-ready-template`. After cloning,
+  run `git submodule update --init --recursive`. To pull upstream template changes, update inside the submodule
+  (`cd submodules/workflow-ready-template && git fetch && git checkout <tag-or-branch> && git pull`) then commit the
+  new submodule pointer with a `T009/S000: update template submodule` message.
 - **Commits per subtask**: Finish each subtask with `T###/S###: short summary`, where `S###` is the
   zero-padded subtask index (use `S000` for task-level commits when no subtask exists). Never mix
   unrelated work in a single commit.
