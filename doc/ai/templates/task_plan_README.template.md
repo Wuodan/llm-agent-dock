@@ -11,7 +11,7 @@ Last updated: <ISO8601 timestamp> by <author>
 1. Explain how checklists/progress logs must be updated.
 2. Reference AGENTS.md rules that apply.
 3. Specify any research logging expectations.
-4. Remind contributors to finish each subtask with documentation and commit `[codex][subtask-name]: summary`.
+4. Remind contributors to finish each subtask with documentation and commit `T###/S###: short summary` (use `S000` for task-level commits).
 
 ## Subtask Directory Map (TXXX)
 | ID | Title | Status | Checklist |

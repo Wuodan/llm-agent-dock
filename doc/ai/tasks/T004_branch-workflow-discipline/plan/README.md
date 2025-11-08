@@ -18,12 +18,12 @@ Last updated: 2025-11-08T15:20Z by Codex
 |----|-------|--------|-----------|
 | S1 | Branch workflow policy decisions | ☑ complete | `plan/subtask_S1_branch-policy/README.md` |
 | S2 | Update AGENTS.md and related docs | ☑ complete (rev. 2) | `plan/subtask_S2_doc-updates/README.md` |
-| S3 | Checklist + template propagation | ◐ in-progress | `plan/subtask_S3_checklists/README.md` |
+| S3 | Checklist + template propagation | ☑ complete | `plan/subtask_S3_checklists/README.md` |
 
 ## Master Checklist (T004)
 - [x] S1 — Branch workflow policy decisions
 - [x] S2 — Update AGENTS.md and related docs (commit prefix + branch policy captured)
-- [ ] S3 — Checklist + template propagation
+- [x] S3 — Checklist + template propagation
 
 ## Progress Log (T004)
 - 2025-11-08T15:15Z — Initialized task plan scaffolding and updated task index to mark T004 active.
@@ -32,6 +32,7 @@ Last updated: 2025-11-08T15:20Z by Codex
 - 2025-11-08T16:10Z — Finished S2; AGENTS.md now documents branch naming, push cadence, merge/deletion checks, and force-push policy.
 - 2025-11-08T16:35Z — Requirement change: commit titles must carry task/subtask prefix (`T###/S###: ...`). Re-opening S2 for doc updates and starting S3 template edits.
 - 2025-11-08T16:45Z — Revisions applied to AGENTS + legacy task docs to codify the `T###/S###` commit format; S2 considered complete again pending S3 template propagation.
+- 2025-11-08T16:55Z — Completed S3 by updating task/subtask templates with the new commit-prefix reminders; branch workflow task ready for validation.
 
 ## References
 - `AGENTS.md`
