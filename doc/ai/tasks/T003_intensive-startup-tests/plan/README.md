@@ -18,7 +18,7 @@ Last updated: 2025-11-08T17:45Z by Codex
 |----|-------|--------|-----------|
 | S1 | Scope & planning alignment | ☑ done | `plan/subtask_S1_planning/README.md` |
 | S2 | Environment + tooling readiness | ☑ done | `plan/subtask_S2_env_enablement/README.md` |
-| S3 | Agent startup capture (`cline`, `codex`, `factory_ai_droid`) | ☐ pending | `plan/subtask_S3_agent_startup_tests/README.md` |
+| S3 | Agent startup capture (`cline`, `codex`, `factory_ai_droid`) | ◔ in-progress | `plan/subtask_S3_agent_startup_tests/README.md` |
 | S4 | Recommendations & documentation updates | ☐ pending | `plan/subtask_S4_recommendations/README.md` |
 
 ## Master Checklist (T003)
@@ -30,6 +30,7 @@ Last updated: 2025-11-08T17:45Z by Codex
 ## Progress Log (T003)
 - 2025-11-08T17:45Z — Initialized plan scaffolding and subtask folders per AGENTS.md.
 - 2025-11-08T17:52Z — Ran docker/bats diagnostics and reviewed build/test scripts for S2 prep.
+- 2025-11-08T18:15Z — Built act/ubuntu images, documented GHCR 403 for universal base, and captured startup logs via the new capture script.
 
 ## References
 - `doc/ai/tasks/T003_intensive-startup-tests/README.md`

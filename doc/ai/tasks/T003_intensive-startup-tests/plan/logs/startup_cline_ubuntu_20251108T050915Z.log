@@ -1,0 +1,55 @@
+# Agent startup capture
+# timestamp_utc: 20251108T050915Z
+# image: ghcr.io/wuodan/llm-agent-dock:cline-ubuntu-latest
+# tool: cline
+# base: ubuntu
+# timeout_s: 15.0
+# docker_cmd: docker run --rm --env OPENAI_API_KEY=dummy -i ghcr.io/wuodan/llm-agent-dock:cline-ubuntu-latest bash -lc 'set -euo pipefail; cline'
+
+[stdout] Cleaning up core process (PID: 23)
+[stdout] Cleaning up host process (PID: 22)
+[stderr] Error: failed to start new instance: failed to start instance: operation failed to after 12 attempts: instance not found in registry: database not available
+[stderr] 
+[stderr] This is usually caused by an incompatible Node.js version
+[stderr] 
+[stderr] REQUIREMENTS:
+[stderr] • Node.js version 20+ is required
+[stderr] • Current Node.js version: v18.19.1
+[stderr] 
+[stderr] DEBUGGING STEPS:
+[stderr] 1. View recent logs: cline log list
+[stderr] 2. Logs are available in: ~/.cline/logs/
+[stderr] 3. The most recent cline-core log file is usually valuable
+[stderr] 
+[stderr] For additional help, visit: https://github.com/cline/cline/issues
+[stderr] 
+[stderr] Usage:
+[stderr]   cline [prompt] [flags]
+[stderr]   cline [command]
+[stderr] 
+[stderr] Available Commands:
+[stderr]   auth        Authenticate a provider and configure what model is used
+[stderr]   completion  Generate the autocompletion script for the specified shell
+[stderr]   config      Manage Cline configuration
+[stderr]   help        Help about any command
+[stderr]   instance    Manage Cline instances
+[stderr]   logs        Manage Cline log files
+[stderr]   task        Manage Cline tasks
+[stderr]   version     Show version information
+[stderr] 
+[stderr] Flags:
+[stderr]       --address string         Cline Core gRPC address (default "localhost:50052")
+[stderr]   -f, --file strings           attach files
+[stderr]   -h, --help                   help for cline
+[stderr]   -i, --image strings          attach image files
+[stderr]   -m, --mode string            mode (act|plan) - defaults to plan (default "plan")
+[stderr]       --no-interactive         enable yolo mode (non-interactive)
+[stderr]   -o, --oneshot                full autonomous mode
+[stderr]   -F, --output-format string   output format (rich|json|plain) (default "rich")
+[stderr]   -s, --setting strings        task settings (key=value format)
+[stderr]   -v, --verbose                verbose output
+[stderr]   -y, --yolo                   enable yolo mode (non-interactive)
+[stderr] 
+[stderr] Use "cline [command] --help" for more information about a command.
+[stderr] 
+[meta] process_exit=1

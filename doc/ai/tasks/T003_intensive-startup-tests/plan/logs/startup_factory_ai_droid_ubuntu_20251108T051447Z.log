@@ -1,0 +1,12 @@
+# Agent startup capture
+# timestamp_utc: 20251108T051447Z
+# image: ghcr.io/wuodan/llm-agent-dock:factory_ai_droid-ubuntu-latest
+# tool: factory_ai_droid
+# base: ubuntu
+# timeout_s: 15.0
+# pty: False
+# docker_cmd: docker run --rm -i ghcr.io/wuodan/llm-agent-dock:factory_ai_droid-ubuntu-latest bash -lc 'set -euo pipefail; factory_ai_droid'
+
+[stdout] [32m*[0m Completed — 15 created, 0 overwritten, 0 skipped.
+[stdout] > Next: Restart Droid (Ctrl+C then relaunch) or run /commands and press R to reload.
+[meta] process_exit=0

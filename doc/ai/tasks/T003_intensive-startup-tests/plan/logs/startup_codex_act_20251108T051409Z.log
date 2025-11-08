@@ -1,0 +1,10 @@
+# Agent startup capture
+# timestamp_utc: 20251108T051409Z
+# image: ghcr.io/wuodan/llm-agent-dock:codex-act-latest
+# tool: codex
+# base: act
+# timeout_s: 10.0
+# pty: True
+# docker_cmd: docker run --rm -t -i ghcr.io/wuodan/llm-agent-dock:codex-act-latest bash -lc 'set -euo pipefail; codex'
+
+[pty] [?2004h[>7u[?1004h[6n[pty] [?u[c[pty] ]10;?\[pty] [?2026h[39m[49m[0m[?25l[?2026l[meta] process_exit=0

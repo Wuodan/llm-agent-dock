@@ -1,0 +1,10 @@
+# Agent startup capture
+# timestamp_utc: 20251108T050947Z
+# image: ghcr.io/wuodan/llm-agent-dock:codex-ubuntu-latest
+# tool: codex
+# base: ubuntu
+# timeout_s: 15.0
+# docker_cmd: docker run --rm --env OPENAI_API_KEY=dummy --env OPENAI_API_BASE=https://example.invalid -i ghcr.io/wuodan/llm-agent-dock:codex-ubuntu-latest bash -lc 'set -euo pipefail; codex'
+
+[stderr] Error: stdout is not a terminal
+[meta] process_exit=1

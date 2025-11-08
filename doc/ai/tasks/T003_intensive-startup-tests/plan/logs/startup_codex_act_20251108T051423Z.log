@@ -1,0 +1,14 @@
+# Agent startup capture
+# timestamp_utc: 20251108T051423Z
+# image: ghcr.io/wuodan/llm-agent-dock:codex-act-latest
+# tool: codex
+# base: act
+# timeout_s: 20.0
+# pty: True
+# docker_cmd: docker run --rm -t -i ghcr.io/wuodan/llm-agent-dock:codex-act-latest bash -lc 'set -euo pipefail; codex login'
+
+[pty] Starting local login server on http://localhost:1455.
+If your browser did not open, navigate to this URL to authenticate:
+
+https://auth.openai.com/oauth/authorize?<redacted>
+[meta] process_exit=0

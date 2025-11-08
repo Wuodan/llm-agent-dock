@@ -1,0 +1,63 @@
+[build] Target=codex-ubuntu Platforms=linux/amd64 Registry=ghcr.io/wuodan/llm-agent-dock Version=latest
+#0 building with "multiarch" instance using docker-container driver
+
+#1 [internal] load local bake definitions
+#1 reading /home/kuhnst/development/PRIVATE/github/Wuodan/llm-agent-dock/docker-bake.hcl 4.40kB / 4.40kB done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 4.35kB done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1.7-labs
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1.7-labs@sha256:b99fecfe00268a8b556fad7d9c37ee25d716ae08a5d7320e6d51c4dd83246894
+#4 resolve docker.io/docker/dockerfile:1.7-labs@sha256:b99fecfe00268a8b556fad7d9c37ee25d716ae08a5d7320e6d51c4dd83246894 0.0s done
+#4 CACHED
+
+#5 [internal] load metadata for docker.io/library/ubuntu:24.04
+#5 ...
+
+#6 [auth] library/ubuntu:pull token for registry-1.docker.io
+#6 DONE 0.0s
+
+#5 [internal] load metadata for docker.io/library/ubuntu:24.04
+#5 DONE 0.5s
+
+#7 [internal] load .dockerignore
+#7 transferring context: 2B done
+#7 DONE 0.0s
+
+#8 [1/7] FROM docker.io/library/ubuntu:24.04@sha256:66460d557b25769b102175144d538d88219c077c678a49af4afca6fbfc1b5252
+#8 resolve docker.io/library/ubuntu:24.04@sha256:66460d557b25769b102175144d538d88219c077c678a49af4afca6fbfc1b5252 0.0s done
+#8 DONE 0.0s
+
+#9 [6/7] RUN mkdir -p /workspace && ln -sf /workspace /root/workspace
+#9 CACHED
+
+#10 [2/7] RUN set -euxo pipefail     && if command -v apt-get >/dev/null; then          apt-get update;          apt-get install -y --no-install-recommends            bash            bash-completion            build-essential            ca-certificates            curl            git            gnupg            jq            locales            nano            nodejs            npm            openssh-client            pipx            python3            python3-pip            python3-venv            ripgrep            sudo            tar            tini            unzip            xz-utils            zip;          rm -rf /var/lib/apt/lists/*;        else          echo "Unsupported base image for llm-agent-dock; apt-get required" >&2;          exit 1;        fi     && locale-gen en_US.UTF-8 || true
+#10 CACHED
+
+#11 [3/7] RUN pipx ensurepath >/dev/null 2>&1 || true
+#11 CACHED
+
+#12 [4/7] RUN python3 -m pip install --break-system-packages --ignore-installed --upgrade pip setuptools wheel
+#12 CACHED
+
+#13 [5/7] RUN npm config set prefix /usr/local
+#13 CACHED
+
+#14 [7/7] RUN /bin/bash <<'EOS'
+#14 CACHED
+
+#15 exporting to docker image format
+#15 exporting layers done
+#15 exporting manifest sha256:ef56fe882bd9002752beeca23c00e59d495c11583329fd8795a7747a1ad0cfd7 done
+#15 exporting config sha256:65f0de7e9c88d7871dce3155a037c8cf8d18e18e178e2e2b13665686c7ffdb0c done
+#15 sending tarball
+#15 sending tarball 2.0s done
+#15 DONE 2.0s
+
+#16 importing to docker
+#16 DONE 0.0s

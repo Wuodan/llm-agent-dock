@@ -1,0 +1,69 @@
+[build] Target=cline-ubuntu Platforms=linux/amd64 Registry=ghcr.io/wuodan/llm-agent-dock Version=latest
+#0 building with "multiarch" instance using docker-container driver
+
+#1 [internal] load local bake definitions
+#1 reading /home/kuhnst/development/PRIVATE/github/Wuodan/llm-agent-dock/docker-bake.hcl 4.40kB / 4.40kB done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 4.35kB done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1.7-labs
+#3 ...
+
+#4 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1.7-labs
+#3 DONE 0.8s
+
+#5 docker-image://docker.io/docker/dockerfile:1.7-labs@sha256:b99fecfe00268a8b556fad7d9c37ee25d716ae08a5d7320e6d51c4dd83246894
+#5 resolve docker.io/docker/dockerfile:1.7-labs@sha256:b99fecfe00268a8b556fad7d9c37ee25d716ae08a5d7320e6d51c4dd83246894 0.0s done
+#5 CACHED
+
+#6 [internal] load metadata for docker.io/library/ubuntu:24.04
+#6 ...
+
+#7 [auth] library/ubuntu:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#6 [internal] load metadata for docker.io/library/ubuntu:24.04
+#6 DONE 0.4s
+
+#8 [internal] load .dockerignore
+#8 transferring context: 2B done
+#8 DONE 0.0s
+
+#9 [1/7] FROM docker.io/library/ubuntu:24.04@sha256:66460d557b25769b102175144d538d88219c077c678a49af4afca6fbfc1b5252
+#9 resolve docker.io/library/ubuntu:24.04@sha256:66460d557b25769b102175144d538d88219c077c678a49af4afca6fbfc1b5252 0.0s done
+#9 DONE 0.0s
+
+#10 [2/7] RUN set -euxo pipefail     && if command -v apt-get >/dev/null; then          apt-get update;          apt-get install -y --no-install-recommends            bash            bash-completion            build-essential            ca-certificates            curl            git            gnupg            jq            locales            nano            nodejs            npm            openssh-client            pipx            python3            python3-pip            python3-venv            ripgrep            sudo            tar            tini            unzip            xz-utils            zip;          rm -rf /var/lib/apt/lists/*;        else          echo "Unsupported base image for llm-agent-dock; apt-get required" >&2;          exit 1;        fi     && locale-gen en_US.UTF-8 || true
+#10 CACHED
+
+#11 [3/7] RUN pipx ensurepath >/dev/null 2>&1 || true
+#11 CACHED
+
+#12 [6/7] RUN mkdir -p /workspace && ln -sf /workspace /root/workspace
+#12 CACHED
+
+#13 [4/7] RUN python3 -m pip install --break-system-packages --ignore-installed --upgrade pip setuptools wheel
+#13 CACHED
+
+#14 [5/7] RUN npm config set prefix /usr/local
+#14 CACHED
+
+#15 [7/7] RUN /bin/bash <<'EOS'
+#15 CACHED
+
+#16 exporting to docker image format
+#16 exporting layers done
+#16 exporting manifest sha256:db8014fce248bdf03b10c430b88c43c96118fcf48cfa4a379d355b14becf9141 done
+#16 exporting config sha256:ffbf79d4d8253bf3699e9652543137cd39c7057889b3b773a3167ad149cd4aad done
+#16 sending tarball
+#16 sending tarball 3.7s done
+#16 DONE 3.7s
+
+#17 importing to docker
+#17 DONE 0.1s

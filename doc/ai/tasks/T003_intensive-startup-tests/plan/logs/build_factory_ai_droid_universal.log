@@ -1,0 +1,32 @@
+[build] Target=factory_ai_droid-universal Platforms=linux/amd64 Registry=ghcr.io/wuodan/llm-agent-dock Version=latest
+#0 building with "multiarch" instance using docker-container driver
+
+#1 [internal] load local bake definitions
+#1 reading /home/kuhnst/development/PRIVATE/github/Wuodan/llm-agent-dock/docker-bake.hcl 4.40kB / 4.40kB done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 4.35kB done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1.7-labs
+#3 DONE 0.2s
+
+#4 docker-image://docker.io/docker/dockerfile:1.7-labs@sha256:b99fecfe00268a8b556fad7d9c37ee25d716ae08a5d7320e6d51c4dd83246894
+#4 resolve docker.io/docker/dockerfile:1.7-labs@sha256:b99fecfe00268a8b556fad7d9c37ee25d716ae08a5d7320e6d51c4dd83246894 0.1s done
+#4 CACHED
+
+#5 [internal] load metadata for ghcr.io/devcontainers/images/universal:2-linux
+#5 ERROR: failed to authorize: failed to fetch anonymous token: unexpected status from GET request to https://ghcr.io/token?scope=repository%3Adevcontainers%2Fimages%2Funiversal%3Apull&service=ghcr.io: 403 Forbidden
+------
+ > [internal] load metadata for ghcr.io/devcontainers/images/universal:2-linux:
+------
+Dockerfile:6
+--------------------
+   4 |     ARG TARGETARCH=amd64
+   5 |     
+   6 | >>> FROM ${BASE_IMAGE} AS runtime
+   7 |     
+   8 |     ARG TOOL
+--------------------
+ERROR: failed to solve: ghcr.io/devcontainers/images/universal:2-linux: failed to fetch anonymous token: unexpected status from GET request to https://ghcr.io/token?scope=repository%3Adevcontainers%2Fimages%2Funiversal%3Apull&service=ghcr.io: 403 Forbidden
