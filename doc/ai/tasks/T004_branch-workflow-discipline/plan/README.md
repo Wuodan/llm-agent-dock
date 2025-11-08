@@ -40,12 +40,14 @@ Last updated: 2025-11-08T15:20Z by Codex
 - 2025-11-08T17:30Z — Completed S4 with docs + hook instructions and validated good/bad samples via the new script.
 - 2025-11-08T17:45Z — Requirement update: lint must live outside product `scripts/` tree and leverage `.venv` Python; re-opening S4 to migrate hook + docs.
 - 2025-11-08T17:55Z — Migrated lint to `devtools/check_commit_message.py`, updated hook + docs with `.venv` instructions, and revalidated good/bad samples.
+- 2025-11-08T18:05Z — Final validation complete; documented outstanding ideas (CI commit-lint, hotfix branch prefix) in Feedback and preparing to close T004.
 
 ## References
 - `AGENTS.md`
 - `doc/ai/templates/task_plan_README.template.md`
 - `doc/ai/templates/subtask_plan_README.template.md`
 
-## Notes
-- Decide whether merges happen via GitHub PRs or enforced local `git merge --no-ff` during S1.
-- Capture any push/force-push troubleshooting tips (e.g., diverged branches) for future agents.
+## Feedback & Learnings
+- **Open Problems**: consider adding CI coverage for the commit-prefix lint (run `devtools/check_commit_message.py` in workflows) and evaluate whether rare hotfix work should use a reserved branch prefix.
+- **Questions**: none outstanding; waiting on product owners if CI automation becomes priority.
+- **Learnings**: separating product docs, contributor guides, and AI-specific instructions avoids user confusion and keeps AGENTS.md the single source of truth.
