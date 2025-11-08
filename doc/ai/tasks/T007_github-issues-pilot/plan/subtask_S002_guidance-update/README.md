@@ -20,8 +20,8 @@ Revise `AGENTS.md` and the planning templates so contributors follow the new Git
 - [x] Captured required policy changes from S001.
 - [x] Edited `AGENTS.md` to reflect GitHub issue workflow.
 - [x] Updated task/subtask plan templates to link GitHub issues.
-- [ ] Documented findings in Feedback.
-- [ ] Commit `T007/S002: refresh guidance for gh issues`.
+- [x] Documented findings in Feedback.
+- [x] Commit `T007/S002: refresh guidance for gh issues`.
 
 ## Inputs & References
 - Output from Subtask S001.

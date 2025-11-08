@@ -17,12 +17,12 @@ Last updated: 2025-11-08T14:31Z by Codex
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
 | S001 | Define GitHub issue planning model | ☑ done | `plan/subtask_S001_issue-model/README.md`
-| S002 | Update contributor guidance + templates | ☐ pending | `plan/subtask_S002_guidance-update/README.md`
+| S002 | Update contributor guidance + templates | ☑ done | `plan/subtask_S002_guidance-update/README.md`
 | S003 | Run pilot issue + link local docs | ☐ pending | `plan/subtask_S003_pilot-sync/README.md`
 
 ## Master Checklist (T007)
 - [x] S001 — Define GitHub issue planning model
-- [ ] S002 — Update contributor guidance + templates
+- [x] S002 — Update contributor guidance + templates
 - [ ] S003 — Run pilot issue + link local docs
 
 ## Progress Log (T007)
@@ -30,6 +30,7 @@ Last updated: 2025-11-08T14:31Z by Codex
 - 2025-11-08T14:33Z — Drafted GitHub issue template plus label/linking policy (S001).
 - 2025-11-08T14:36Z — Committed S001 deliverables and recorded GitHub issue model references.
 - 2025-11-08T14:38Z — Updated AGENTS + plan templates with GitHub issue workflow (S002 in progress).
+- 2025-11-08T14:39Z — Committed S002 guidance changes and logged outstanding label/automation questions.
 - 2025-11-08T14:33Z — Drafted GitHub issue template plus label/linking policy (S001).
 
 ## References
