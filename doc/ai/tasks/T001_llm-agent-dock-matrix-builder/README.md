@@ -1,7 +1,7 @@
 # Task T001 — Build the llm-agent-dock Matrix Builder
 
-> Canonical task folder: `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/README.md`. Keep this file
-> synchronized with that directory’s README so future agents can find the full brief in either spot.
+> This README mirrors `doc/ai/TASK.md`. Edit both files together so the active task description stays
+> consistent regardless of entry point.
 
 ## Background
 This repository must evolve into a reusable multi-architecture Docker build system for agentic
