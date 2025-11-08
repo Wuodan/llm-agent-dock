@@ -31,12 +31,14 @@ Last updated: <ISO8601 timestamp> by <author>
 5. Every time you add a Progress Log entry, mirror the same summary as a GitHub issue comment (queue it locally if offline).
 
 ## Retro Metrics (fill after completion)
-- **Actual Token Bucket**: XS/S/M/L/XL plus delta vs. estimate (e.g., “+1 bucket / +25%”).
-- **Time Spent**: rough agent-hours or calendar days.
-- **Accuracy / Variance Notes**: why estimate held or drifted (link to research logs if needed).
-- **LLM Tier Used**: note if different from recommendation and why.
-- **Key Learnings**: bullets for future planners.
-- Leave placeholder text until the subtask finishes; populate within 1 session of completion.
+- **Actual Token Bucket**: XS/S/M/L/XL plus variance (e.g., “Actual: L vs. Estimate: M, +1 bucket / +30%”).
+- **Token Source & Confidence**: `chat-export`, `dashboard`, or manual estimate + High/Med/Low confidence.
+- **Time Spent**: nearest 0.5 agent-hour (or list calendar days) plus major blockers.
+- **Estimate Accuracy Rating**: `On target`, `Under`, or `Over` with ≤2 sentence rationale.
+- **LLM Tier Used**: actual tier(s) and why it differed from the recommendation (if applicable).
+- **Variance Drivers & Learnings**: bullets noting what increased/decreased cost and how to act on it.
+- Escalate in the Progress Log + GitHub issue if variance ≥1 bucket or confidence drops to Low.
+- Leave placeholder text until the task/subtask finishes; populate within 1 working session.
 
 ## Subtask Directory Map (TXXX)
 | ID | Title | Status | Checklist |

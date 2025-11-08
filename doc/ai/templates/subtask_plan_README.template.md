@@ -39,11 +39,13 @@ Describe the singular goal for this subtask.
 - State what must be true before moving on (e.g., checklist checked, tests passing, Feedback updated, GitHub issue comment posted).
 
 ## Retro Metrics (fill after completion)
-- Actual Token Bucket + delta vs. estimate.
-- Time spent (agent-hours or calendar days) and blockers.
-- Accuracy notes (what drove variance, lessons for next time).
-- LLM tier actually used (if different) + reason.
-- Capture within one working session after finishing the subtask.
+- Actual Token Bucket: XS/S/M/L/XL plus variance note (e.g., “Actual S vs. Estimate XS, +1 bucket”).
+- Token Source & Confidence: `chat-export`, `dashboard`, or manual estimate + confidence rating.
+- Time Spent: nearest 0.5 agent-hour (note days if work was spread out) and blockers.
+- Estimate Accuracy Rating: `On target`, `Under`, or `Over` with ≤2 sentence rationale.
+- LLM Tier Used: record deviations and why tier upgrades/downgrades happened.
+- Variance Drivers & Learnings: bullet list for future planners; link to research logs if helpful.
+- Populate within one working session after completion; escalate if variance ≥1 bucket.
 
 ## Feedback & Learnings
 - **Open Problems**: _TBD_

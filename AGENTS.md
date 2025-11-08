@@ -25,8 +25,10 @@ the workflow hardening and coding conventions below to keep hand-offs simple and
   bucket (≈≥5% cost). If confidence drops to Low or bucket increases, call it out in the Progress
   Log + GitHub issue comment before continuing.
 - **Retro metrics**: Populate the plan’s Retro Metrics section within one session of finishing a
-  task/subtask. Record actual token bucket, rough time spent, accuracy/variance notes, and which LLM
-  tier was used. These retros feed future estimate calibration and the workflow cost audit.
+  task/subtask. Record the actual token bucket plus variance, token source + confidence,
+  nearest-0.5h time spent (note calendar days if useful), estimate accuracy rating (On target /
+  Under / Over), LLM tier actually used, and variance drivers/learnings. Escalate in the Progress Log
+  + GitHub issue if variance ≥1 bucket or confidence drops to Low.
 - **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
   only need the latest checklist state to resume.
 - **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
