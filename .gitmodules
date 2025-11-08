@@ -1,0 +1,3 @@
+[submodule "submodules/workflow-ready-template"]
+	path = submodules/workflow-ready-template
+	url = git@github.com-Wuodan:Wuodan/workflow-ready-template.git

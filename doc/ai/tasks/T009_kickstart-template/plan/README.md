@@ -1,6 +1,6 @@
 # Task T009 — Project Kickstart Template
 
-Last updated: 2025-11-08T18:06Z by Codex
+Last updated: 2025-11-08T18:26Z by Codex
 
 ## Context
 - We want to spin up a reusable template repo that captures our workflow best practices without project-specific details.
@@ -21,19 +21,20 @@ Last updated: 2025-11-08T18:06Z by Codex
 | ID | Title | Status | Checklist |
 |----|-------|--------|-----------|
 | S001 | Repo naming & description alignment | ☑ done | `plan/subtask_S001_repo-naming/README.md`
-| S002 | Template structure & contents | ☐ pending | `plan/subtask_S002_template-structure/README.md`
+| S002 | Template structure & contents | ☑ done | `plan/subtask_S002_template-structure/README.md`
 | S003 | Author README + AGENTS kickstart flow | ☐ pending | `plan/subtask_S003_instruction-authoring/README.md`
 | S004 | Submodule integration & wiring | ☐ pending | `plan/subtask_S004_submodule-integration/README.md`
 
 ## Master Checklist (T009)
 - [x] S001 — Repo naming & description alignment
-- [ ] S002 — Template structure & contents
+- [x] S002 — Template structure & contents
 - [ ] S003 — Author README + AGENTS kickstart flow
 - [ ] S004 — Submodule integration & wiring
 
 ## Progress Log (T009)
 - 2025-11-08T17:44Z — Drafted task plan scaffold pending naming discussion.
 - 2025-11-08T18:06Z — Completed S001: selected repo name `workflow-ready-template`, description "Kickstarts new repos with the documented AGENTS workflow baked in.", and submodule path `submodules/workflow-ready-template` to keep its Git nature obvious.
+- 2025-11-08T18:26Z — Completed S002: locked the initial template file map (README, AGENTS, doc/ai/tasks catalog, plan templates, `.gitignore`, and `.github/ISSUE_TEMPLATE/task.yml`) and documented the decision to stay documentation-first for now.
 
 ## References
 - T008 outputs (workflow guardrails) for reuse.
