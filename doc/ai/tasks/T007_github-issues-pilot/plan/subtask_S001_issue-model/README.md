@@ -17,10 +17,10 @@ Design a lightweight yet explicit model for representing llm-agent-dock tasks as
 5. Commit `T007/S001: define github issue model` once checklist items are complete.
 
 ## Checklist
-- [ ] Audited existing issue templates/labels.
-- [ ] Authored or updated GitHub issue template draft.
-- [ ] Defined label + linking policy and documented locally.
-- [ ] Documented findings in Feedback.
+- [x] Audited existing issue templates/labels.
+- [x] Authored or updated GitHub issue template draft.
+- [x] Defined label + linking policy and documented locally.
+- [x] Documented findings in Feedback.
 - [ ] Commit `T007/S001: define github issue model`.
 
 ## Inputs & References
@@ -32,6 +32,6 @@ Design a lightweight yet explicit model for representing llm-agent-dock tasks as
 - GitHub issue model documented, reviewed against checklist, Feedback updated with open questions.
 
 ## Feedback & Learnings
-- **Open Problems**: _TBD_
-- **Questions**: _TBD_
-- **Learnings**: _TBD_
+- **Open Problems**: Need to add the `task` + `status:*` labels inside GitHub once permissions confirmed; automation for label flips could come later.
+- **Questions**: Should we allow multiple simultaneous `status:*` labels for edge cases (e.g., Active + Blocked), or enforce the single-label rule defined here?
+- **Learnings**: No prior issue templates existed, so mirroring the repo plan requires a form that mandates links + sync plans to prevent documentation drift.

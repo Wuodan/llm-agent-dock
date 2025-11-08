@@ -27,6 +27,7 @@ Last updated: 2025-11-08T14:31Z by Codex
 
 ## Progress Log (T007)
 - 2025-11-08T14:31Z — Created task plan scaffold and initial checklist entries (Codex).
+- 2025-11-08T14:33Z — Drafted GitHub issue template plus label/linking policy (S001).
 
 ## References
 - `doc/ai/tasks/T007_github-issues-pilot/README.md`

@@ -1,0 +1,78 @@
+name: Repository Task (T###)
+description: Track llm-agent-dock tasks in GitHub while linking back to doc/ai plans.
+title: "T###: <short title>"
+labels:
+  - task
+  - status:proposed
+assignees: []
+body:
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      description: Match the `T###` folder under `doc/ai/tasks/`.
+      placeholder: T007
+    validations:
+      required: true
+  - type: input
+    id: task_slug
+    attributes:
+      label: Task Slug / Folder Name
+      description: `T###_<slug>` as used in branch + folder names.
+      placeholder: T007_github-issues-pilot
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Summarize why the task exists plus any constraints. Keep it high level—details live in the plan folder.
+      placeholder: Background, assumptions, dependencies.
+    validations:
+      required: true
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals & Deliverables
+      description: Bullet list of major outcomes. Reference local plan checklists for execution detail.
+      placeholder: "- Goal 1\n- Goal 2"
+    validations:
+      required: true
+  - type: textarea
+    id: github_local_links
+    attributes:
+      label: GitHub ↔ Local Links
+      description: Link the plan README, subtask folders, and any research logs. Include branch names (`task/...`, `subtask/...`) and relevant commits if they already exist.
+      placeholder: "- Plan: doc/ai/tasks/T###_<slug>/plan/README.md\n- Branch: task/T###_<slug>"
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow Guardrails / Notes
+      description: Call out branch policies, test expectations, or checklist prerequisites unique to this task.
+      placeholder: E.g., "Must update docker matrix before merging".
+  - type: textarea
+    id: sync_plan
+    attributes:
+      label: Status & Sync Plan
+      description: Describe how GitHub status/labels mirror local checklists (e.g., when to flip to **Active**, add `status:blocked`, etc.) plus any offline fallbacks.
+      placeholder: Provide update cadence + instructions.
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: Feedback & Open Questions
+      description: Track outstanding problems so they can be reflected in plan Feedback sections.
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I created/updated the matching folder under `doc/ai/tasks/T###_<slug>/`.
+          required: true
+        - label: I added or updated the task entry inside `doc/ai/tasks/README.md`.
+          required: true
+        - label: I will keep GitHub labels (`task`, `status:*`) in sync with the local plan checklist.
+          required: true
