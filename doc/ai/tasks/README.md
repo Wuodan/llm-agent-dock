@@ -17,6 +17,12 @@
 
 Update this table as tasks finish or new ones start. Mark exactly one row as **Active** so the current folder is obvious.
 
+## Plan Usage
+- Planning artifacts live inside each task’s `plan/` directory (see the table above for quick links).
+- Keep those plan files up to date; never overwrite another task’s plan when starting a new effort.
+- Reference `AGENTS.md` for repository-wide workflow expectations.
+- Keep this index/table in sync so future agents can immediately locate the active plan.
+
 ### Creating a New Task
 1. Copy `doc/ai/templates/task_plan_README.template.md` to `doc/ai/tasks/T###_<slug>/plan/README.md` and
    fill in the placeholders.
