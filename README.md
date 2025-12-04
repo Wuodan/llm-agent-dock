@@ -90,11 +90,12 @@ variant shares the same definition. You can dry-run it directly while the helper
 under construction:
 
 ```bash
-docker build \\
-  --build-arg BASE_IMAGE=ubuntu:24.04 \\
-  --build-arg TOOL=codex \\
-  --build-arg TARGETARCH=amd64 \\
-  -t llm-agent-dock:codex-ubuntu .
+docker build \
+  --build-arg BASE_IMAGE=ubuntu:24.04 \
+  --build-arg TOOL=codex \
+  --build-arg TARGETARCH=amd64 \
+  -t llm-agent-dock:codex-ubuntu \
+  .
 ```
 
 Use `TOOL=cline|codex|factory_ai_droid` and swap `BASE_IMAGE` with any alias from the matrix.
