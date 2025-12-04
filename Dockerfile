@@ -166,5 +166,25 @@ case "${TOOL}" in
 esac
 EOS
 
+# ARG UID=1000
+# ARG GID=1000
+
+# add user
+# RUN groupadd -g ${GID} appuser && \
+#     useradd -m -u ${UID} -g ${GID} -s /bin/bash appuser
+
+# USER appuser
+USER ubuntu
+
+ENV PIPX_HOME=/home/ubuntu/.local/pipx \
+    PIPX_BIN_DIR=/home/ubuntu/.local/bin \
+    PATH="/home/ubuntu/.local/bin:${PATH}"
+
+RUN PIP_NO_CACHE_DIR=1 \
+    pipx install uv \
+      --pip-args="--no-cache-dir"
+
+WORKDIR /workspace
+
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["bash"]

@@ -1,49 +1,8 @@
-# Task Index & Numbering
+# Task Notes
 
-Use this file to catalog every task in your project. Keep it updated so collaborators can find the
-active work without digging through branches.
+For new tasks, create a single file `doc/ai/tasks/TXXX/TASK.md` with:
+- Goal / scope
+- Key requirements or checklist
+- Notes/links if useful
 
-## Numbering Scheme
-- Tasks use identifiers `T###` (e.g., `T001`, `T002`).
-- Folder naming pattern: `doc/ai/tasks/T###_<slug>/`.
-- The task description **lives inside each folder’s `README.md`** and may include extra helper files for that task only.
-  Task READMEs define scope/instructions—planning and execution details belong in the task’s `plan/` folder.
-- Every `README.md` must link to:
-    - Its plan folder under `doc/ai/tasks/T###_<slug>/plan/` (and related subtask checklists) for execution detail.
-    - Relevant commits, research notes, or supporting artifacts.
-    - A Feedback section with open problems, outstanding questions, and learnings.
-
-## Task Overview
-| Task ID | Title | Status | Plan Folder | GitHub Issue | Notes |
-|---------|-------|--------|-------------|--------------|-------|
-| T001 | Build the llm-agent-dock Matrix Builder | Completed | `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/plan/` | — | `doc/ai/tasks/T001_llm-agent-dock-matrix-builder/README.md`
-| T002 | Validate llm-agent-dock Builds & Docker Access | Completed | `doc/ai/tasks/T002_validate-builds-docker/plan/` | — | `doc/ai/tasks/T002_validate-builds-docker/README.md`
-| T003 | Intensive Agent Startup & Prompt Capture | Completed | `doc/ai/tasks/T003_intensive-startup-tests/plan/` | — | `doc/ai/tasks/T003_intensive-startup-tests/README.md`
-| T004 | Enforce Branch Workflow & Merge Discipline | Completed | `doc/ai/tasks/T004_branch-workflow-discipline/plan/` | — | `doc/ai/tasks/T004_branch-workflow-discipline/README.md`
-| T005 | GHCR Auth & Release-Build Pipeline Readiness | Proposed | _(Plan pending)_ | — | `doc/ai/tasks/T005_ghcr-release-pipeline/README.md`
-| T006 | Deterministic Agent Auth Fixtures for Tests | Proposed | _(Plan pending)_ | — | `doc/ai/tasks/T006_agent-auth-fixtures/README.md`
-| T007 | Pilot GitHub-Issue Task Tracking | Completed | `doc/ai/tasks/T007_github-issues-pilot/plan/` | [Issue #1](https://github.com/Wuodan/llm-agent-dock/issues/1) | `doc/ai/tasks/T007_github-issues-pilot/README.md`
-| T008 | Workflow Cost Management Additions & Improvements | Completed | `doc/ai/tasks/T008_workflow-cost-management/plan/` | [Issue #2](https://github.com/Wuodan/llm-agent-dock/issues/2) | `doc/ai/tasks/T008_workflow-cost-management/README.md`
-| T009 | Project Kickstart Template | Proposed | `doc/ai/tasks/T009_kickstart-template/plan/` | — | `doc/ai/tasks/T009_kickstart-template/README.md`
-| T010 | Cost Reduction Tooling Analysis | Draft | `doc/ai/tasks/T010_cost-reduction-tooling/plan/` | — | `doc/ai/tasks/T010_cost-reduction-tooling/README.md`
-
-Update this table as tasks finish or new ones start. Mark exactly one row as **Active** so the current folder is
-obvious, and keep the GitHub Issue column in sync with the canonical tracker link (leave `—` until an issue exists).
-Open the matching draft PR (`task/T###_<slug>` → `development`) as soon as the task branch exists and mention
-“Closes #<issue>” in the description so the issue auto-closes when the PR merges.
-
-## Plan Usage
-- Planning artifacts live inside each task’s `plan/` directory (see the table above for quick links).
-- Keep those plan files up to date; never overwrite another task’s plan when starting a new effort.
-- Reference `AGENTS.md` for repository-wide workflow expectations.
-- Keep this index/table in sync so future agents can immediately locate the active plan.
-
-## Creating a New Task
-1. Copy `doc/ai/templates/task_plan_README.template.md` to `doc/ai/tasks/T###_<slug>/plan/README.md` and
-   fill in the placeholders.
-2. For each subtask, copy `doc/ai/templates/subtask_plan_README.template.md` into `plan/subtask_S###_<slug>/README.md`.
-   Keep the commit + feedback checklist items intact.
-3. Open a GitHub issue via `.github/ISSUE_TEMPLATE/task.yml`, apply the `task` label and a single
-   `status:*` label, then create a draft PR from `task/T###_<slug>` → `development` with "Closes
-   #<issue>" in the body.
-4. Link the new plan and subtask files inside the task README and update the table above.
+Keep it brief. Refer to `AGENTS.md` for the workflow overview.

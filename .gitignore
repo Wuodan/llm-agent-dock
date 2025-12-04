@@ -10,3 +10,4 @@ dist/
 .roomodes
 # may contain API-keys
 .roo/mcp.json
+**/.env

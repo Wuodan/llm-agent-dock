@@ -1,178 +1,23 @@
 # Repository Guidelines
 
-These instructions are intentionally task-agnostic. Every future effort in this repo should follow
-the workflow hardening and coding conventions below to keep hand-offs simple and recoverable.
+## Project Layout
+- `Dockerfile`, `docker-bake.hcl`: build matrix for base × tool variants.
+- `scripts/`: build/test helpers (`dev/bootstrap.sh`, `build.sh`, `test.sh`).
+- `tests/smoke/`: Bats smoke suites per tool.
+- `doc/`: user-facing docs and optional lightweight task notes.
 
-## Workflow Hardening
-- **Planning trail**: For every task `T###`, scaffold `doc/ai/tasks/T###_<slug>/plan/README.md` (start from
-  `doc/ai/templates/task_plan_README.template.md`) plus one subfolder per subtask (copy
-  `doc/ai/templates/subtask_plan_README.template.md`). Each plan file needs objective, deliverables,
-  flow, checklist, explicit “commit `T###/S###: short summary`” step, and a Feedback section updated at
-  completion.
-- **GitHub task issues**: Mirror every task in GitHub using `.github/ISSUE_TEMPLATE/task.yml` as soon as
-  the task branch is created. Apply the `task` label plus exactly one `status:*` label at a time
-  (`status:proposed`, `status:active`, `status:blocked`, `status:needs-review`, `status:completed`).
-  The issue stores the canonical scope/context; after creation, only update it for status changes or
-  major scope shifts. Local docs must link to the issue instead of duplicating its prose.
-- **Task PRs**: Immediately after opening the issue, create a draft PR from `task/T###_<slug>` to
-  `development` via the MCP `github` server. The PR description must include “Closes #<issue>` plus a
-  short scope summary. Keep the PR open throughout execution, push subtask commits to the task
-  branch, and only merge once reviews/tests finish. Do **not** merge task branches locally into
-  `development`; let the PR handle merges + issue auto-close.
-- **Progress log mirroring**: Every Progress Log entry added to the plan must be duplicated as a
-  comment on the task PR (queue it locally if offline, then post once connectivity returns) so
-  reviewers can track live checkpoints without touching the issue.
-- **Workflow cost check**: For any workflow/process change, jot a quick token-cost note. If the
-  change nudges spend, verify the benefit; if it pushes ≥5% more tokens per task (or a higher tier),
-  stop and get project-owner approval first. Log the analysis in the plan so the decision is
-  traceable.
-- **Estimate snapshot**: Every task + subtask plan must include the Estimate Snapshot block (token
-  bucket XS/XL, complexity 1–5, ≤3 work-type tags, LLM tier recommendation, confidence, optional
-  dependencies + risk hotspots). Update it whenever scope changes or projected usage jumps ≥1
-  bucket (≈≥5% cost). If confidence drops to Low or bucket increases, call it out in the Progress
-  Log + task PR comment before continuing.
-- **Retro metrics**: Populate the plan’s Retro Metrics section within one session of finishing a
-  task/subtask. Record the actual token bucket plus variance, token source + confidence,
-  nearest-0.5h time spent (note calendar days if useful), estimate accuracy rating (On target /
-  Under / Over), LLM tier actually used, and variance drivers/learnings. Escalate in the Progress Log
-  + task PR if variance ≥1 bucket or confidence drops to Low.
-- **GitHub operations via MCP**: Use the MCP `github` server for every interaction with GitHub—issues,
-  labels, comments, file edits, pushes, merges, etc. Local `git push`, `git pull`, `gh ...`, or direct
-  API calls are forbidden. If MCP access ever blocks a required action, pause and document it in the
-  plan/PR instead of falling back to local tooling.
-- **Checkpointing**: Update plan checklists immediately after any progress. A stopped laptop should
-  only need the latest checklist state to resume.
-- **Research logs**: When using MCP `brave-search` or `fetch`, capture URLs + summaries in the
-  relevant subtask doc (or under `doc/ai/research/` if reused later). Avoid repeating lookups.
-- **Documentation hygiene**: Do not paste chat/discussion transcripts into repository documents; summarize outcomes and
-  link to sanitized logs instead.
-- **Documentation scope**: Keep user-facing docs (e.g., root `README.md`) focused on product usage. Capture developer
-  workflow/process details here in `AGENTS.md` or contributor guides, and reserve AI-only instructions for `doc/ai/**`
-  so audiences stay separated.
-- **Template submodule**: The reusable workflow template lives at `submodules/workflow-ready-template`. After cloning,
-  run `git submodule update --init --recursive`. To pull upstream template changes, update inside the submodule
-  (`cd submodules/workflow-ready-template && git fetch && git checkout <tag-or-branch> && git pull`) then commit the
-  new submodule pointer with a `T009/S000: update template submodule` message.
-- **Commits per subtask**: Finish each subtask with `T###/S###: short summary`, where `S###` is the
-  zero-padded subtask index (use `S000` for task-level commits when no subtask exists). Never mix
-  unrelated work in a single commit.
-- **Python tooling**: Activate the repo venv (`source .venv/bin/activate`) whenever you need the
-  `python` command; the commit hook depends on `.venv/bin/python` being available.
-- **Commit lint hook**: Run `git config core.hooksPath githooks` once per clone to enable the tracked
-  `commit-msg` hook. It calls `devtools/check_commit_message.py` (via `.venv/bin/python`) to block
-  subjects that do not match `T###/S###: short summary`.
-- **Status visibility**: Keep a progress log in the root plan so new agents can inspect the latest
-  timestamp and continue confidently.
-- **Task catalog**: Number tasks as `T###` (e.g., `T001`) and track them under
-  `doc/ai/tasks/README.md`. Each task owns a folder `doc/ai/tasks/T###_<slug>/` whose `README.md`
-  holds the canonical brief and links to the GitHub issue. Mark exactly one row as **Active** and
-  ensure it matches the GitHub issue’s `status:active` label. Every task doc (and each subtask file)
-  needs a Feedback section with open problems, outstanding questions, and learnings for future
-  sessions plus a link back to the GitHub issue.
+## Build & Test
+- Bootstrap (when needed): `scripts/dev/bootstrap.sh`
+- Build a variant: `scripts/build.sh <tool> <base> [--platform linux/amd64 --load]`
+- Test an image: `scripts/test.sh <image-ref> [--tool <name>] [--no-pull]`
+- Helpful prereqs: `docker info`, `bats --version`
 
-### Branch Workflow (Tasks & Subtasks)
-1. **Start from `development`**: Before creating a task branch, run `git checkout development` and
-   `git pull --ff-only origin development` so you branch from the latest tip.
-2. **Task branch naming & remote tracking**: Create exactly one branch per active task named
-   `task/T###_<slug>` (slug matches the task folder) and push it immediately via the MCP `github`
-   server (`task/T###_<slug>` vs. `development`). All subsequent pushes for that branch also go
-   through MCP.
-3. **Issue + draft PR**: Right after the branch exists, open the GitHub issue (if not already) and a
-   draft PR from `task/T###_<slug>`→`development` with “Closes #<issue>` in the body. The PR stays
-   open/draft until tests + reviews finish; no direct merges into `development`.
-4. **Subtask branches**: For each subtask, branch from the task branch tip using
-   `subtask/T###_S#_<slug>` (example: `subtask/T004_S1_branch-policy`). Push new subtask branches via
-   MCP on creation so remote history mirrors the plan log.
-5. **Subtask integration**: When a subtask passes its checklist/tests, merge its branch back into the
-   task branch locally using `git merge --no-ff subtask/...` (still on the task branch), resolve any
-   conflicts, then push the updated task branch via MCP. Never merge the task branch into
-   `development` locally.
-6. **Push cadence**: Push after creation, after every meaningful checkpoint (tests run, major edits),
-   and before ending a session. If you cannot push (offline), record the reason + next steps in the
-   task plan progress log and the PR comment, then push as soon as connectivity returns.
-7. **PR review & merge**: All task-level merges happen via the GitHub PR. Once reviewers approve and
-   required checks pass, merge the PR (allowing GitHub to fast-forward or create the merge commit) so
-   the issue auto-closes. Only after the PR merge should you delete task/subtask branches (local+remote).
-8. **Force pushes**: `git push --force*` is forbidden on `development` and task branches. It remains
-   allowed on an unpublished subtask branch only to fix mistakes before hand-off or to excise
-   sensitive data, and the plan’s Feedback section must record the reason.
-9. **Session hand-off**: Before ending a session (or pausing a task), ensure the task branch is
-   pushed, leave the latest checkpoint in the plan + PR comment, and note any pending actions. You no
-   longer need to merge back to `development` for hand-off.
+## Coding Style
+- Bash: `#!/usr/bin/env bash`, `set -euo pipefail`, two-space indent, descriptive functions.
+- Dockerfile: args at top (`BASE_IMAGE`, `TOOL`, `TARGETARCH`), POSIX-friendly steps, comment extension points.
+- HCL/JSON: snake_case variables, kebab-case Bake targets.
+- Markdown: ~100-char wrap, tables for matrix summaries.
 
-### Planning Templates
-- Task-level plan template: `doc/ai/templates/task_plan_README.template.md`
-- Subtask plan template: `doc/ai/templates/subtask_plan_README.template.md`
-- Always copy these templates when creating new task or subtask plan files and keep the commit +
-  feedback checklist items intact.
-- The templates include a "GitHub Issue" section—populate it with the issue URL, current
-  `status:*` label, and sync expectations so anyone reviewing the plan can jump straight to the
-  canonical tracker.
-
-## Project Structure & Ownership
-- Root `Dockerfile` stays parameterized via `BASE_IMAGE`, `TOOL`, and `TARGETARCH` so the same
-  definition feeds every variant. Extension points must be commented (`# Add new agent installers
-  below`).
-- `docker-bake.hcl` owns the base×tool×arch matrix. Add new targets under the `matrix` group and
-  document tag formats inline for quick audits.
-- `scripts/` stores reproducible helpers (`dev/bootstrap.sh`, `build.sh`, `test.sh`, optional
-  `lint.sh`). Any behavior change must be mirrored in README usage docs.
-- `tests/` (prefer `tests/smoke/*.bats`) validates container boot, agent binaries, and required CLIs.
-- Each `doc/ai/tasks/T###_<slug>/plan/` folder captures planning artifacts; never delete history—append
-  timestamped entries so other agents can replay decisions.
-
-## Build, Test, and Development Commands
-- Use `docker buildx bake -f docker-bake.hcl matrix --set "*.platform=linux/amd64,linux/arm64"` to
-  build the full grid; scope with `matrix.<target>` when iterating.
-- `scripts/dev/bootstrap.sh` provisions BuildKit builders, QEMU emulation, and `.env` defaults; rerun
-  after Docker upgrades or new hosts.
-- `scripts/build.sh <tool> <base>` should wrap Bake with validation and support overrides for
-  registry, tag, and platform.
-- `scripts/test.sh <image-ref>` pulls (or builds) the given image and runs all smoke tests.
-- Before invoking build/test scripts, run `docker info` and `bats --version`; log the output in the
-  active plan. If the Docker socket is unavailable, follow the README troubleshooting steps
-  (docker group, rootless Docker, or remote builder) and document the outcome.
-- When iterating locally without a multi-arch builder, prefer
-  `scripts/build.sh <tool> <base> --platform linux/amd64 --load` followed by
-  `scripts/test.sh <image> --tool <name> --no-pull` so smoke tests run against the freshly built
-  image.
-
-## Coding Style & Naming Conventions
-- Bash scripts: `#!/usr/bin/env bash`, `set -euo pipefail`, two-space indentation, descriptive
-  function names (`build_matrix`, `push_variant`). Lint with `shellcheck`/`shfmt`.
-- Dockerfiles: declare ARGs at the top, then base OS prep, then tool install steps. Keep logic
-  POSIX-friendly for BuildKit portability.
-- HCL/JSON: snake_case variables, kebab-case Bake targets (e.g., `cline-arm64`).
-- Markdown: title case headings, wrap lines at ~100 chars, favor tables for matrix summaries.
-
-## Testing Guidelines
-- Tests rely on `bats` (or lightweight Bash) inside `tests/smoke/`; each file mirrors a tool
-  (`cline.bats`, `codex.bats`, etc.).
-- Name tests `test_<feature>` and cover container boot, agent CLI response, and required OS packages.
-- `scripts/test.sh --all` (or equivalent) should gate merges so both architectures are sampled at
-  least weekly.
-
-## Commit, PR, and Review Expectations
-- Commit subject format: `T###/S###: short summary` (≤72 chars). Example: `T004/S001: Add branch
-  workflow policy`. `S###` is zero-padded (`S001`, `S002`, …); use `S000` for task-wide commits if no
-  subtask applies.
-- Use `.venv/bin/python devtools/check_commit_message.py --message "T123/S045: Example"` (or pass a
-  commit message file) to lint manually; the `githooks/commit-msg` hook runs the same script
-  automatically.
-- PRs open as drafts when the task branch is created. The description must include “Closes #<issue>`,
-  affected matrix slices, commands executed, and links to governing tasks/plan docs. Update the PR
-  body whenever scope changes so reviewers never have to chase context. Include logs or screenshots
-  only when diagnosing failures.
-- Cross-reference planning docs (`doc/ai/tasks/T###_<slug>/plan/*.md`) whenever scope changes so
-  reviewers can trace intent quickly.
-- All merges into `development` happen through the GitHub PR (no local merges). After the PR merges
-  cleanly and the issue auto-closes, delete task/subtask branches locally + remotely and record the
-  merge in the plan progress log.
-
-## Security & Configuration Tips
-- Keep secrets (registry tokens, SSH keys, API keys) out of source control and Bake variables; inject
-  via `docker buildx bake --set *.secrets` or CI secrets managers.
-- Pin base images to digests during releases to avoid upstream drift; refresh digests quarterly or
-  when security advisories land.
-- Validate licenses and telemetry defaults before merging new agents or tooling. Document any
-  opt-out steps directly in the Dockerfile comments and README.
+## Testing Expectations
+- Prefer `tests/smoke/*.bats` for tool coverage; name tests `test_<feature>`.
+- When changing scripts or Docker build behavior, run the relevant smoke tests and note the command used.
