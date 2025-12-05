@@ -19,7 +19,7 @@ Options:
   -h, --help      Show this help and exit
 
 Examples:
-  scripts/test.sh ghcr.io/example/aicage:codex-ubuntu-latest
+  scripts/test.sh example/aicage:codex-ubuntu-latest
   scripts/test.sh aicage:cline-act-dev --tool cline -- --filter test_cli
 USAGE
   exit 1

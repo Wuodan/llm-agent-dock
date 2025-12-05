@@ -18,7 +18,10 @@ setup_file() {
     --env AICAGE_GID=2345 \
     --env AICAGE_USER=demo
   [ "$status" -eq 0 ]
-  IFS=$'\n' read -r uid gid home <<<"${output}"
+  mapfile -t lines <<<"${output}"
+  uid="${lines[0]}"
+  gid="${lines[1]}"
+  home="${lines[2]}"
   [ "${uid}" -eq 1234 ]
   [ "${gid}" -eq 2345 ]
   [[ "${home}" == "/home/demo" ]]

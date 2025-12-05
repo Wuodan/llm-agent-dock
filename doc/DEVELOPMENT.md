@@ -28,7 +28,6 @@ scripts/dev/bootstrap.sh
 ```
 
 `.env` variables (edit to override):
-- `AICAGE_REGISTRY` (default `ghcr.io`)
 - `AICAGE_REPOSITORY` (default `wuodan/aicage`)
 - `AICAGE_VERSION` (default `dev`)
 - `AICAGE_PLATFORMS` (default `linux/amd64,linux/arm64`)
@@ -39,7 +38,7 @@ scripts/build.sh <tool> <base> [--platform list] [--push|--load] [--print] [--se
 ```
 - `tool`: `cline`, `codex`, `factory_ai_droid`
 - `base`: `act`, `universal`, `ubuntu`
-- Images are tagged `${REGISTRY}/${REPOSITORY}:<tool>-<base>-<version>` from `.env` (or env vars).
+- Images are tagged `${REPOSITORY}:<tool>-<base>-<version>` from `.env` (or env vars).
 
 Examples:
 ```bash
@@ -59,7 +58,7 @@ setup, run `scripts/dev/bootstrap.sh` to create a builder, seed `.env`, and enab
 ## Test (smoke)
 Run all suites or filter by tool:
 ```bash
-scripts/test.sh ghcr.io/wuodan/aicage:codex-ubuntu-dev --tool codex --no-pull
+scripts/test.sh wuodan/aicage:codex-ubuntu-dev --tool codex --no-pull
 ```
 - `--pull` is on by default; add `--no-pull` for local images.
 - `AICAGE_IMAGE` can be set manually when running Bats directly.

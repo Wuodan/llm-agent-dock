@@ -1,11 +1,6 @@
-variable "REGISTRY" {
-  default = "ghcr.io"
-  description = "Registry host (override via AICAGE_REGISTRY)."
-}
-
 variable "REPOSITORY" {
   default = "wuodan/aicage"
-  description = "Registry namespace/repo (org/image)."
+  description = "Repository namespace/image."
 }
 
 variable "VERSION" {
@@ -31,7 +26,6 @@ variable "TOOLS" {
 # Shared target - override BASE_IMAGE/TOOL + tags downstream.
 target "_agent" {
   context = "."
-  dockerfile = "Dockerfile"
   platforms = [
     for platform in split(",", PLATFORMS) : trimspace(platform)
     if trimspace(platform) != ""
@@ -40,7 +34,7 @@ target "_agent" {
 }
 
 # Tag format reference:
-#   ${REGISTRY}/${REPOSITORY}:<tool>-<base>-${VERSION}
+#   ${REPOSITORY}:<tool>-<base>-${VERSION}
 
 # ---------------------------- Cline variants -----------------------------------
 target "cline-act" {
@@ -49,7 +43,7 @@ target "cline-act" {
     BASE_IMAGE = "ghcr.io/catthehacker/ubuntu:act-latest"
     TOOL       = "cline"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:cline-act-${VERSION}"]
+  tags = ["${REPOSITORY}:cline-act-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Cline CLI / VSCode AI"
   }
@@ -61,7 +55,7 @@ target "cline-universal" {
     BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
     TOOL       = "cline"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:cline-universal-${VERSION}"]
+  tags = ["${REPOSITORY}:cline-universal-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Cline CLI / VSCode AI"
   }
@@ -73,7 +67,7 @@ target "cline-ubuntu" {
     BASE_IMAGE = "ubuntu:24.04"
     TOOL       = "cline"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:cline-ubuntu-${VERSION}"]
+  tags = ["${REPOSITORY}:cline-ubuntu-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Cline CLI / VSCode AI"
   }
@@ -86,7 +80,7 @@ target "codex-act" {
     BASE_IMAGE = "ghcr.io/catthehacker/ubuntu:act-latest"
     TOOL       = "codex"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:codex-act-${VERSION}"]
+  tags = ["${REPOSITORY}:codex-act-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Codex coding agent"
   }
@@ -98,7 +92,7 @@ target "codex-universal" {
     BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
     TOOL       = "codex"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:codex-universal-${VERSION}"]
+  tags = ["${REPOSITORY}:codex-universal-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Codex coding agent"
   }
@@ -110,7 +104,7 @@ target "codex-ubuntu" {
     BASE_IMAGE = "ubuntu:24.04"
     TOOL       = "codex"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:codex-ubuntu-${VERSION}"]
+  tags = ["${REPOSITORY}:codex-ubuntu-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Codex coding agent"
   }
@@ -123,7 +117,7 @@ target "factory_ai_droid-act" {
     BASE_IMAGE = "ghcr.io/catthehacker/ubuntu:act-latest"
     TOOL       = "factory_ai_droid"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:factory_ai_droid-act-${VERSION}"]
+  tags = ["${REPOSITORY}:factory_ai_droid-act-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Factory.AI Droid agent"
   }
@@ -135,7 +129,7 @@ target "factory_ai_droid-universal" {
     BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
     TOOL       = "factory_ai_droid"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:factory_ai_droid-universal-${VERSION}"]
+  tags = ["${REPOSITORY}:factory_ai_droid-universal-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Factory.AI Droid agent"
   }
@@ -147,7 +141,7 @@ target "factory_ai_droid-ubuntu" {
     BASE_IMAGE = "ubuntu:24.04"
     TOOL       = "factory_ai_droid"
   }
-  tags = ["${REGISTRY}/${REPOSITORY}:factory_ai_droid-ubuntu-${VERSION}"]
+  tags = ["${REPOSITORY}:factory_ai_droid-ubuntu-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Factory.AI Droid agent"
   }

@@ -14,7 +14,7 @@ usage() {
 Usage: scripts/test-all.sh [options] [-- <bats-args>]
 
 Runs smoke tests for every <tool>-<base> combination. Image references are derived from
-registry/repository/version values (defaults align with scripts/build.sh). Options are forwarded to
+repository/version values (defaults align with scripts/build.sh). Options are forwarded to
 each scripts/test.sh invocation.
 
 Options:
@@ -68,7 +68,6 @@ main() {
   parse_args "$@"
   load_env_file
 
-  local registry="${AICAGE_REGISTRY:-${REGISTRY:-ghcr.io}}"
   local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
   local version="${AICAGE_VERSION:-${VERSION:-latest}}"
 
@@ -79,7 +78,7 @@ main() {
 
   for tool in "${TOOLS[@]}"; do
     for base in "${BASES[@]}"; do
-      local image="${registry}/${repository}:${tool}-${base}-${version}"
+      local image="${repository}:${tool}-${base}-${version}"
       echo "[test-all] Testing ${image}" >&2
       "${ROOT_DIR}/scripts/test.sh" "${image}" --tool "${tool}" "${pull_flag[@]}" -- "${BATS_ARGS[@]}"
     done

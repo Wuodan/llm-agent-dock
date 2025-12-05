@@ -121,14 +121,12 @@ main() {
   contains "${TOOL}" "${SUPPORTED_TOOLS[@]}" || die "Unsupported tool '${TOOL}'. Valid: ${SUPPORTED_TOOLS[*]}"
   contains "${BASE}" "${SUPPORTED_BASES[@]}" || die "Unsupported base '${BASE}'. Valid: ${SUPPORTED_BASES[*]}"
 
-  local registry="${AICAGE_REGISTRY:-${REGISTRY:-ghcr.io}}"
   local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
   local version="${AICAGE_VERSION:-${VERSION:-latest}}"
   local platforms="${PLATFORM_OVERRIDE:-${AICAGE_PLATFORMS:-${PLATFORMS:-linux/amd64,linux/arm64}}}"
 
   local target="${TOOL}-${BASE}"
   local env_prefix=(
-    REGISTRY="${registry}"
     REPOSITORY="${repository}"
     VERSION="${version}"
     PLATFORMS="${platforms}"
@@ -151,7 +149,7 @@ main() {
 
   cmd+=("${BAKE_FLAGS[@]}")
 
-  echo "[build] Target=${target} Platforms=${platforms} Registry=${registry}/${repository} Version=${version}" >&2
+  echo "[build] Target=${target} Platforms=${platforms} Repository=${repository} Version=${version}" >&2
   "${cmd[@]}"
 }
 

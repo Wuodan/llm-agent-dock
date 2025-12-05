@@ -1,0 +1,104 @@
+name: Build, Test, and Publish
+
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+  pull_request:
+  workflow_dispatch:
+
+env:
+  PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  test:
+    name: Test ${{ matrix.tool }}-${{ matrix.base }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [cline, codex, factory_ai_droid]
+        base: [act, universal, ubuntu]
+    env:
+      REPOSITORY: wuodan/aicage
+      VERSION: ci-${{ github.sha }}
+      PLATFORMS: linux/amd64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare env overrides
+        run: |
+          cat > .env <<EOF
+          REPOSITORY=${REPOSITORY}
+          VERSION=${VERSION}
+          PLATFORMS=${PLATFORMS}
+          EOF
+
+      - name: Install bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Build image
+        run: |
+          scripts/build.sh "${{ matrix.tool }}" "${{ matrix.base }}" \
+            --platform "${PLATFORMS}" --load
+
+      - name: Run smoke tests
+        run: |
+          scripts/test.sh \
+            "${REPOSITORY}:${{ matrix.tool }}-${{ matrix.base }}-${VERSION}" \
+            --no-pull \
+            --tool "${{ matrix.tool }}"
+
+  publish:
+    name: Build and push
+    runs-on: ubuntu-latest
+    needs: test
+    if: >
+      startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: read
+    env:
+      REPOSITORY: wuodan/aicage
+      VERSION: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare env overrides
+        run: |
+          cat > .env <<EOF
+          REPOSITORY=${REPOSITORY}
+          VERSION=${VERSION}
+          PLATFORMS=${PLATFORMS}
+          EOF
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push matrix
+        uses: docker/bake-action@v5
+        env:
+          REPOSITORY: ${{ env.REPOSITORY }}
+          VERSION: ${{ env.VERSION }}
+          PLATFORMS: ${{ env.PLATFORMS }}
+        with:
+          files: docker-bake.hcl
+          targets: matrix
+          push: true
+          set: |
+            *.platform=${{ env.PLATFORMS }}

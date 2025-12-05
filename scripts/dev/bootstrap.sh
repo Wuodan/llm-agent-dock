@@ -4,7 +4,6 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ENV_FILE="${ROOT_DIR}/.env"
 DEFAULT_BUILDER="${AICAGE_BUILDER_NAME:-aicage}"
-DEFAULT_REGISTRY="${AICAGE_REGISTRY:-ghcr.io}"
 DEFAULT_REPOSITORY="${AICAGE_REPOSITORY:-wuodan/aicage}"
 DEFAULT_VERSION="${AICAGE_VERSION:-dev}"
 DEFAULT_PLATFORMS="${AICAGE_PLATFORMS:-linux/amd64,linux/arm64}"

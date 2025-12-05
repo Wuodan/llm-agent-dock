@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1.7-labs
 ARG BASE_IMAGE=ubuntu:24.04
 ARG TOOL=codex
-ARG TARGETARCH=amd64
 ARG NODEJS_VERSION=20.17.0
 
 FROM ${BASE_IMAGE} AS runtime

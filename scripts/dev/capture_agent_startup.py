@@ -34,11 +34,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--image",
         help=(
-            "Override image tag (default ghcr.io/wuodan/aicage:<tool>-<base>-latest). "
+            "Override image tag (default wuodan/aicage:<tool>-<base>-latest). "
             "If provided, overrides --repository/--registry/--version"
         ),
     )
-    parser.add_argument("--registry", default="ghcr.io", help="Registry host when deriving tag")
+    parser.add_argument("--registry", default="", help="Registry host when deriving tag")
     parser.add_argument("--repository", default="wuodan/aicage", help="Registry namespace/image")
     parser.add_argument("--version", default="latest", help="Tag suffix in <tool>-<base>-<version>")
     parser.add_argument("--timeout", type=float, default=20.0, help="Seconds before docker run is terminated")
@@ -74,7 +74,10 @@ def build_parser() -> argparse.ArgumentParser:
 def derive_image(args: argparse.Namespace) -> str:
     if args.image:
         return args.image
-    return f"{args.registry.rstrip('/')}/{args.repository.strip('/')}:" f"{args.tool}-{args.base}-{args.version}"
+    registry = args.registry.rstrip("/")
+    repo = args.repository.strip("/")
+    prefix = f"{registry}/" if registry else ""
+    return f"{prefix}{repo}:{args.tool}-{args.base}-{args.version}"
 
 
 def build_container_command(agent_cmd: str, use_script: bool) -> str:

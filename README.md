@@ -10,18 +10,18 @@ base OS, pull the tag, and you get a ready-to-run shell with the agent preinstal
 - Thin images: agent install only; you bring your own API keys.
 
 ## Image tags
-Tags follow `${REGISTRY}/${REPOSITORY}:<tool>-<base>-<version>`.
+Tags follow `${REPOSITORY}:<tool>-<base>-<version>`.
 
-Default registry/repo: `ghcr.io/wuodan/aicage`.
+Default repo: `wuodan/aicage` on Docker Hub.
 
 Examples:
-- `ghcr.io/wuodan/aicage:codex-ubuntu-latest`
-- `ghcr.io/wuodan/aicage:cline-act-latest`
+- `wuodan/aicage:codex-ubuntu-latest`
+- `wuodan/aicage:cline-act-latest`
 
 ## Quick start (use prebuilt images)
 ```bash
 # Pull an image
-docker pull ghcr.io/wuodan/aicage:codex-ubuntu-latest
+docker pull wuodan/aicage:codex-ubuntu-latest
 
 # Run a shell with your API key injected and a user matching your host UID/GID
 docker run -it --rm \
@@ -30,7 +30,7 @@ docker run -it --rm \
   -e AICAGE_GID=$(id -g) \
   -e AICAGE_USER=$(id -un) \
   -v "$(pwd)":/workspace \
-  ghcr.io/wuodan/aicage:codex-ubuntu-latest \
+  wuodan/aicage:codex-ubuntu-latest \
   bash
 ```
 
