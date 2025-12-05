@@ -1,185 +1,60 @@
-# 🧠 llm-agent-dock
+# llm-agent-dock
 
-llm-agent-dock builds ready-to-run Docker images for popular agentic coding assistants. Each image
-combines a curated “fat” base OS with a thin layer that installs and configures the selected agent.
-The same configuration produces images for `linux/amd64` and `linux/arm64`.
+Docker images for popular AI coding agents, built from a single, repeatable recipe. Pick a tool and
+base OS, pull the tag, and you get a ready-to-run shell with the agent preinstalled.
 
----
+## What you get
+- Prebuilt tags for `cline`, `codex`, and `factory_ai_droid`.
+- Base choices: `ubuntu` (24.04), `act` (CI-friendly), and `universal` (Dev Container base).
+- Multi-arch images (`linux/amd64` and `linux/arm64`) via Buildx.
+- Thin images: agent install only; you bring your own API keys.
 
-## Why Use It?
+## Image tags
+Tags follow `${REGISTRY}/${REPOSITORY}:<tool>-<base>-<version>`.
 
-- **One command, many variants**: Generate every base × tool combination through a single Bake file.
-- **Consistent tooling**: Shared packages (git, curl, Python, etc.) plus per-agent installers ensure
-  parity across environments.
-- **Multi-arch by default**: Buildx and QEMU support mean you can test both architectures locally or
-  in CI.
-- **Smoke-tested**: Automated Bats suites confirm that containers boot and agent CLIs respond.
+Default registry/repo: `ghcr.io/wuodan/llm-agent-dock`.
 
----
+Examples:
+- `ghcr.io/wuodan/llm-agent-dock:codex-ubuntu-latest`
+- `ghcr.io/wuodan/llm-agent-dock:cline-act-latest`
 
-## Matrix at a Glance
+## Quick start (use prebuilt images)
+```bash
+# Pull an image
+docker pull ghcr.io/wuodan/llm-agent-dock:codex-ubuntu-latest
 
-| Base Alias | Image Reference                                |
-|------------|------------------------------------------------|
-| `act`      | `ghcr.io/catthehacker/ubuntu:act-latest`       |
-| `universal`| `ghcr.io/devcontainers/images/universal:2-linux` |
-| `ubuntu`   | `ubuntu:24.04`                                 |
+# Run a shell with your API key injected
+docker run -it --rm \
+  -e OPENAI_API_KEY=sk-... \
+  ghcr.io/wuodan/llm-agent-dock:codex-ubuntu-latest \
+  bash
+```
 
-| Tool Key          | Description            |
-|-------------------|------------------------|
-| `cline`           | Cline CLI / VSCode AI  |
-| `codex`           | Codex coding agent     |
-| `factory_ai_droid`| Factory.AI Droid agent |
+Swap `codex` for `cline` or `factory_ai_droid`, and `ubuntu` for `act` or `universal` as needed.
 
-Platforms: `linux/amd64`, `linux/arm64`.
-
----
-
-## Quick Start
-
-> Scripts are introduced gradually; check `git log` or the active plan folder under `doc/ai/tasks/T###_<slug>/plan/` for availability while the
-> project is under active development.
+## Build locally
+Prerequisites: Docker with Buildx, and (for multi-arch) binfmt/QEMU.
 
 ```bash
-# 1) Prepare BuildKit + QEMU emulation
+# One-time setup: create a buildx builder, seed .env defaults, and enable binfmt
 scripts/dev/bootstrap.sh
 
-# 2) Build a specific variant
-scripts/build.sh cline ubuntu --platform linux/amd64
-
-# 3) Run smoke tests against a tag
-scripts/test.sh ghcr.io/<org>/llm-agent-dock:cline-ubuntu-latest
+# Build a single variant (loads into your local image store)
+scripts/build.sh codex ubuntu --platform linux/amd64 --load
 ```
 
-The bootstrap helper also writes a `.env` file with `LLM_AGENT_DOCK_*` defaults so the build/test
-scripts share registry, tag, and platform settings. Install `bats` (`brew install bats-core` or
-`npm install -g bats`) before running `scripts/test.sh`.
+`scripts/build.sh` tags images as `${LLM_AGENT_DOCK_REGISTRY}/${LLM_AGENT_DOCK_REPOSITORY}:<tool>-<base>-<version>`.
+Edit `.env` to change registry/repo/version/platform defaults.
 
-### Prerequisites & Troubleshooting
-
-1. **Docker socket access** — run `docker info` first. If you see `permission denied ... /var/run/docker.sock`, either add your user to the `docker` group (`sudo usermod -aG docker $USER && newgrp docker`), enable rootless Docker (`dockerd-rootless-setuptool.sh install`), or point Buildx at a remote builder (`docker context create ...` + `docker buildx create ... --use`).
-2. **Bats availability** — `bats --version` must succeed on the host before invoking `scripts/test.sh` (install via Homebrew or npm as noted above).
-3. **Local image testing** — when you want to run smoke tests without pushing images, call `scripts/build.sh <tool> <base> --platform linux/amd64 --load` so the result lands in the local Docker image store, then run `scripts/test.sh <tag> --tool <name> --no-pull`.
-4. **Pip on Debian/Ubuntu** — these bases enforce [PEP 668](https://peps.python.org/pep-0668/); use `python3 -m pip install --break-system-packages --ignore-installed ...` when upgrading core Python tooling inside the image.
-5. **Node CLIs with native modules** — the Dockerfile installs `build-essential` so packages like `cline` (which depends on `better-sqlite3`) have `make`/`g++` available. If you trim dependencies later, keep that requirement in mind.
-6. **GitHub Container Registry auth for `universal` base** — `ghcr.io/devcontainers/images/universal:2-linux` returns `403 Forbidden` unless you run `docker login ghcr.io -u <github-username> -p <PAT with read:packages>`. Do this before building any `*-universal` target.
-
----
-
-## Configuration Defaults
-
-`scripts/dev/bootstrap.sh` seeds a `.env` file in the repo root so every command agrees on image
-coordinates:
-
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `LLM_AGENT_DOCK_REGISTRY` | Registry hostname used for tags. | `ghcr.io` |
-| `LLM_AGENT_DOCK_REPOSITORY` | Namespace/repo appended to the registry. | `wuodan/llm-agent-dock` |
-| `LLM_AGENT_DOCK_VERSION` | Tag suffix (format: `<tool>-<base>-<version>`). | `latest` |
-| `LLM_AGENT_DOCK_PLATFORMS` | Comma-separated build platforms for Buildx. | `linux/amd64,linux/arm64` |
-
-Override any value via environment variables (`export LLM_AGENT_DOCK_VERSION=dev`) or by editing the
-generated `.env`.
-
----
-
-## Dockerfile Args
-
-The root `Dockerfile` accepts `BASE_IMAGE`, `TOOL`, and `TARGETARCH` build args so every base × tool
-variant shares the same definition. You can dry-run it directly while the helper scripts are still
-under construction:
+## Smoke tests
+Smoke suites live in `tests/smoke/` (one per tool). After building or pulling an image, run:
 
 ```bash
-docker build \
-  --build-arg BASE_IMAGE=ubuntu:24.04 \
-  --build-arg TOOL=codex \
-  --build-arg TARGETARCH=amd64 \
-  -t llm-agent-dock:codex-ubuntu \
-  .
+scripts/test.sh ghcr.io/wuodan/llm-agent-dock:codex-ubuntu-latest --tool codex
 ```
 
-Use `TOOL=cline|codex|factory_ai_droid` and swap `BASE_IMAGE` with any alias from the matrix.
+Use `--no-pull` to test a locally built image. Install `bats` if you plan to run the suites.
 
----
-
-## Build Automation
-
-- `docker-bake.hcl` defines one target per base × tool combination plus a `matrix` group so
-  `docker buildx bake -f docker-bake.hcl matrix --print` shows the full grid.
-- `scripts/build.sh <tool> <base>` wraps Bake with guardrails. Useful flags:
-  - `--platform <list>` overrides `LLM_AGENT_DOCK_PLATFORMS`.
-  - `--push` / `--load` toggle Buildx outputs.
-  - `--print` previews the Bake config for the selected target.
-  - `--set key=value` forwards arbitrary Bake overrides (for example, `--set REGISTRY=example.com`).
-- All builds tag images as `${LLM_AGENT_DOCK_REGISTRY}/${LLM_AGENT_DOCK_REPOSITORY}:<tool>-<base>-<version>`.
-
----
-
-## Testing
-
-Smoke tests live under `tests/smoke/` (one Bats suite per tool) and rely on Docker to run each image
-under test. Use `scripts/test.sh` to orchestrate them:
-
-```bash
-scripts/test.sh ghcr.io/<org>/llm-agent-dock:codex-ubuntu-latest --tool codex --no-pull
-```
-
-- `--tool <name>` limits execution to a single suite; omit it to run all suites.
-- `--pull` is enabled by default; pass `--no-pull` to use a local image.
-- When running Bats manually, export `LLM_AGENT_IMAGE=<tag>` so `tests/smoke/common.bash` knows
-  which image to start.
-
-## Agent Startup Notes
-
-### Cline
-- Images now ship Node.js 20.17.0 so the bundled "core" process launches cleanly. If you derive
-  your own Dockerfile, keep Node ≥20 or Cline will emit `Node.js version 20+ is required` and exit.
-- Provider auth happens on first launch. Export `OPENAI_API_KEY` (or run `cline auth ...`) before
-  invoking unattended workflows.
-
-### Codex
-- Avoid the interactive OAuth dance by streaming an API key into the CLI: `printf "$OPENAI_API_KEY" |
-  codex login --with-api-key`. The key is stored under `~/.codex/config.toml` inside the container.
-- Codex expects a TTY; when capturing startup logs in CI, run it via
-  `scripts/dev/capture_agent_startup.py codex ubuntu --pty --timeout 10` so stdout/stderr are drained
-  asynchronously.
-
-### Factory AI Droid
-- Running `factory_ai_droid` populates `~/.factory/{commands,droids}`. Set `HOME=/tmp/droid`
-  (or mount a throwaway volume) when running smoke tests to avoid writing into the image layer.
-
-## Startup Capture Helper
-
-`scripts/dev/capture_agent_startup.py` wraps `docker run` with async stdout/stderr readers, optional
-PTY allocation, and per-run log files under `doc/ai/tasks/<task>/plan/logs/`. Example:
-
-```bash
-scripts/dev/capture_agent_startup.py codex act --pty \
-  --timeout 15 --env OPENAI_API_KEY=dummy-token
-```
-
-The script prints a log path upon completion so you can staple sanitized output into task plans.
-
----
-
-## Extending the Catalog
-
-1. **Add a base**:
-   - Append the image reference to `docker-bake.hcl` (new target + `matrix` group entry).
-   - Adjust the Dockerfile’s base-prep section if the OS needs extra packages.
-   - Document the alias in the matrix table.
-2. **Add a tool**:
-   - Extend the Dockerfile’s installer `case` block and comment where new agents should plug in.
-   - Create a Bake target + smoke suite (`tests/smoke/<tool>.bats`).
-   - Update scripts/tests to mention the new tool where validation is performed.
-3. **Share the process**: Update this README, `AGENTS.md`, and the active plan folder (e.g., `doc/ai/tasks/T002_validate-builds-docker/plan/`) so future agents can
-   trace decisions and rerun commands.
-
-Need contributor details or current milestones? See the relevant task folder under
-`doc/ai/tasks/` and its `plan/` subdirectory (e.g., `doc/ai/tasks/T002_validate-builds-docker/plan/`).
-
----
-
-## License
-
-Apache-2.0 — see `LICENSE`.
+## Need to hack on this?
+Developer-focused docs live in `doc/DEVELOPMENT.md` (scripts, tagging, adding bases/tools, testing
+expectations).
