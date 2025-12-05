@@ -13,22 +13,6 @@ log() {
   printf '[bootstrap] %s\n' "$*"
 }
 
-ensure_env_file() {
-  if [[ -f "${ENV_FILE}" ]]; then
-    log "Environment file already exists (${ENV_FILE})."
-    return
-  fi
-
-  cat >"${ENV_FILE}" <<EOF_ENV
-# aicage defaults — edit to match your registry/namespace
-AICAGE_REGISTRY=${DEFAULT_REGISTRY}
-AICAGE_REPOSITORY=${DEFAULT_REPOSITORY}
-AICAGE_VERSION=${DEFAULT_VERSION}
-AICAGE_PLATFORMS=${DEFAULT_PLATFORMS}
-EOF_ENV
-  log "Wrote default env configuration to ${ENV_FILE}."
-}
-
 require_docker() {
   if ! command -v docker >/dev/null 2>&1; then
     log "docker CLI not found; install Docker Desktop or Engine first."
@@ -59,7 +43,6 @@ enable_qemu() {
 }
 
 main() {
-  ensure_env_file
   ensure_builder
   enable_qemu
   log "Bootstrap complete. Platforms: ${DEFAULT_PLATFORMS}. Override via ${ENV_FILE}."

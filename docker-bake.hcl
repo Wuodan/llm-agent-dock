@@ -58,7 +58,7 @@ target "cline-act" {
 target "cline-universal" {
   inherits = ["_agent"]
   args = {
-    BASE_IMAGE = "ghcr.io/devcontainers/images/universal:2-linux"
+    BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
     TOOL       = "cline"
   }
   tags = ["${REGISTRY}/${REPOSITORY}:cline-universal-${VERSION}"]
@@ -95,7 +95,7 @@ target "codex-act" {
 target "codex-universal" {
   inherits = ["_agent"]
   args = {
-    BASE_IMAGE = "ghcr.io/devcontainers/images/universal:2-linux"
+    BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
     TOOL       = "codex"
   }
   tags = ["${REGISTRY}/${REPOSITORY}:codex-universal-${VERSION}"]
@@ -132,7 +132,7 @@ target "factory_ai_droid-act" {
 target "factory_ai_droid-universal" {
   inherits = ["_agent"]
   args = {
-    BASE_IMAGE = "ghcr.io/devcontainers/images/universal:2-linux"
+    BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
     TOOL       = "factory_ai_droid"
   }
   tags = ["${REGISTRY}/${REPOSITORY}:factory_ai_droid-universal-${VERSION}"]

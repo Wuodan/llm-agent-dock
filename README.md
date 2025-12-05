@@ -23,38 +23,19 @@ Examples:
 # Pull an image
 docker pull ghcr.io/wuodan/aicage:codex-ubuntu-latest
 
-# Run a shell with your API key injected
+# Run a shell with your API key injected and a user matching your host UID/GID
 docker run -it --rm \
   -e OPENAI_API_KEY=sk-... \
+  -e AICAGE_UID=$(id -u) \
+  -e AICAGE_GID=$(id -g) \
+  -e AICAGE_USER=$(id -un) \
+  -v "$(pwd)":/workspace \
   ghcr.io/wuodan/aicage:codex-ubuntu-latest \
   bash
 ```
 
 Swap `codex` for `cline` or `factory_ai_droid`, and `ubuntu` for `act` or `universal` as needed.
 
-## Build locally
-Prerequisites: Docker with Buildx, and (for multi-arch) binfmt/QEMU.
-
-```bash
-# One-time setup: create a buildx builder, seed .env defaults, and enable binfmt
-scripts/dev/bootstrap.sh
-
-# Build a single variant (loads into your local image store)
-scripts/build.sh codex ubuntu --platform linux/amd64 --load
-```
-
-`scripts/build.sh` tags images as `${AICAGE_REGISTRY}/${AICAGE_REPOSITORY}:<tool>-<base>-<version>`.
-Edit `.env` to change registry/repo/version/platform defaults.
-
-## Smoke tests
-Smoke suites live in `tests/smoke/` (one per tool). After building or pulling an image, run:
-
-```bash
-scripts/test.sh ghcr.io/wuodan/aicage:codex-ubuntu-latest --tool codex
-```
-
-Use `--no-pull` to test a locally built image. Install `bats` if you plan to run the suites.
-
-## Need to hack on this?
-Developer-focused docs live in `doc/DEVELOPMENT.md` (scripts, tagging, adding bases/tools, testing
-expectations).
+The image boots as root, then `scripts/entrypoint.sh` creates a matching user/group from
+`AICAGE_UID`/`AICAGE_GID` (defaults `1000`) and switches into it with `gosu`. `/workspace` is
+created and chowned to that user.

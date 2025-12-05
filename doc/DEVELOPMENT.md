@@ -7,10 +7,13 @@ need to develop, extend, or debug the build/test tooling.
 - `Dockerfile` — single definition used for every base × tool combination.
 - `docker-bake.hcl` — targets for each matrix entry plus a `matrix` group.
 - `scripts/`
-  - `dev/bootstrap.sh` — creates/uses a Buildx builder, seeds `.env`, enables binfmt.
+  - `dev/bootstrap.sh` — creates/uses a Buildx builder, enables binfmt.
   - `build.sh` — wraps `docker buildx bake` with guardrails.
+  - `build-all.sh` — builds every tool/base combination, forwarding build flags.
   - `test.sh` — runs smoke tests via Bats.
+  - `test-all.sh` — runs smoke suites for every tool/base using derived image tags.
   - `installers/` — per-tool installer scripts invoked during the Docker build.
+  - `entrypoint.sh` — runtime user bootstrap (creates UID/GID, workspace, drops to gosu).
 - `tests/smoke/` — Bats smoke suites per tool.
 
 ## Prerequisites
@@ -19,7 +22,7 @@ need to develop, extend, or debug the build/test tooling.
 - Bats (`bats --version`) to run smoke tests.
 
 ## Bootstrap
-Creates `.env` with defaults, ensures a Buildx builder, and attempts binfmt setup:
+Ensures a Buildx builder, and attempts binfmt setup:
 ```bash
 scripts/dev/bootstrap.sh
 ```
@@ -43,9 +46,15 @@ Examples:
 # Build and load a single-arch image locally
 scripts/build.sh codex ubuntu --platform linux/amd64 --load
 
+# Build the full matrix
+scripts/build-all.sh --load
+
 # Preview bake config without building
 scripts/build.sh cline act --print
 ```
+
+Quick-start prerequisites: Docker with Buildx and (for multi-arch) binfmt/QEMU. For first-time
+setup, run `scripts/dev/bootstrap.sh` to create a builder, seed `.env`, and enable binfmt.
 
 ## Test (smoke)
 Run all suites or filter by tool:
@@ -54,6 +63,21 @@ scripts/test.sh ghcr.io/wuodan/aicage:codex-ubuntu-dev --tool codex --no-pull
 ```
 - `--pull` is on by default; add `--no-pull` for local images.
 - `AICAGE_IMAGE` can be set manually when running Bats directly.
+
+Test the full matrix using derived tags:
+```bash
+scripts/test-all.sh --no-pull
+```
+
+Smoke suites live in `tests/smoke/` (one per tool). Install `bats` to run the suites (e.g.,
+`npm install -g bats`).
+
+## Runtime user
+Images start as root and rely on `scripts/entrypoint.sh` to create a user at runtime. It reads
+`AICAGE_UID`/`AICAGE_GID`/`AICAGE_USER` (defaults `1000`/`1000`/`aicage`), creates the group/user
+if missing, creates `/workspace`, chowns it, and switches to that account with `gosu`. Mount host
+code into `/workspace` and pass your host IDs, e.g.
+`-e AICAGE_UID=$(id -u) -e AICAGE_GID=$(id -g) -e AICAGE_USER=$(id -un)`.
 
 ## Adding a tool
 1) Create `scripts/installers/install_<tool>.sh` (executable) that installs the agent; fail fast on
@@ -73,7 +97,6 @@ scripts/test.sh ghcr.io/wuodan/aicage:codex-ubuntu-dev --tool codex --no-pull
 - Markdown: wrap near ~100 chars, keep tables readable.
 
 ## Troubleshooting
-- **Docker auth for `universal` base**: `docker login ghcr.io` with a PAT that has `read:packages`.
 - **Missing bats**: `npm install -g bats` or `brew install bats-core`.
 - **Multi-arch failures**: rerun `scripts/dev/bootstrap.sh` to recreate builder and reconfigure
   binfmt; pass `--platform linux/amd64` to build single-arch.
