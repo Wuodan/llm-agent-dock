@@ -19,7 +19,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
     AGENT_TARGETARCH=${TARGETARCH} \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    PATH="/root/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin" \
+    AICAGE_USER=aicage \
+    AICAGE_UID=1000 \
+    AICAGE_GID=1000 \
+    PIPX_HOME=/opt/pipx \
+    PIPX_BIN_DIR=/opt/pipx/bin \
+    PATH="/opt/pipx/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin" \
     NPM_CONFIG_PREFIX=/usr/local
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -34,18 +39,19 @@ RUN set -euxo pipefail \
            ca-certificates \
            curl \
            git \
-           gnupg \
-           jq \
-           locales \
-           nano \
-           openssh-client \
-           pipx \
-           python3 \
-           python3-pip \
-           python3-venv \
-           ripgrep \
-           sudo \
-           tar \
+         gnupg \
+         jq \
+         locales \
+          nano \
+          openssh-client \
+          pipx \
+          python3 \
+          python3-pip \
+          python3-venv \
+          gosu \
+          ripgrep \
+          sudo \
+          tar \
            tini \
            unzip \
            xz-utils \
@@ -72,36 +78,21 @@ RUN set -euxo pipefail \
 
 # Add new base tweaks here (e.g., base-specific packages or config overrides).
 
-RUN pipx ensurepath >/dev/null 2>&1 || true
 RUN python3 -m pip install --break-system-packages --ignore-installed --upgrade pip setuptools wheel
 RUN npm config set prefix /usr/local
-
-# Shared workspace directory and convenience symlinks.
-RUN mkdir -p /workspace && ln -sf /workspace /root/workspace
+RUN mkdir -p ${PIPX_HOME} ${PIPX_BIN_DIR}
+RUN PIPX_HOME=${PIPX_HOME} PIPX_BIN_DIR=${PIPX_BIN_DIR} pipx ensurepath
 
 # Tool installers -----------------------------------------------------------
 RUN --mount=type=bind,source=scripts/installers/,target=/tmp/installers,readonly \
     /tmp/installers/install_${TOOL}.sh
 
-# ARG UID=1000
-# ARG GID=1000
-
-# add user
-# RUN groupadd -g ${GID} appuser && \
-#     useradd -m -u ${UID} -g ${GID} -s /bin/bash appuser
-
-# USER appuser
-USER ubuntu
-
-ENV PIPX_HOME=/home/ubuntu/.local/pipx \
-    PIPX_BIN_DIR=/home/ubuntu/.local/bin \
-    PATH="/home/ubuntu/.local/bin:${PATH}"
-
 RUN PIP_NO_CACHE_DIR=1 \
+    PIPX_HOME=${PIPX_HOME} \
+    PIPX_BIN_DIR=${PIPX_BIN_DIR} \
     pipx install uv \
       --pip-args="--no-cache-dir"
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-WORKDIR /workspace
-
-ENTRYPOINT ["/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
 CMD ["bash"]

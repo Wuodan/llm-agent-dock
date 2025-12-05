@@ -18,8 +18,10 @@ require_aicage_image() {
 
 agent_exec() {
   local cmd="$1"
+  shift || true
   docker run --rm \
     --env AICAGE_IMAGE="${AICAGE_IMAGE}" \
+    "$@" \
     "${AICAGE_IMAGE}" \
     /bin/bash -lc "${cmd}"
 }
