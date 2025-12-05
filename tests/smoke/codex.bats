@@ -3,7 +3,7 @@
 load './common.bash'
 
 setup_file() {
-  require_llm_agent_image
+  require_aicage_image
 }
 
 @test "test_boots_container" {

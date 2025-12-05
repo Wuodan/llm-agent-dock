@@ -19,8 +19,8 @@ Options:
   -h, --help      Show this help and exit
 
 Examples:
-  scripts/test.sh ghcr.io/example/llm-agent-dock:codex-ubuntu-latest
-  scripts/test.sh llm-agent-dock:cline-act-dev --tool cline -- --filter test_cli
+  scripts/test.sh ghcr.io/example/aicage:codex-ubuntu-latest
+  scripts/test.sh aicage:cline-act-dev --tool cline -- --filter test_cli
 USAGE
   exit 1
 }
@@ -113,7 +113,7 @@ run_tests() {
   fi
 
   log "Running smoke tests via bats"
-  LLM_AGENT_IMAGE="${IMAGE_REF}" bats "${bats_path}" "${BATS_ARGS[@]}"
+  AICAGE_IMAGE="${IMAGE_REF}" bats "${bats_path}" "${BATS_ARGS[@]}"
 }
 
 parse_args "$@"

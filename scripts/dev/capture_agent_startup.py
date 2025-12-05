@@ -34,12 +34,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--image",
         help=(
-            "Override image tag (default ghcr.io/wuodan/llm-agent-dock:<tool>-<base>-latest). "
+            "Override image tag (default ghcr.io/wuodan/aicage:<tool>-<base>-latest). "
             "If provided, overrides --repository/--registry/--version"
         ),
     )
     parser.add_argument("--registry", default="ghcr.io", help="Registry host when deriving tag")
-    parser.add_argument("--repository", default="wuodan/llm-agent-dock", help="Registry namespace/image")
+    parser.add_argument("--repository", default="wuodan/aicage", help="Registry namespace/image")
     parser.add_argument("--version", default="latest", help="Tag suffix in <tool>-<base>-<version>")
     parser.add_argument("--timeout", type=float, default=20.0, help="Seconds before docker run is terminated")
     parser.add_argument("--log-dir", type=pathlib.Path, help="Directory to store logs (default task plan logs folder)")

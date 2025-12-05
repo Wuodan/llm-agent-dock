@@ -121,10 +121,10 @@ main() {
   contains "${TOOL}" "${SUPPORTED_TOOLS[@]}" || die "Unsupported tool '${TOOL}'. Valid: ${SUPPORTED_TOOLS[*]}"
   contains "${BASE}" "${SUPPORTED_BASES[@]}" || die "Unsupported base '${BASE}'. Valid: ${SUPPORTED_BASES[*]}"
 
-  local registry="${LLM_AGENT_DOCK_REGISTRY:-${REGISTRY:-ghcr.io}}"
-  local repository="${LLM_AGENT_DOCK_REPOSITORY:-${REPOSITORY:-wuodan/llm-agent-dock}}"
-  local version="${LLM_AGENT_DOCK_VERSION:-${VERSION:-latest}}"
-  local platforms="${PLATFORM_OVERRIDE:-${LLM_AGENT_DOCK_PLATFORMS:-${PLATFORMS:-linux/amd64,linux/arm64}}}"
+  local registry="${AICAGE_REGISTRY:-${REGISTRY:-ghcr.io}}"
+  local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
+  local version="${AICAGE_VERSION:-${VERSION:-latest}}"
+  local platforms="${PLATFORM_OVERRIDE:-${AICAGE_PLATFORMS:-${PLATFORMS:-linux/amd64,linux/arm64}}}"
 
   local target="${TOOL}-${BASE}"
   local env_prefix=(

@@ -3,11 +3,11 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ENV_FILE="${ROOT_DIR}/.env"
-DEFAULT_BUILDER="${LLM_AGENT_DOCK_BUILDER_NAME:-llm-agent-dock}"
-DEFAULT_REGISTRY="${LLM_AGENT_DOCK_REGISTRY:-ghcr.io}"
-DEFAULT_REPOSITORY="${LLM_AGENT_DOCK_REPOSITORY:-wuodan/llm-agent-dock}"
-DEFAULT_VERSION="${LLM_AGENT_DOCK_VERSION:-dev}"
-DEFAULT_PLATFORMS="${LLM_AGENT_DOCK_PLATFORMS:-linux/amd64,linux/arm64}"
+DEFAULT_BUILDER="${AICAGE_BUILDER_NAME:-aicage}"
+DEFAULT_REGISTRY="${AICAGE_REGISTRY:-ghcr.io}"
+DEFAULT_REPOSITORY="${AICAGE_REPOSITORY:-wuodan/aicage}"
+DEFAULT_VERSION="${AICAGE_VERSION:-dev}"
+DEFAULT_PLATFORMS="${AICAGE_PLATFORMS:-linux/amd64,linux/arm64}"
 
 log() {
   printf '[bootstrap] %s\n' "$*"
@@ -20,11 +20,11 @@ ensure_env_file() {
   fi
 
   cat >"${ENV_FILE}" <<EOF_ENV
-# llm-agent-dock defaults — edit to match your registry/namespace
-LLM_AGENT_DOCK_REGISTRY=${DEFAULT_REGISTRY}
-LLM_AGENT_DOCK_REPOSITORY=${DEFAULT_REPOSITORY}
-LLM_AGENT_DOCK_VERSION=${DEFAULT_VERSION}
-LLM_AGENT_DOCK_PLATFORMS=${DEFAULT_PLATFORMS}
+# aicage defaults — edit to match your registry/namespace
+AICAGE_REGISTRY=${DEFAULT_REGISTRY}
+AICAGE_REPOSITORY=${DEFAULT_REPOSITORY}
+AICAGE_VERSION=${DEFAULT_VERSION}
+AICAGE_PLATFORMS=${DEFAULT_PLATFORMS}
 EOF_ENV
   log "Wrote default env configuration to ${ENV_FILE}."
 }

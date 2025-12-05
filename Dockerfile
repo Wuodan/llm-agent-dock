@@ -10,9 +10,9 @@ ARG TOOL
 ARG TARGETARCH
 ARG NODEJS_VERSION
 
-LABEL org.opencontainers.image.title="llm-agent-dock" \
+LABEL org.opencontainers.image.title="aicage" \
       org.opencontainers.image.description="Multi-base build for agentic developer CLIs" \
-      org.opencontainers.image.source="https://github.com/Wuodan/llm-agent-dock" \
+      org.opencontainers.image.source="https://github.com/Wuodan/aicage" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -52,7 +52,7 @@ RUN set -euxo pipefail \
            zip; \
          rm -rf /var/lib/apt/lists/*; \
        else \
-         echo "Unsupported base image for llm-agent-dock; apt-get required" >&2; \
+         echo "Unsupported base image for aicage; apt-get required" >&2; \
          exit 1; \
        fi \
     && locale-gen en_US.UTF-8 || true

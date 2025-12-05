@@ -1,10 +1,10 @@
 variable "REGISTRY" {
   default = "ghcr.io"
-  description = "Registry host (override via LLM_AGENT_DOCK_REGISTRY)."
+  description = "Registry host (override via AICAGE_REGISTRY)."
 }
 
 variable "REPOSITORY" {
-  default = "wuodan/llm-agent-dock"
+  default = "wuodan/aicage"
   description = "Registry namespace/repo (org/image)."
 }
 

@@ -25,10 +25,10 @@ scripts/dev/bootstrap.sh
 ```
 
 `.env` variables (edit to override):
-- `LLM_AGENT_DOCK_REGISTRY` (default `ghcr.io`)
-- `LLM_AGENT_DOCK_REPOSITORY` (default `wuodan/llm-agent-dock`)
-- `LLM_AGENT_DOCK_VERSION` (default `dev`)
-- `LLM_AGENT_DOCK_PLATFORMS` (default `linux/amd64,linux/arm64`)
+- `AICAGE_REGISTRY` (default `ghcr.io`)
+- `AICAGE_REPOSITORY` (default `wuodan/aicage`)
+- `AICAGE_VERSION` (default `dev`)
+- `AICAGE_PLATFORMS` (default `linux/amd64,linux/arm64`)
 
 ## Build
 ```bash
@@ -50,10 +50,10 @@ scripts/build.sh cline act --print
 ## Test (smoke)
 Run all suites or filter by tool:
 ```bash
-scripts/test.sh ghcr.io/wuodan/llm-agent-dock:codex-ubuntu-dev --tool codex --no-pull
+scripts/test.sh ghcr.io/wuodan/aicage:codex-ubuntu-dev --tool codex --no-pull
 ```
 - `--pull` is on by default; add `--no-pull` for local images.
-- `LLM_AGENT_IMAGE` can be set manually when running Bats directly.
+- `AICAGE_IMAGE` can be set manually when running Bats directly.
 
 ## Adding a tool
 1) Create `scripts/installers/install_<tool>.sh` (executable) that installs the agent; fail fast on
