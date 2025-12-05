@@ -44,8 +44,8 @@ contains() {
 
 load_env_file() {
   if [[ -f "${ENV_FILE}" ]]; then
-    # shellcheck disable=SC1090
     set -a
+    # shellcheck disable=SC1090
     source "${ENV_FILE}"
     set +a
   fi
