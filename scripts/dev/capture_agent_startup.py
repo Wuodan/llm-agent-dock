@@ -30,7 +30,7 @@ def detect_repo_root() -> pathlib.Path:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("tool", choices=sorted(DEFAULT_AGENT_CMDS.keys()), help="Tool name")
-    parser.add_argument("base", choices=["ubuntu", "act", "universal"], help="Base alias")
+    parser.add_argument("base", choices=["ubuntu", "act"], help="Base alias")
     parser.add_argument(
         "--image",
         help=(

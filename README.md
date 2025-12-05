@@ -5,7 +5,7 @@ base OS, pull the tag, and you get a ready-to-run shell with the agent preinstal
 
 ## What you get
 - Prebuilt tags for `cline`, `codex`, and `factory_ai_droid`.
-- Base choices: `ubuntu` (24.04), `act` (CI-friendly), and `universal` (Dev Container base).
+- Base choices: `ubuntu` (24.04) and `act` (CI-friendly).
 - Multi-arch images (`linux/amd64` and `linux/arm64`) via Buildx.
 - Thin images: agent install only; you bring your own API keys.
 
@@ -34,7 +34,7 @@ docker run -it --rm \
   bash
 ```
 
-Swap `codex` for `cline` or `factory_ai_droid`, and `ubuntu` for `act` or `universal` as needed.
+Swap `codex` for `cline` or `factory_ai_droid`, and `ubuntu` for `act` as needed.
 
 The image boots as root, then `scripts/entrypoint.sh` creates a matching user/group from
 `AICAGE_UID`/`AICAGE_GID` (defaults `1000`) and switches into it with `gosu`. `/workspace` is

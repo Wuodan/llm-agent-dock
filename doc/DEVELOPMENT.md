@@ -37,7 +37,7 @@ scripts/dev/bootstrap.sh
 scripts/build.sh <tool> <base> [--platform list] [--push|--load] [--print] [--set k=v]
 ```
 - `tool`: `cline`, `codex`, `factory_ai_droid`
-- `base`: `act`, `universal`, `ubuntu`
+- `base`: `act`, `ubuntu`
 - Images are tagged `${REPOSITORY}:<tool>-<base>-<version>` from `.env` (or env vars).
 
 Examples:

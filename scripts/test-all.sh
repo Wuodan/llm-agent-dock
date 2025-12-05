@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ROOT_DIR}/.env"
 TOOLS=(cline codex factory_ai_droid)
-BASES=(act universal ubuntu)
+BASES=(act ubuntu)
 
 PULL_IMAGE=1
 BATS_ARGS=()

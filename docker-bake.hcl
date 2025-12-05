@@ -14,7 +14,7 @@ variable "PLATFORMS" {
 }
 
 variable "BASES" {
-  default = "act,universal,ubuntu"
+  default = "act,ubuntu"
   description = "Documented base aliases; keep README matrix in sync when editing."
 }
 
@@ -49,18 +49,6 @@ target "cline-act" {
   }
 }
 
-target "cline-universal" {
-  inherits = ["_agent"]
-  args = {
-    BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
-    TOOL       = "cline"
-  }
-  tags = ["${REPOSITORY}:cline-universal-${VERSION}"]
-  labels = {
-    "org.opencontainers.image.description" = "Cline CLI / VSCode AI"
-  }
-}
-
 target "cline-ubuntu" {
   inherits = ["_agent"]
   args = {
@@ -81,18 +69,6 @@ target "codex-act" {
     TOOL       = "codex"
   }
   tags = ["${REPOSITORY}:codex-act-${VERSION}"]
-  labels = {
-    "org.opencontainers.image.description" = "Codex coding agent"
-  }
-}
-
-target "codex-universal" {
-  inherits = ["_agent"]
-  args = {
-    BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
-    TOOL       = "codex"
-  }
-  tags = ["${REPOSITORY}:codex-universal-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Codex coding agent"
   }
@@ -123,18 +99,6 @@ target "factory_ai_droid-act" {
   }
 }
 
-target "factory_ai_droid-universal" {
-  inherits = ["_agent"]
-  args = {
-    BASE_IMAGE = "mcr.microsoft.com/devcontainers/universal:2-linux"
-    TOOL       = "factory_ai_droid"
-  }
-  tags = ["${REPOSITORY}:factory_ai_droid-universal-${VERSION}"]
-  labels = {
-    "org.opencontainers.image.description" = "Factory.AI Droid agent"
-  }
-}
-
 target "factory_ai_droid-ubuntu" {
   inherits = ["_agent"]
   args = {
@@ -152,13 +116,10 @@ target "factory_ai_droid-ubuntu" {
 group "matrix" {
   targets = [
     "cline-act",
-    "cline-universal",
     "cline-ubuntu",
     "codex-act",
-    "codex-universal",
     "codex-ubuntu",
     "factory_ai_droid-act",
-    "factory_ai_droid-universal",
     "factory_ai_droid-ubuntu",
   ]
 }
