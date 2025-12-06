@@ -90,7 +90,7 @@ main() {
       local base_alias="${BASE_ALIASES[$idx]}"
       local image="${repository}:${tool}-${base_alias}-${version}"
       echo "[test-all] Testing ${image}" >&2
-      "${FINAL_DIR}/scripts/test.sh" "${image}" --tool "${tool}" -- "${BATS_ARGS[@]}"
+      "${FINAL_DIR}/scripts/test.sh" --image "${image}" --tool "${tool}" -- "${BATS_ARGS[@]}"
     done
   done
 }
