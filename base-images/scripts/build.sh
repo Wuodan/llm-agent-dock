@@ -20,7 +20,7 @@ Options:
   --base <value>       Upstream base image reference (required)
   --platform <value>   Override platform list (default: env or linux/amd64,linux/arm64)
   --push               Push the image instead of loading it locally
-  --version <value>    Override AICAGE_BASE_VERSION for this build
+  --version <value>    Override AICAGE_VERSION for this build
   -h, --help           Show this help and exit
 
 Examples:
