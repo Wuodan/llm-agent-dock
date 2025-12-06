@@ -14,16 +14,12 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 ```
 
 ## Repo layout
-- `Dockerfile` — single definition used for every base × tool combination.
-- `docker-bake.hcl` — single flexible Bake target; scripts set TOOL/BASE_IMAGE/tags via `--set`.
-- `scripts/`
-  - `build.sh` — wraps `docker buildx bake` with guardrails.
-  - `build-all.sh` — builds every tool/base combination, forwarding build flags.
-  - `test.sh` — runs smoke tests via Bats.
-  - `test-all.sh` — runs smoke suites for every tool/base using derived image tags.
-  - `installers/` — per-tool installer scripts invoked during the Docker build.
-  - `entrypoint.sh` — runtime user bootstrap (creates UID/GID, workspace, drops to gosu).
-- `tests/smoke/` — Bats smoke suites per tool.
+- `base-images/` — standalone base image Dockerfile, Bake file, scripts, and smoke tests.
+- `final-images/` — agent Dockerfile/Bake plus all agent build/test scripts and installers.
+  - `scripts/` — build/test helpers (agent-specific).
+  - `tests/smoke/` — Bats smoke suites for agents.
+- `.env` — shared matrix/config for both base and final images.
+- `scripts/dev/` — developer utilities unrelated to image builds.
 
 `.env` variables (edit to override):
 - `AICAGE_REPOSITORY` (default `wuodan/aicage`)
@@ -32,41 +28,45 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 - `AICAGE_TOOLS` (default `cline codex droid`, space-separated)
 - `AICAGE_BASES` (default `ghcr.io/catthehacker/ubuntu:act-latest ubuntu:24.04`, space-separated)
 - `AICAGE_BASE_ALIASES` (default `act ubuntu`, space-separated, aligned by index with `AICAGE_BASES`)
+- `AICAGE_BASE_REPOSITORY` (default `wuodan/aicage-base`, must differ from `AICAGE_REPOSITORY`)
 
 ## Build
+### Base images
 ```bash
-scripts/build.sh <tool> <base> [--platform list]
+base-images/scripts/build.sh --base <ref> [--platform list] [--version <tag>]
+base-images/scripts/build-all.sh [--platform list]
+```
+- `base` values come from `.env` (`AICAGE_BASES`) and align with aliases in `AICAGE_BASE_ALIASES`.
+- Images are tagged `${AICAGE_BASE_REPOSITORY}:<base-alias>-<AICAGE_VERSION>`.
+
+### Agent (final) images
+```bash
+final-images/scripts/build.sh --tool <tool> --base <base> [--platform list] [--version <tag>]
+final-images/scripts/build-all.sh [--platform list]
 ```
 - `tool` values come from `.env` (`AICAGE_TOOLS`).
 - `base` values come from `.env` (`AICAGE_BASES`) and are paired with aliases in `AICAGE_BASE_ALIASES`.
 - Images are tagged `${REPOSITORY}:<tool>-<base-alias>-<version>`.
 
-Examples:
-```bash
-# Build and load a single-arch image locally
-scripts/build.sh codex ubuntu --platform linux/amd64
-
-# Build the full matrix
-scripts/build-all.sh
-
-# Build only one platform via build-all
-scripts/build-all.sh --platform linux/amd64
-```
-
 ## Test (smoke)
 Run all suites or filter by tool:
 ```bash
-scripts/test.sh wuodan/aicage:codex-ubuntu-24.04-dev --tool codex
+final-images/scripts/test.sh --image wuodan/aicage:codex-ubuntu-24.04-dev --tool codex
 ```
 - `AICAGE_IMAGE` can be set manually when running Bats directly.
 
 Test the full matrix using derived tags:
 ```bash
-scripts/test-all.sh
+final-images/scripts/test-all.sh
 ```
 
-Smoke suites live in `tests/smoke/` (one per tool). Install `bats` to run the suites (e.g.,
+Smoke suites live in `final-images/tests/smoke/` (one per tool). Install `bats` to run the suites (e.g.,
 `npm install -g bats`).
+
+Base images also have a smoke sweep:
+```bash
+base-images/scripts/test-all.sh
+```
 
 ## Runtime user
 Images start as root and rely on `scripts/entrypoint.sh` to create a user at runtime. It reads
@@ -75,11 +75,17 @@ if missing, creates `/workspace`, chowns it, and switches to that account with `
 code into `/workspace` and pass your host IDs, e.g.
 `-e AICAGE_UID=$(id -u) -e AICAGE_GID=$(id -g) -e AICAGE_USER=$(id -un)`.
 
+## Publish workflows
+- Base images: `.github/workflows/build-base.yml` builds on base changes (amd64 smoke) and publishes
+  multi-arch base images to Docker Hub (`wuodan/aicage-base`) on `base-*` tags.
+- Agent images: `.github/workflows/build-publish.yml` builds/tests agents and publishes to
+  `wuodan/aicage` on tags, consuming the published base images.
+
 ## Adding a tool
-1) Create `scripts/installers/install_<tool>.sh` (executable) that installs the agent; fail fast on
-   errors.  
+1) Create `final-images/scripts/installers/install_<tool>.sh` (executable) that installs the agent;
+   fail fast on errors.  
 2) Add the tool to `AICAGE_TOOLS` in `.env`.  
-3) Add a smoke suite at `tests/smoke/<tool>.bats`.  
+3) Add a smoke suite at `final-images/tests/smoke/<tool>.bats`.  
 4) Update README tables to mention the tool.
 
 ## Adding a base

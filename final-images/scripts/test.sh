@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SMOKE_DIR="${ROOT_DIR}/tests/smoke"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SMOKE_DIR="${ROOT_DIR}/final-images/tests/smoke"
 TOOL_FILTER=""
 BATS_ARGS=()
 IMAGE_REF=""
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/test.sh <image-ref> [options] [-- <bats-args>]
+Usage: final-images/scripts/test.sh --image <image-ref> [options] [-- <bats-args>]
 
 Options:
+  --image <ref>   Image reference to test (required)
   --tool <name>   Only run the smoke suite for the specified tool
   -h, --help      Show this help and exit
 
 Examples:
-  scripts/test.sh example/aicage:codex-ubuntu-24.04-latest
-  scripts/test.sh aicage:cline-ghcr.io-catthehacker-ubuntu-act-latest-dev --tool cline -- --filter test_cli
+  final-images/scripts/test.sh --image example/aicage:codex-ubuntu-24.04-latest
+  final-images/scripts/test.sh --image aicage:cline-ghcr.io-catthehacker-ubuntu-act-latest-dev --tool cline -- --filter test_cli
 USAGE
   exit 1
 }
@@ -40,6 +41,11 @@ require_cmd() {
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --image)
+        [[ $# -ge 2 ]] || usage
+        IMAGE_REF="$2"
+        shift 2
+        ;;
       --tool)
         [[ $# -ge 2 ]] || usage
         TOOL_FILTER="$2"
@@ -57,17 +63,13 @@ parse_args() {
         usage
         ;;
       *)
-        if [[ -z "${IMAGE_REF}" ]]; then
-          IMAGE_REF="$1"
-        else
-          BATS_ARGS+=("$1")
-        fi
-        shift
+        usage
         ;;
     esac
   done
 
   if [[ -z "${IMAGE_REF}" ]]; then
+    log "--image is required"
     usage
   fi
 }
@@ -86,7 +88,7 @@ run_tests() {
 
   if [[ ! -e "${bats_path}" ]]; then
     log "Smoke tests not found at ${bats_path}."
-    log "Add tests under tests/smoke or adjust --tool."
+    log "Add tests under final-images/tests/smoke or adjust --tool."
     exit 1
   fi
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ -z "${AICAGE_IMAGE:-}" ]]; then
-  echo "AICAGE_IMAGE must be set (use scripts/test.sh)." >&2
+  echo "AICAGE_IMAGE must be set (use final-images/scripts/test.sh)." >&2
   exit 1
 fi
 
