@@ -1,33 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+BASE_DIR="${ROOT_DIR}/base-images"
 ENV_FILE="${ROOT_DIR}/.env"
-TOOLS=()
 BASES=()
 BASE_ALIASES=()
-
 BATS_ARGS=()
 
 die() {
-  echo "[test-all] $*" >&2
+  echo "[base-test-all] $*" >&2
   exit 1
 }
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/test-all.sh [options] [-- <bats-args>]
+Usage: base-images/scripts/test-all.sh [options] [-- <bats-args>]
 
-Runs smoke tests for every <tool>-<base> combination. Image references are derived from
-repository/version values (defaults align with scripts/build.sh). Bats args after -- are forwarded to
-each scripts/test.sh invocation.
+Runs smoke tests for every base image. Image references are derived from repository/version values.
+Bats args after -- are forwarded to each base-images/scripts/test.sh invocation.
 
 Options:
   -h, --help      Show this help and exit
 
 Examples:
-  scripts/test-all.sh
-  scripts/test-all.sh -- --filter test_runtime_user_creation
+  base-images/scripts/test-all.sh
+  base-images/scripts/test-all.sh -- --filter base
 USAGE
   exit 1
 }
@@ -48,10 +46,8 @@ split_list() {
 }
 
 init_supported_lists() {
-  split_list "${AICAGE_TOOLS}" TOOLS
   split_list "${AICAGE_BASES}" BASES
   split_list "${AICAGE_BASE_ALIASES}" BASE_ALIASES
-  [[ ${#TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty; update ${ENV_FILE}."
   [[ ${#BASES[@]} -gt 0 ]] || die "AICAGE_BASES is empty; update ${ENV_FILE}."
   [[ ${#BASE_ALIASES[@]} -gt 0 ]] || die "AICAGE_BASE_ALIASES is empty; update ${ENV_FILE}."
   [[ ${#BASES[@]} -eq ${#BASE_ALIASES[@]} ]] || die "AICAGE_BASES and AICAGE_BASE_ALIASES must have the same length."
@@ -80,17 +76,14 @@ main() {
   load_env_file
   init_supported_lists
 
-  local repository="${AICAGE_REPOSITORY}"
+  local repository="${AICAGE_BASE_REPOSITORY}"
   local version="${AICAGE_VERSION}"
 
-  for tool in "${TOOLS[@]}"; do
-    for idx in "${!BASES[@]}"; do
-      local base="${BASES[$idx]}"
-      local base_alias="${BASE_ALIASES[$idx]}"
-      local image="${repository}:${tool}-${base_alias}-${version}"
-      echo "[test-all] Testing ${image}" >&2
-      "${ROOT_DIR}/scripts/test.sh" "${image}" --tool "${tool}" -- "${BATS_ARGS[@]}"
-    done
+  for idx in "${!BASES[@]}"; do
+    local base_alias="${BASE_ALIASES[$idx]}"
+    local image="${repository}:${base_alias}-${version}"
+    echo "[base-test-all] Testing ${image}" >&2
+    "${BASE_DIR}/scripts/test.sh" --image "${image}" -- "${BATS_ARGS[@]}"
   done
 }
 

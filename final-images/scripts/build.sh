@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ENV_FILE="${ROOT_DIR}/.env"
+FINAL_DIR="${ROOT_DIR}/final-images"
 SUPPORTED_TOOLS=()
 SUPPORTED_BASES=()
 SUPPORTED_BASE_ALIASES=()
@@ -14,17 +15,19 @@ die() {
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/build.sh <tool> <base> [options]
+Usage: final-images/scripts/build.sh --tool <tool> --base <base> [options]
 
 Options:
+  --tool <value>       Tool name to build (required)
+  --base <value>       Base alias to consume (required; must match AICAGE_BASES entry)
   --platform <value>   Override platform list (default: env or linux/amd64,linux/arm64)
   --push               Push the image instead of loading it locally
   --version <value>    Override AICAGE_VERSION for this build
   -h, --help           Show this help and exit
 
 Examples:
-  scripts/build.sh cline ubuntu:24.04
-  scripts/build.sh codex ghcr.io/catthehacker/ubuntu:act-latest --platform linux/amd64
+  final-images/scripts/build.sh --tool cline --base ubuntu:24.04
+  final-images/scripts/build.sh --tool codex --base ghcr.io/catthehacker/ubuntu:act-latest --platform linux/amd64
 USAGE
   exit 1
 }
@@ -63,6 +66,11 @@ init_supported_lists() {
   [[ ${#SUPPORTED_BASES[@]} -gt 0 ]] || die "AICAGE_BASES is empty; update ${ENV_FILE}."
   [[ ${#SUPPORTED_BASE_ALIASES[@]} -gt 0 ]] || die "AICAGE_BASE_ALIASES is empty; update ${ENV_FILE}."
   [[ ${#SUPPORTED_BASES[@]} -eq ${#SUPPORTED_BASE_ALIASES[@]} ]] || die "AICAGE_BASES and AICAGE_BASE_ALIASES must have the same length."
+  [[ -n "${AICAGE_BASE_REPOSITORY:-}" ]] || die "AICAGE_BASE_REPOSITORY is empty; update ${ENV_FILE}."
+  [[ -n "${AICAGE_VERSION:-}" ]] || die "AICAGE_VERSION is empty; update ${ENV_FILE}."
+  if [[ "${AICAGE_BASE_REPOSITORY}" == "${AICAGE_REPOSITORY}" ]]; then
+    die "AICAGE_BASE_REPOSITORY must differ from AICAGE_REPOSITORY to keep base images separate."
+  fi
 }
 
 require_docker() {
@@ -80,6 +88,16 @@ parse_args() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --tool)
+        [[ $# -ge 2 ]] || die "--tool requires a value"
+        TOOL="$2"
+        shift 2
+        ;;
+      --base)
+        [[ $# -ge 2 ]] || die "--base requires a value"
+        BASE="$2"
+        shift 2
+        ;;
       --platform)
         [[ $# -ge 2 ]] || die "--platform requires a value"
         PLATFORM_OVERRIDE="$2"
@@ -105,20 +123,13 @@ parse_args() {
         die "Unknown option '$1'"
         ;;
       *)
-        if [[ -z "${TOOL}" ]]; then
-          TOOL="$1"
-        elif [[ -z "${BASE}" ]]; then
-          BASE="$1"
-        else
-          die "Unexpected argument '$1'"
-        fi
-        shift
+        die "Unknown option '$1'"
         ;;
     esac
   done
 
   if [[ -z "${TOOL}" || -z "${BASE}" ]]; then
-    usage
+    die "--tool and --base are required"
   fi
 }
 
@@ -151,7 +162,7 @@ main() {
   [[ -n "${base_alias}" ]] || die "Base alias not found for '${BASE}'. Check AICAGE_BASES/AICAGE_BASE_ALIASES."
 
   local target="${TOOL}-${base_alias}"
-  local base_image="${BASE}"
+  local base_image="${AICAGE_BASE_REPOSITORY}:${base_alias}-${AICAGE_VERSION}"
   local tag="${AICAGE_REPOSITORY}:${TOOL}-${base_alias}-${AICAGE_VERSION}"
   local description="Agent image for ${TOOL}"
   local env_prefix=(
@@ -162,7 +173,7 @@ main() {
 
   local cmd=("env" "${env_prefix[@]}" \
     docker buildx bake \
-      -f "${ROOT_DIR}/docker-bake.hcl" \
+      -f "${FINAL_DIR}/docker-bake.hcl" \
       agent \
       --set "agent.args.BASE_IMAGE=${base_image}" \
       --set "agent.args.TOOL=${TOOL}" \

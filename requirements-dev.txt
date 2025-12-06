@@ -1,0 +1,7 @@
+# Development dependencies for running tests and linters.
+-r requirements.txt
+pymarkdownlnt
+pytest
+pytest-cov
+ruff
+yamllint

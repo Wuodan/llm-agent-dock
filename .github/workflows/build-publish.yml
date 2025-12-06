@@ -1,19 +1,41 @@
+---
 name: Build, Test, and Publish
 
-on:
+"on":
   push:
-    branches: [main]
-    tags: ['*']
+    branches:
+      - main
+    tags:
+      - "*"
   pull_request:
   workflow_dispatch:
 
 jobs:
   test:
+    if: >-
+      ${{ github.event_name != 'push'
+          || !startsWith(github.ref, 'refs/tags/base-') }}
     name: Build, test and push all images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install lint deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run linters (yamllint, ruff, pymarkdown)
+        run: |
+          yamllint .
+          ruff check .
+          pymarkdown --config .pymarkdown.json scan .
 
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
@@ -25,11 +47,11 @@ jobs:
 
       - name: "Test: Build all images for tests"
         run: |
-          scripts/build-all.sh --platform linux/amd64
+          final-images/scripts/build-all.sh --platform linux/amd64
 
       - name: "Test: Run smoke suites"
         run: |
-          scripts/test-all.sh
+          final-images/scripts/test-all.sh
 
       - name: "Publish: Set up QEMU"
         if: startsWith(github.ref, 'refs/tags/')
@@ -45,4 +67,6 @@ jobs:
       - name: "Publish: Build and push all images"
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          scripts/build-all.sh --version "${{ github.ref_name }}" --push
+          final-images/scripts/build-all.sh \
+            --version "${{ github.ref_name }}" \
+            --push

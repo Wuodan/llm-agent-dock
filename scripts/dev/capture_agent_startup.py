@@ -146,7 +146,7 @@ def sanitize_env(env_pair: str) -> str:
 def log_banner(log_file: pathlib.Path, metadata: dict) -> None:
     log_file.parent.mkdir(parents=True, exist_ok=True)
     with log_file.open("w", encoding="utf-8") as fp:
-        fp.write(f"# Agent startup capture\n")
+        fp.write("# Agent startup capture\n")
         for key, value in metadata.items():
             fp.write(f"# {key}: {value}\n")
         fp.write("\n")

@@ -15,7 +15,7 @@ variable "AICAGE_PLATFORMS" {
 
 # Single flexible target; scripts set TOOL/BASE_IMAGE/tags dynamically via --set.
 target "agent" {
-  context = "."
+  context = "./final-images"
   platforms = [
     for platform in split(" ", AICAGE_PLATFORMS) : platform
   ]

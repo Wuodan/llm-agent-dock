@@ -1,16 +1,14 @@
 # syntax=docker/dockerfile:1.7-labs
 ARG BASE_IMAGE=ubuntu:24.04
-ARG TOOL=codex
 ARG NODEJS_VERSION=20.17.0
 
-FROM ${BASE_IMAGE} AS runtime
+FROM ${BASE_IMAGE} AS base
 
-ARG TOOL
 ARG TARGETARCH
 ARG NODEJS_VERSION
 
-LABEL org.opencontainers.image.title="aicage" \
-      org.opencontainers.image.description="Multi-base build for agentic developer CLIs" \
+LABEL org.opencontainers.image.title="aicage-base" \
+      org.opencontainers.image.description="Prebuilt base layer for agent images" \
       org.opencontainers.image.source="https://github.com/Wuodan/aicage" \
       org.opencontainers.image.licenses="Apache-2.0"
 
@@ -38,19 +36,19 @@ RUN set -euxo pipefail \
            ca-certificates \
            curl \
            git \
-         gnupg \
-         jq \
-         locales \
-          nano \
-          openssh-client \
-          pipx \
-          python3 \
-          python3-pip \
-          python3-venv \
-          gosu \
-          ripgrep \
-          sudo \
-          tar \
+           gnupg \
+           jq \
+           locales \
+           nano \
+           openssh-client \
+           pipx \
+           python3 \
+           python3-pip \
+           python3-venv \
+           gosu \
+           ripgrep \
+           sudo \
+           tar \
            tini \
            unzip \
            xz-utils \
@@ -87,12 +85,3 @@ RUN PIP_NO_CACHE_DIR=1 \
     PIPX_BIN_DIR=${PIPX_BIN_DIR} \
     pipx install uv \
       --pip-args="--no-cache-dir"
-
-# Tool installers -----------------------------------------------------------
-RUN --mount=type=bind,source=scripts/installers/,target=/tmp/installers,readonly \
-    /tmp/installers/install_${TOOL}.sh
-
-COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
-CMD ["bash"]

@@ -1,28 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+BASE_DIR="${ROOT_DIR}/base-images"
 ENV_FILE="${ROOT_DIR}/.env"
-TOOLS=()
 BASES=()
 
 die() {
-  echo "[build-all] $*" >&2
+  echo "[build-base-all] $*" >&2
   exit 1
 }
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/build-all.sh [build-options]
+Usage: base-images/scripts/build-all.sh [build-options]
 
-Builds the full matrix of <tool>-<base> combinations. Any options after the script name are
-forwarded to scripts/build.sh for each build (e.g., --platform). Platforms must come from --platform
+Builds all base-image variants. Options after the script name are forwarded to
+base-images/scripts/build.sh for each build (e.g., --platform). Platforms must come from --platform
 or environment (.env).
 
 Options:
   --platform <value>  Build only a single platform (e.g., linux/amd64)
   --push              Push images instead of loading locally
-  -h, --help      Show this help and exit
+  --version <value>   Override AICAGE_BASE_VERSION
+  -h, --help          Show this help and exit
 USAGE
   exit 1
 }
@@ -43,9 +44,7 @@ split_list() {
 }
 
 init_supported_lists() {
-  split_list "${AICAGE_TOOLS}" TOOLS
   split_list "${AICAGE_BASES}" BASES
-  [[ ${#TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty; update ${ENV_FILE}."
   [[ ${#BASES[@]} -gt 0 ]] || die "AICAGE_BASES is empty; update ${ENV_FILE}."
 }
 
@@ -63,7 +62,7 @@ version_override=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --platform)
-      [[ $# -ge 2 ]] || { echo "[build-all] --platform requires a value" >&2; exit 1; }
+      [[ $# -ge 2 ]] || { echo "[build-base-all] --platform requires a value" >&2; exit 1; }
       platform_override="$2"
       shift 2
       ;;
@@ -72,7 +71,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --version)
-      [[ $# -ge 2 ]] || { echo "[build-all] --version requires a value" >&2; exit 1; }
+      [[ $# -ge 2 ]] || { echo "[build-base-all] --version requires a value" >&2; exit 1; }
       version_override="$2"
       shift 2
       ;;
@@ -88,10 +87,10 @@ done
 platforms=()
 if [[ -n "${platform_override}" ]]; then
   split_list "${platform_override}" platforms
-  echo "[build-all] Building platform ${platforms[*]}." >&2
-elif [[ -n "${AICAGE_PLATFORMS:-${PLATFORMS:-}}" ]]; then
+  echo "[build-base-all] Building platform ${platforms[*]}." >&2
+elif [[ -n "${AICAGE_PLATFORMS:-${PLATFORMS:-}}}" ]]; then
   split_list "${AICAGE_PLATFORMS:-${PLATFORMS:-}}" platforms
-  echo "[build-all] Building platforms ${platforms[*]} (from env)." >&2
+  echo "[build-base-all] Building platforms ${platforms[*]} (from env)." >&2
 else
   die "Platform list is empty; set AICAGE_PLATFORMS or use --platform."
 fi
@@ -101,14 +100,12 @@ if [[ -n "${version_override}" ]]; then
   AICAGE_VERSION="${version_override}"
 fi
 
-for tool in "${TOOLS[@]}"; do
-  for base in "${BASES[@]}"; do
-    local_platforms="${platforms[*]}"
-    echo "[build-all] Building ${tool}-${base} (platforms: ${local_platforms})" >&2
-    if [[ -n "${push_flag}" ]]; then
-      "${ROOT_DIR}/scripts/build.sh" "${tool}" "${base}" "${platform_arg[@]}" "${push_flag}"
-    else
-      "${ROOT_DIR}/scripts/build.sh" "${tool}" "${base}" "${platform_arg[@]}"
-    fi
-  done
+for base in "${BASES[@]}"; do
+  local_platforms="${platforms[*]}"
+  echo "[build-base-all] Building ${base} (platforms: ${local_platforms})" >&2
+  if [[ -n "${push_flag}" ]]; then
+    "${BASE_DIR}/scripts/build.sh" --base "${base}" "${platform_arg[@]}" "${push_flag}" --version "${AICAGE_BASE_VERSION}"
+  else
+    "${BASE_DIR}/scripts/build.sh" --base "${base}" "${platform_arg[@]}" --version "${AICAGE_BASE_VERSION}"
+  fi
 done
