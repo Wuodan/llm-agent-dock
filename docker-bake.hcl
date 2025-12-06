@@ -1,14 +1,14 @@
-variable "REPOSITORY" {
+variable "AICAGE_REPOSITORY" {
   default = "wuodan/aicage"
   description = "Repository namespace/image."
 }
 
-variable "VERSION" {
-  default = "latest"
-  description = "Tag suffix appended as <tool>-<base>-<VERSION>."
+variable "AICAGE_VERSION" {
+  default = "dev"
+  description = "Tag suffix appended as <tool>-<base>-<AICAGE_VERSION>."
 }
 
-variable "PLATFORMS" {
+variable "AICAGE_PLATFORMS" {
   default = "linux/amd64 linux/arm64"
   description = "Space-separated platform list (linux/amd64 linux/arm64)."
 }
@@ -17,7 +17,7 @@ variable "PLATFORMS" {
 target "agent" {
   context = "."
   platforms = [
-    for platform in split(" ", PLATFORMS) : platform
+    for platform in split(" ", AICAGE_PLATFORMS) : platform
   ]
   pull = true
 }

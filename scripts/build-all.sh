@@ -16,24 +16,15 @@ usage() {
 Usage: scripts/build-all.sh [build-options]
 
 Builds the full matrix of <tool>-<base> combinations. Any options after the script name are
-forwarded to scripts/build.sh for each build (e.g., --platform). By default all
-platforms are built with the host architecture listed last.
+forwarded to scripts/build.sh for each build (e.g., --platform). Platforms must come from --platform
+or environment (.env).
 
 Options:
   --platform <value>  Build only a single platform (e.g., linux/amd64)
+  --push              Push images instead of loading locally
   -h, --help      Show this help and exit
 USAGE
   exit 1
-}
-
-detect_host_platform() {
-  local arch
-  arch="$(uname -m)"
-  case "${arch}" in
-    x86_64|amd64) echo "linux/amd64" ;;
-    arm64|aarch64) echo "linux/arm64" ;;
-    *) echo "linux/amd64" ;; # fallback
-  esac
 }
 
 load_env_file() {
@@ -65,14 +56,24 @@ fi
 load_env_file
 init_supported_lists
 
-host_platform="$(detect_host_platform)"
 platform_override=""
+push_flag=""
+version_override=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --platform)
       [[ $# -ge 2 ]] || { echo "[build-all] --platform requires a value" >&2; exit 1; }
       platform_override="$2"
+      shift 2
+      ;;
+    --push)
+      push_flag="--push"
+      shift
+      ;;
+    --version)
+      [[ $# -ge 2 ]] || { echo "[build-all] --version requires a value" >&2; exit 1; }
+      version_override="$2"
       shift 2
       ;;
     -h|--help)
@@ -92,22 +93,22 @@ elif [[ -n "${AICAGE_PLATFORMS:-${PLATFORMS:-}}" ]]; then
   split_list "${AICAGE_PLATFORMS:-${PLATFORMS:-}}" platforms
   echo "[build-all] Building platforms ${platforms[*]} (from env)." >&2
 else
-  default_platforms=("linux/amd64" "linux/arm64")
-  for p in "${default_platforms[@]}"; do
-    if [[ "${p}" != "${host_platform}" ]]; then
-      platforms+=("${p}")
-    fi
-  done
-  platforms+=("${host_platform}")
-  echo "[build-all] Building platforms ${platforms[*]} (host last)." >&2
+  die "Platform list is empty; set AICAGE_PLATFORMS or use --platform."
 fi
 
 platform_arg=(--platform "${platforms[*]}")
+if [[ -n "${version_override}" ]]; then
+  AICAGE_VERSION="${version_override}"
+fi
 
 for tool in "${TOOLS[@]}"; do
   for base in "${BASES[@]}"; do
     local_platforms="${platforms[*]}"
     echo "[build-all] Building ${tool}-${base} (platforms: ${local_platforms})" >&2
-    "${ROOT_DIR}/scripts/build.sh" "${tool}" "${base}" "${platform_arg[@]}"
+    if [[ -n "${push_flag}" ]]; then
+      "${ROOT_DIR}/scripts/build.sh" "${tool}" "${base}" "${platform_arg[@]}" "${push_flag}"
+    else
+      "${ROOT_DIR}/scripts/build.sh" "${tool}" "${base}" "${platform_arg[@]}"
+    fi
   done
 done

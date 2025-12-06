@@ -18,6 +18,8 @@ Usage: scripts/build.sh <tool> <base> [options]
 
 Options:
   --platform <value>   Override platform list (default: env or linux/amd64,linux/arm64)
+  --push               Push the image instead of loading it locally
+  --version <value>    Override AICAGE_VERSION for this build
   -h, --help           Show this help and exit
 
 Examples:
@@ -69,15 +71,10 @@ require_docker() {
   fi
 }
 
-slugify_base() {
-  local base="$1"
-  local slug="${base//\//-}"
-  slug="${slug//:/-}"
-  echo "${slug}"
-}
-
 parse_args() {
   PLATFORM_OVERRIDE=""
+  PUSH_MODE="--load"
+  VERSION_OVERRIDE=""
   TOOL=""
   BASE=""
 
@@ -86,6 +83,15 @@ parse_args() {
       --platform)
         [[ $# -ge 2 ]] || die "--platform requires a value"
         PLATFORM_OVERRIDE="$2"
+        shift 2
+        ;;
+      --push)
+        PUSH_MODE="--push"
+        shift
+        ;;
+      --version)
+        [[ $# -ge 2 ]] || die "--version requires a value"
+        VERSION_OVERRIDE="$2"
         shift 2
         ;;
       -h|--help)
@@ -119,14 +125,14 @@ parse_args() {
 main() {
   parse_args "$@"
   load_env_file
+  if [[ -n "${VERSION_OVERRIDE}" ]]; then
+    AICAGE_VERSION="${VERSION_OVERRIDE}"
+  fi
   init_supported_lists
   require_docker
 
   contains "${TOOL}" "${SUPPORTED_TOOLS[@]}" || die "Unsupported tool '${TOOL}'. Valid: ${SUPPORTED_TOOLS[*]}"
   contains "${BASE}" "${SUPPORTED_BASES[@]}" || die "Unsupported base '${BASE}'. Valid: ${SUPPORTED_BASES[*]}"
-
-  local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
-  local version="${AICAGE_VERSION:-${VERSION:-latest}}"
 
   local raw_platforms="${PLATFORM_OVERRIDE:-${AICAGE_PLATFORMS:-${PLATFORMS:-}}}"
   [[ -n "${raw_platforms}" ]] || die "Platform list is empty; set AICAGE_PLATFORMS or use --platform."
@@ -146,12 +152,12 @@ main() {
 
   local target="${TOOL}-${base_alias}"
   local base_image="${BASE}"
-  local tag="${repository}:${TOOL}-${base_alias}-${version}"
+  local tag="${AICAGE_REPOSITORY}:${TOOL}-${base_alias}-${AICAGE_VERSION}"
   local description="Agent image for ${TOOL}"
   local env_prefix=(
-    REPOSITORY="${repository}"
-    VERSION="${version}"
-    PLATFORMS="${platforms_str}"
+    AICAGE_REPOSITORY="${AICAGE_REPOSITORY}"
+    AICAGE_VERSION="${AICAGE_VERSION}"
+    AICAGE_PLATFORMS="${platforms_str}"
   )
 
   local cmd=("env" "${env_prefix[@]}" \
@@ -162,10 +168,10 @@ main() {
       --set "agent.args.TOOL=${TOOL}" \
       --set "agent.tags=${tag}" \
       --set "agent.labels.org.opencontainers.image.description=${description}" \
-      --load
+      "${PUSH_MODE}"
   )
 
-  echo "[build] Target=${target} Platforms=${platforms_str} Repository=${repository} Version=${version} BaseImage=${base_image}" >&2
+  echo "[build] Target=${target} Platforms=${platforms_str} Repo=${AICAGE_REPOSITORY} Version=${AICAGE_VERSION} BaseImage=${base_image} Mode=${PUSH_MODE}" >&2
   "${cmd[@]}"
 }
 

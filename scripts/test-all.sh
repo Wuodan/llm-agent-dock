@@ -80,8 +80,8 @@ main() {
   load_env_file
   init_supported_lists
 
-  local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
-  local version="${AICAGE_VERSION:-${VERSION:-latest}}"
+  local repository="${AICAGE_REPOSITORY}"
+  local version="${AICAGE_VERSION}"
 
   for tool in "${TOOLS[@]}"; do
     for idx in "${!BASES[@]}"; do
