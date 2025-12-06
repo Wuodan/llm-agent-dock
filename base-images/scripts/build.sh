@@ -69,12 +69,6 @@ init_supported_lists() {
   fi
 }
 
-require_docker() {
-  if ! command -v docker >/dev/null 2>&1; then
-    die "Docker CLI not found. Install Docker (with Buildx) first."
-  fi
-}
-
 parse_args() {
   PLATFORM_OVERRIDE=""
   PUSH_MODE="--load"
@@ -127,7 +121,6 @@ main() {
     AICAGE_VERSION="${VERSION_OVERRIDE}"
   fi
   init_supported_lists
-  require_docker
 
   contains "${BASE}" "${SUPPORTED_BASES[@]}" || die "Unsupported base '${BASE}'. Valid: ${SUPPORTED_BASES[*]}"
 

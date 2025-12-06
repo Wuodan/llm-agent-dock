@@ -1,22 +1,18 @@
 #!/usr/bin/env bats
 
-load './common.bash'
-
-setup_file() {
-  require_aicage_image
-}
-
 @test "test_boots_container" {
-  run agent_exec "echo droid-boot && ls /usr/local/bin | head -n 1"
+  run docker run --rm "${AICAGE_IMAGE}" /bin/bash -lc "echo droid-boot && ls /usr/local/bin | head -n 1"
   [ "$status" -eq 0 ]
   [[ "$output" == *"droid-boot"* ]]
 }
 
 @test "test_runtime_user_creation" {
-  run agent_exec "printf '%s\n%s\n%s\n' \"\$(id -u)\" \"\$(id -g)\" \"\${HOME}\"" \
+  run docker run --rm \
     --env AICAGE_UID=1234 \
     --env AICAGE_GID=2345 \
-    --env AICAGE_USER=demo
+    --env AICAGE_USER=demo \
+    "${AICAGE_IMAGE}" \
+    /bin/bash -lc "printf '%s\n%s\n%s\n' \"\$(id -u)\" \"\$(id -g)\" \"\${HOME}\""
   [ "$status" -eq 0 ]
   mapfile -t lines <<<"${output}"
   uid="${lines[0]}"
@@ -28,12 +24,13 @@ setup_file() {
 }
 
 @test "test_agent_binary_present" {
-  run agent_exec "command -v droid"
+  run docker run --rm "${AICAGE_IMAGE}" /bin/bash -lc "command -v droid"
   [ "$status" -eq 0 ]
   [[ "$output" == *"droid"* ]]
 }
 
 @test "test_required_packages" {
-  run agent_exec "git --version >/dev/null && python3 --version >/dev/null && node --version >/dev/null && npm --version >/dev/null"
+  run docker run --rm "${AICAGE_IMAGE}" /bin/bash -lc \
+    "git --version >/dev/null && python3 --version >/dev/null && node --version >/dev/null && npm --version >/dev/null"
   [ "$status" -eq 0 ]
 }
