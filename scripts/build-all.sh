@@ -10,8 +10,8 @@ usage() {
 Usage: scripts/build-all.sh [build-options]
 
 Builds the full matrix of <tool>-<base> combinations. Any options after the script name are
-forwarded to scripts/build.sh for each build (e.g., --platform, --push, --load, --no-cache,
---set k=v, --print).
+forwarded to scripts/build.sh for each build (e.g., --platform, --load, --no-cache,
+--print).
 USAGE
   exit 1
 }
