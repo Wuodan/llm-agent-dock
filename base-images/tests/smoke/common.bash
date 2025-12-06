@@ -3,7 +3,7 @@
 if [[ -z "${AICAGE_BASE_IMAGE:-}" ]]; then
   echo "AICAGE_BASE_IMAGE must be set (use base-images/scripts/test.sh)." >&2
   exit 1
-}
+fi
 
 require_base_image() {
   if [[ -z "${AICAGE_BASE_IMAGE:-}" ]]; then
@@ -17,7 +17,7 @@ require_base_image() {
 }
 
 base_exec() {
-  local cmd="$1"
+  local cmd="$*"
   docker run --rm \
     "${AICAGE_BASE_IMAGE}" \
     /bin/bash -lc "${cmd}"
