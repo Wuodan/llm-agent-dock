@@ -28,27 +28,27 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 `.env` variables (edit to override):
 - `AICAGE_REPOSITORY` (default `wuodan/aicage`)
 - `AICAGE_VERSION` (default `dev`)
-- `AICAGE_PLATFORMS` (default `linux/amd64,linux/arm64`)
 
 ## Build
 ```bash
-scripts/build.sh <tool> <base> [--platform list] [--load] [--print]
+scripts/build.sh <tool> <base> [--platform list]
 ```
 - `tool`: `cline`, `codex`, `droid`
 - `base`: `act`, `ubuntu`
 - Images are tagged `${REPOSITORY}:<tool>-<base>-<version>` from `.env` (or env vars).
-- Publishing to a registry is handled by CI; `scripts/build.sh` only builds locally.
+- Builds are always loaded into the local Docker image store; publishing to a registry is handled by
+  CI.
 
 Examples:
 ```bash
 # Build and load a single-arch image locally
-scripts/build.sh codex ubuntu --platform linux/amd64 --load
+scripts/build.sh codex ubuntu --platform linux/amd64
 
 # Build the full matrix
-scripts/build-all.sh --load
+scripts/build-all.sh
 
-# Preview bake config without building
-scripts/build.sh cline act --print
+# Build only one platform via build-all
+scripts/build-all.sh --platform linux/amd64
 ```
 
 ## Test (smoke)
