@@ -7,9 +7,9 @@ setup_file() {
 }
 
 @test "test_boots_container" {
-  run agent_exec "echo factory-boot && ls /usr/local/bin | head -n 1"
+  run agent_exec "echo droid-boot && ls /usr/local/bin | head -n 1"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"factory-boot"* ]]
+  [[ "$output" == *"droid-boot"* ]]
 }
 
 @test "test_runtime_user_creation" {
@@ -28,9 +28,9 @@ setup_file() {
 }
 
 @test "test_agent_binary_present" {
-  run agent_exec "command -v factory_ai_droid"
+  run agent_exec "command -v droid"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"factory_ai_droid"* ]]
+  [[ "$output" == *"droid"* ]]
 }
 
 @test "test_required_packages" {

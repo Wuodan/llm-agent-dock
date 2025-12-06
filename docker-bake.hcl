@@ -19,7 +19,7 @@ variable "BASES" {
 }
 
 variable "TOOLS" {
-  default = "cline,codex,factory_ai_droid"
+  default = "cline,codex,droid"
   description = "Documented tool keys; extend when adding new installers."
 }
 
@@ -87,25 +87,25 @@ target "codex-ubuntu" {
 }
 
 # ------------------------ Factory Droid variants -------------------------------
-target "factory_ai_droid-act" {
+target "droid-act" {
   inherits = ["_agent"]
   args = {
     BASE_IMAGE = "ghcr.io/catthehacker/ubuntu:act-latest"
-    TOOL       = "factory_ai_droid"
+    TOOL       = "droid"
   }
-  tags = ["${REPOSITORY}:factory_ai_droid-act-${VERSION}"]
+  tags = ["${REPOSITORY}:droid-act-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Factory.AI Droid agent"
   }
 }
 
-target "factory_ai_droid-ubuntu" {
+target "droid-ubuntu" {
   inherits = ["_agent"]
   args = {
     BASE_IMAGE = "ubuntu:24.04"
-    TOOL       = "factory_ai_droid"
+    TOOL       = "droid"
   }
-  tags = ["${REPOSITORY}:factory_ai_droid-ubuntu-${VERSION}"]
+  tags = ["${REPOSITORY}:droid-ubuntu-${VERSION}"]
   labels = {
     "org.opencontainers.image.description" = "Factory.AI Droid agent"
   }
@@ -119,7 +119,7 @@ group "matrix" {
     "cline-ubuntu",
     "codex-act",
     "codex-ubuntu",
-    "factory_ai_droid-act",
-    "factory_ai_droid-ubuntu",
+    "droid-act",
+    "droid-ubuntu",
   ]
 }

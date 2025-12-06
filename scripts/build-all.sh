@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TOOLS=(cline codex factory_ai_droid)
+TOOLS=(cline codex droid)
 BASES=(act ubuntu)
 
 usage() {

@@ -82,15 +82,16 @@ RUN npm config set prefix /usr/local
 RUN mkdir -p ${PIPX_HOME} ${PIPX_BIN_DIR}
 RUN PIPX_HOME=${PIPX_HOME} PIPX_BIN_DIR=${PIPX_BIN_DIR} pipx ensurepath
 
-# Tool installers -----------------------------------------------------------
-RUN --mount=type=bind,source=scripts/installers/,target=/tmp/installers,readonly \
-    /tmp/installers/install_${TOOL}.sh
-
 RUN PIP_NO_CACHE_DIR=1 \
     PIPX_HOME=${PIPX_HOME} \
     PIPX_BIN_DIR=${PIPX_BIN_DIR} \
     pipx install uv \
       --pip-args="--no-cache-dir"
+
+# Tool installers -----------------------------------------------------------
+RUN --mount=type=bind,source=scripts/installers/,target=/tmp/installers,readonly \
+    /tmp/installers/install_${TOOL}.sh
+
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]

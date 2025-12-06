@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ROOT_DIR}/.env"
-SUPPORTED_TOOLS=(cline codex factory_ai_droid)
+SUPPORTED_TOOLS=(cline codex droid)
 SUPPORTED_BASES=(act ubuntu)
 
 die() {

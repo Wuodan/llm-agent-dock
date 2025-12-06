@@ -19,7 +19,7 @@ from typing import List
 DEFAULT_AGENT_CMDS = {
     "cline": "cline",
     "codex": "codex",
-    "factory_ai_droid": "factory_ai_droid",
+    "droid": "droid",
 }
 
 
