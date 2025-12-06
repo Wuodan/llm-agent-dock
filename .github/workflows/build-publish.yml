@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: Build and test
+    name: Build, test and push all images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,40 +18,31 @@ jobs:
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Install bats
+      - name: "Test: Install bats"
         run: |
           sudo apt-get update
           sudo apt-get install -y bats
 
-      - name: Build all images
+      - name: "Test: Build all images for amd64"
         run: |
           scripts/build-all.sh --platform linux/amd64 --version "ci-${{ github.sha }}"
 
-      - name: Run smoke suites
+      - name: "Test: Run smoke suites"
         run: |
           scripts/test-all.sh --platform linux/amd64 --version "ci-${{ github.sha }}"
 
-  publish:
-    name: Build and push all images
-    needs: test
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
+      - name: "Publish: Set up QEMU"
+        if: startsWith(github.ref, 'refs/tags/')
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
+      - name: "Publish: Log in to Docker Hub"
+        if: startsWith(github.ref, 'refs/tags/')
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push all images
+      - name: "Publish: Build and push all images"
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           scripts/build-all.sh --version "${{ github.ref_name }}" --push
