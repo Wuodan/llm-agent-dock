@@ -25,11 +25,11 @@ jobs:
 
       - name: "Test: Build all images for amd64"
         run: |
-          scripts/build-all.sh --platform linux/amd64 --version "ci-${{ github.sha }}"
+          scripts/build-all.sh --platform linux/amd64
 
       - name: "Test: Run smoke suites"
         run: |
-          scripts/test-all.sh --platform linux/amd64 --version "ci-${{ github.sha }}"
+          scripts/test-all.sh --platform linux/amd64
 
       - name: "Publish: Set up QEMU"
         if: startsWith(github.ref, 'refs/tags/')
