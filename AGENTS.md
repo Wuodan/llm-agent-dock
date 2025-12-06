@@ -7,7 +7,7 @@
 - `doc/`: user-facing docs and optional lightweight task notes.
 
 ## Build & Test
-- Build a variant: `scripts/build.sh <tool> <base> [--platform linux/amd64 --load]`
+- Build a variant: `scripts/build.sh <tool> <base> [--platform linux/amd64]`
 - Test an image: `scripts/test.sh <image-ref> [--tool <name>]`
 - Helpful prereqs: `docker info`, `bats --version`
 

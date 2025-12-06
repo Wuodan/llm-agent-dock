@@ -17,14 +17,11 @@ Usage: scripts/build.sh <tool> <base> [options]
 
 Options:
   --platform <value>   Override platform list (default: env or linux/amd64,linux/arm64)
-  --load               Load images into the local docker image store
-  --print              Show bake configuration without building
-  --no-cache           Disable build cache
   -h, --help           Show this help and exit
 
 Examples:
   scripts/build.sh cline ubuntu
-  scripts/build.sh codex act --platform linux/amd64 --load
+  scripts/build.sh codex act --platform linux/amd64
 USAGE
   exit 1
 }
@@ -57,7 +54,6 @@ require_docker() {
 
 parse_args() {
   PLATFORM_OVERRIDE=""
-  BAKE_FLAGS=()
   TOOL=""
   BASE=""
 
@@ -67,10 +63,6 @@ parse_args() {
         [[ $# -ge 2 ]] || die "--platform requires a value"
         PLATFORM_OVERRIDE="$2"
         shift 2
-        ;;
-      --load|--print|--no-cache)
-        BAKE_FLAGS+=("$1")
-        shift
         ;;
       -h|--help)
         usage
@@ -123,10 +115,9 @@ main() {
     docker buildx bake \
       -f "${ROOT_DIR}/docker-bake.hcl" \
       "${target}" \
-      --set "*.platform=${platforms}"
+      --set "*.platform=${platforms}" \
+      --load
   )
-
-  cmd+=("${BAKE_FLAGS[@]}")
 
   echo "[build] Target=${target} Platforms=${platforms} Repository=${repository} Version=${version}" >&2
   "${cmd[@]}"
