@@ -7,45 +7,48 @@ name: Build, Test, and Publish Final Images
       - main
     tags:
       - "*"
+    paths:
+      - "final-images/**"
+      - ".env"
+      - ".github/workflows/build-final.yml"
   pull_request:
-  workflow_dispatch:
+    paths:
+      - "final-images/**"
+      - ".env"
+      - ".github/workflows/build-final.yml"
+  workflow_dispatch: {}
 
 jobs:
-  test:
-    if: >-
-      ${{ github.event_name != 'push'
-          || !startsWith(github.ref, 'refs/tags/base-') }}
+  build:
     name: Build, test and push all images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.1
 
-      - name: Set up Python
+      - name: "Test: Set up Python"
         uses: actions/setup-python@v6.1.0
         with:
           python-version: "3.x"
 
-      - name: Install lint deps
+      - name: "Test: Install lint deps"
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Run linters (yamllint, ruff, pymarkdown)
+      - name: "Test: Run linters (yamllint, ruff, pymarkdown)"
         run: |
           yamllint .
           ruff check .
           pymarkdown --config .pymarkdown.json scan .
 
-      - name: Set up Buildx
+      - name: "Test: Set up Buildx"
         uses: docker/setup-buildx-action@v3.11.1
 
-      - name: "Test: Install bats"
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
+      - name: "Test: Setup BATS testing framework"
+        uses: mig4/setup-bats@v1.2.0
 
-      - name: "Test: Build final images for tests"
+      - name: "Test: Build images for tests"
         run: |
           final-images/scripts/build-all.sh --platform linux/amd64
 
