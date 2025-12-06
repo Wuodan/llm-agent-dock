@@ -15,7 +15,7 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 
 ## Repo layout
 - `Dockerfile` — single definition used for every base × tool combination.
-- `docker-bake.hcl` — targets for each matrix entry plus a `matrix` group.
+- `docker-bake.hcl` — single flexible Bake target; scripts set TOOL/BASE_IMAGE/tags via `--set`.
 - `scripts/`
   - `build.sh` — wraps `docker buildx bake` with guardrails.
   - `build-all.sh` — builds every tool/base combination, forwarding build flags.
@@ -28,14 +28,18 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 `.env` variables (edit to override):
 - `AICAGE_REPOSITORY` (default `wuodan/aicage`)
 - `AICAGE_VERSION` (default `dev`)
+- `AICAGE_PLATFORMS` (default `linux/amd64 linux/arm64`, space-separated)
+- `AICAGE_TOOLS` (default `cline codex droid`, space-separated)
+- `AICAGE_BASES` (default `ghcr.io/catthehacker/ubuntu:act-latest ubuntu:24.04`, space-separated)
+- `AICAGE_BASE_ALIASES` (default `act ubuntu`, space-separated, aligned by index with `AICAGE_BASES`)
 
 ## Build
 ```bash
 scripts/build.sh <tool> <base> [--platform list]
 ```
-- `tool`: `cline`, `codex`, `droid`
-- `base`: `act`, `ubuntu`
-- Images are tagged `${REPOSITORY}:<tool>-<base>-<version>` from `.env` (or env vars).
+- `tool` values come from `.env` (`AICAGE_TOOLS`).
+- `base` values come from `.env` (`AICAGE_BASES`) and are paired with aliases in `AICAGE_BASE_ALIASES`.
+- Images are tagged `${REPOSITORY}:<tool>-<base-alias>-<version>`.
 - Builds are always loaded into the local Docker image store; publishing to a registry is handled by
   CI.
 
@@ -54,7 +58,7 @@ scripts/build-all.sh --platform linux/amd64
 ## Test (smoke)
 Run all suites or filter by tool:
 ```bash
-scripts/test.sh wuodan/aicage:codex-ubuntu-dev --tool codex
+scripts/test.sh wuodan/aicage:codex-ubuntu-24.04-dev --tool codex
 ```
 - `AICAGE_IMAGE` can be set manually when running Bats directly.
 
@@ -76,14 +80,14 @@ code into `/workspace` and pass your host IDs, e.g.
 ## Adding a tool
 1) Create `scripts/installers/install_<tool>.sh` (executable) that installs the agent; fail fast on
    errors.  
-2) Add a Bake target for each base in `docker-bake.hcl` and list the tool in the `TOOLS` variable.  
+2) Add the tool to `AICAGE_TOOLS` in `.env`.  
 3) Add a smoke suite at `tests/smoke/<tool>.bats`.  
 4) Update README tables to mention the tool.
 
 ## Adding a base
-1) Add a target to `docker-bake.hcl` with `BASE_IMAGE` set appropriately and list it in `BASES`.  
+1) Add the full base image reference to `.env` (`AICAGE_BASES`).  
 2) Extend the `Dockerfile` only if the base needs extra packages/config.  
-3) Update README tables to mention the base.
+3) Update README tables to mention the base and alias.
 
 ## Coding style
 - Bash: `#!/usr/bin/env bash`, `set -euo pipefail`, two-space indent, descriptive functions.

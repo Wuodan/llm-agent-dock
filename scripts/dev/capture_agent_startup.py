@@ -14,33 +14,62 @@ import signal
 import subprocess
 import sys
 import time
-from typing import List
-
-DEFAULT_AGENT_CMDS = {
-    "cline": "cline",
-    "codex": "codex",
-    "droid": "droid",
-}
-
+from typing import Dict, List, Tuple
 
 def detect_repo_root() -> pathlib.Path:
     return pathlib.Path(__file__).resolve().parents[2]
 
 
+def load_dotenv(env_path: pathlib.Path) -> Dict[str, str]:
+    if not env_path.exists():
+        return {}
+    env: Dict[str, str] = {}
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        env[key.strip()] = value.strip()
+    return env
+
+
+REPO_ROOT = detect_repo_root()
+DOTENV_VALUES = load_dotenv(REPO_ROOT / ".env")
+
+
+def split_list(raw: str) -> List[str]:
+    return raw.split()
+
+
+def load_matrix_settings() -> Tuple[List[str], List[str]]:
+    tool_str = DOTENV_VALUES.get("AICAGE_TOOLS") or os.environ.get("AICAGE_TOOLS")
+    base_str = DOTENV_VALUES.get("AICAGE_BASES") or os.environ.get("AICAGE_BASES")
+    base_alias_str = DOTENV_VALUES.get("AICAGE_BASE_ALIASES") or os.environ.get("AICAGE_BASE_ALIASES")
+    if not tool_str or not base_str or not base_alias_str:
+        raise RuntimeError("AICAGE_TOOLS, AICAGE_BASES, and AICAGE_BASE_ALIASES must be set in .env or the environment.")
+    return split_list(tool_str), split_list(base_str), split_list(base_alias_str)
+
+
+SUPPORTED_TOOLS, SUPPORTED_BASES, SUPPORTED_BASE_ALIASES = load_matrix_settings()
+if len(SUPPORTED_BASES) != len(SUPPORTED_BASE_ALIASES):
+    raise RuntimeError("AICAGE_BASES and AICAGE_BASE_ALIASES must have the same length.")
+DEFAULT_AGENT_CMDS = {tool: tool for tool in SUPPORTED_TOOLS}
+
+
 def build_parser() -> argparse.ArgumentParser:
+    repository_default = DOTENV_VALUES.get("AICAGE_REPOSITORY") or os.environ.get("AICAGE_REPOSITORY") or "wuodan/aicage"
+    version_default = DOTENV_VALUES.get("AICAGE_VERSION") or os.environ.get("AICAGE_VERSION") or "dev"
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("tool", choices=sorted(DEFAULT_AGENT_CMDS.keys()), help="Tool name")
-    parser.add_argument("base", choices=["ubuntu", "act"], help="Base alias")
+    parser.add_argument("tool", choices=sorted(SUPPORTED_TOOLS), help="Tool name")
+    parser.add_argument("base", choices=sorted(SUPPORTED_BASES), help="Base alias")
     parser.add_argument(
         "--image",
-        help=(
-            "Override image tag (default wuodan/aicage:<tool>-<base>-latest). "
-            "If provided, overrides --repository/--registry/--version"
-        ),
+        help="Override image tag (default <repo>:<tool>-<base>-<version> from .env). "
+        "If provided, overrides --repository/--registry/--version",
     )
     parser.add_argument("--registry", default="", help="Registry host when deriving tag")
-    parser.add_argument("--repository", default="wuodan/aicage", help="Registry namespace/image")
-    parser.add_argument("--version", default="latest", help="Tag suffix in <tool>-<base>-<version>")
+    parser.add_argument("--repository", default=repository_default, help="Registry namespace/image")
+    parser.add_argument("--version", default=version_default, help="Tag suffix in <tool>-<base>-<version>")
     parser.add_argument("--timeout", type=float, default=20.0, help="Seconds before docker run is terminated")
     parser.add_argument("--log-dir", type=pathlib.Path, help="Directory to store logs (default task plan logs folder)")
     parser.add_argument("--agent-cmd", help="Override command executed inside the container")
@@ -76,8 +105,13 @@ def derive_image(args: argparse.Namespace) -> str:
         return args.image
     registry = args.registry.rstrip("/")
     repo = args.repository.strip("/")
+    try:
+        base_index = SUPPORTED_BASES.index(args.base)
+    except ValueError as exc:
+        raise ValueError(f"Base '{args.base}' not found in AICAGE_BASES") from exc
+    base_alias = SUPPORTED_BASE_ALIASES[base_index]
     prefix = f"{registry}/" if registry else ""
-    return f"{prefix}{repo}:{args.tool}-{args.base}-{args.version}"
+    return f"{prefix}{repo}:{args.tool}-{base_alias}-{args.version}"
 
 
 def build_container_command(agent_cmd: str, use_script: bool) -> str:
@@ -135,8 +169,7 @@ async def stream_pipe(reader: asyncio.StreamReader, label: str, log_file: pathli
 
 
 async def capture(args: argparse.Namespace) -> int:
-    repo_root = detect_repo_root()
-    log_dir = args.log_dir or repo_root / "doc/ai/tasks/T003_intensive-startup-tests/plan/logs"
+    log_dir = args.log_dir or REPO_ROOT / "doc/ai/tasks/T003_intensive-startup-tests/plan/logs"
     timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     log_file = log_dir / f"startup_{args.tool}_{args.base}_{timestamp}.log"
     metadata = {

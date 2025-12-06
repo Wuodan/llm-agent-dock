@@ -3,8 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ROOT_DIR}/.env"
-SUPPORTED_TOOLS=(cline codex droid)
-SUPPORTED_BASES=(act ubuntu)
+SUPPORTED_TOOLS=()
+SUPPORTED_BASES=()
+SUPPORTED_BASE_ALIASES=()
 
 die() {
   echo "[build] $*" >&2
@@ -20,8 +21,8 @@ Options:
   -h, --help           Show this help and exit
 
 Examples:
-  scripts/build.sh cline ubuntu
-  scripts/build.sh codex act --platform linux/amd64
+  scripts/build.sh cline ubuntu:24.04
+  scripts/build.sh codex ghcr.io/catthehacker/ubuntu:act-latest --platform linux/amd64
 USAGE
   exit 1
 }
@@ -46,10 +47,33 @@ load_env_file() {
   fi
 }
 
+split_list() {
+  local raw="$1"
+  local -n out=$2
+  read -r -a out <<< "${raw}"
+}
+
+init_supported_lists() {
+  split_list "${AICAGE_TOOLS}" SUPPORTED_TOOLS
+  split_list "${AICAGE_BASES}" SUPPORTED_BASES
+  split_list "${AICAGE_BASE_ALIASES}" SUPPORTED_BASE_ALIASES
+  [[ ${#SUPPORTED_TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty; update ${ENV_FILE}."
+  [[ ${#SUPPORTED_BASES[@]} -gt 0 ]] || die "AICAGE_BASES is empty; update ${ENV_FILE}."
+  [[ ${#SUPPORTED_BASE_ALIASES[@]} -gt 0 ]] || die "AICAGE_BASE_ALIASES is empty; update ${ENV_FILE}."
+  [[ ${#SUPPORTED_BASES[@]} -eq ${#SUPPORTED_BASE_ALIASES[@]} ]] || die "AICAGE_BASES and AICAGE_BASE_ALIASES must have the same length."
+}
+
 require_docker() {
   if ! command -v docker >/dev/null 2>&1; then
     die "Docker CLI not found. Install Docker (with Buildx) first."
   fi
+}
+
+slugify_base() {
+  local base="$1"
+  local slug="${base//\//-}"
+  slug="${slug//:/-}"
+  echo "${slug}"
 }
 
 parse_args() {
@@ -95,6 +119,7 @@ parse_args() {
 main() {
   parse_args "$@"
   load_env_file
+  init_supported_lists
   require_docker
 
   contains "${TOOL}" "${SUPPORTED_TOOLS[@]}" || die "Unsupported tool '${TOOL}'. Valid: ${SUPPORTED_TOOLS[*]}"
@@ -102,24 +127,45 @@ main() {
 
   local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
   local version="${AICAGE_VERSION:-${VERSION:-latest}}"
-  local platforms="${PLATFORM_OVERRIDE:-${AICAGE_PLATFORMS:-${PLATFORMS:-linux/amd64,linux/arm64}}}"
 
-  local target="${TOOL}-${BASE}"
+  local raw_platforms="${PLATFORM_OVERRIDE:-${AICAGE_PLATFORMS:-${PLATFORMS:-}}}"
+  [[ -n "${raw_platforms}" ]] || die "Platform list is empty; set AICAGE_PLATFORMS or use --platform."
+  local platform_list=()
+  split_list "${raw_platforms}" platform_list
+  [[ ${#platform_list[@]} -gt 0 ]] || die "Platform list is empty; set AICAGE_PLATFORMS or use --platform."
+  local platforms_str="${platform_list[*]}"
+
+  local base_alias=""
+  for idx in "${!SUPPORTED_BASES[@]}"; do
+    if [[ "${SUPPORTED_BASES[$idx]}" == "${BASE}" ]]; then
+      base_alias="${SUPPORTED_BASE_ALIASES[$idx]}"
+      break
+    fi
+  done
+  [[ -n "${base_alias}" ]] || die "Base alias not found for '${BASE}'. Check AICAGE_BASES/AICAGE_BASE_ALIASES."
+
+  local target="${TOOL}-${base_alias}"
+  local base_image="${BASE}"
+  local tag="${repository}:${TOOL}-${base_alias}-${version}"
+  local description="Agent image for ${TOOL}"
   local env_prefix=(
     REPOSITORY="${repository}"
     VERSION="${version}"
-    PLATFORMS="${platforms}"
+    PLATFORMS="${platforms_str}"
   )
 
   local cmd=("env" "${env_prefix[@]}" \
     docker buildx bake \
       -f "${ROOT_DIR}/docker-bake.hcl" \
-      "${target}" \
-      --set "*.platform=${platforms}" \
+      agent \
+      --set "agent.args.BASE_IMAGE=${base_image}" \
+      --set "agent.args.TOOL=${TOOL}" \
+      --set "agent.tags=${tag}" \
+      --set "agent.labels.org.opencontainers.image.description=${description}" \
       --load
   )
 
-  echo "[build] Target=${target} Platforms=${platforms} Repository=${repository} Version=${version}" >&2
+  echo "[build] Target=${target} Platforms=${platforms_str} Repository=${repository} Version=${version} BaseImage=${base_image}" >&2
   "${cmd[@]}"
 }
 

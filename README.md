@@ -5,14 +5,17 @@ base OS, pull the tag, and you get a ready-to-run shell with the agent preinstal
 
 ## What you get
 - Prebuilt tags for `cline`, `codex`, and `droid`.
-- Base choices: `ubuntu` (24.04) and `act` (CI-friendly).
+- Base choices defined in `.env` (defaults: `ubuntu:24.04` and `ghcr.io/catthehacker/ubuntu:act-latest`).
 - Multi-arch images (`linux/amd64` and `linux/arm64`) via Buildx.
 - Thin images: agent install only; you bring your own API keys.
 
 ## Image tags
-Tags follow `${REPOSITORY}:<tool>-<base>-<version>`.
+Tags follow `${REPOSITORY}:<tool>-<base-alias>-<version>`.
 
 Default repo: `wuodan/aicage` on Docker Hub.
+
+Tools, bases, platforms, and base image references are defined once in `.env` and respected by the
+scripts and Bake targets.
 
 Examples:
 - `wuodan/aicage:codex-ubuntu-latest`
@@ -33,8 +36,7 @@ docker run -it --rm \
   wuodan/aicage:codex-ubuntu-latest \
   bash
 ```
-
-Swap `codex` for `cline` or `droid`, and `ubuntu` for `act` as needed.
+Swap `codex` for `cline` or `droid`, and use the base alias from `.env` (e.g., `act` or `ubuntu`).
 
 The image boots as root, then `scripts/entrypoint.sh` creates a matching user/group from
 `AICAGE_UID`/`AICAGE_GID` (defaults `1000`) and switches into it with `gosu`. `/workspace` is

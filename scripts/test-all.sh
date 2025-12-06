@@ -3,10 +3,16 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ROOT_DIR}/.env"
-TOOLS=(cline codex droid)
-BASES=(act ubuntu)
+TOOLS=()
+BASES=()
+BASE_ALIASES=()
 
 BATS_ARGS=()
+
+die() {
+  echo "[test-all] $*" >&2
+  exit 1
+}
 
 usage() {
   cat <<'USAGE'
@@ -35,6 +41,22 @@ load_env_file() {
   fi
 }
 
+split_list() {
+  local raw="$1"
+  local -n out=$2
+  read -r -a out <<< "${raw}"
+}
+
+init_supported_lists() {
+  split_list "${AICAGE_TOOLS}" TOOLS
+  split_list "${AICAGE_BASES}" BASES
+  split_list "${AICAGE_BASE_ALIASES}" BASE_ALIASES
+  [[ ${#TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty; update ${ENV_FILE}."
+  [[ ${#BASES[@]} -gt 0 ]] || die "AICAGE_BASES is empty; update ${ENV_FILE}."
+  [[ ${#BASE_ALIASES[@]} -gt 0 ]] || die "AICAGE_BASE_ALIASES is empty; update ${ENV_FILE}."
+  [[ ${#BASES[@]} -eq ${#BASE_ALIASES[@]} ]] || die "AICAGE_BASES and AICAGE_BASE_ALIASES must have the same length."
+}
+
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -56,13 +78,16 @@ parse_args() {
 main() {
   parse_args "$@"
   load_env_file
+  init_supported_lists
 
   local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
   local version="${AICAGE_VERSION:-${VERSION:-latest}}"
 
   for tool in "${TOOLS[@]}"; do
-    for base in "${BASES[@]}"; do
-      local image="${repository}:${tool}-${base}-${version}"
+    for idx in "${!BASES[@]}"; do
+      local base="${BASES[$idx]}"
+      local base_alias="${BASE_ALIASES[$idx]}"
+      local image="${repository}:${tool}-${base_alias}-${version}"
       echo "[test-all] Testing ${image}" >&2
       "${ROOT_DIR}/scripts/test.sh" "${image}" --tool "${tool}" -- "${BATS_ARGS[@]}"
     done

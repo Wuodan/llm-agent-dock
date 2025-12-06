@@ -2,8 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TOOLS=(cline codex droid)
-BASES=(act ubuntu)
+ENV_FILE="${ROOT_DIR}/.env"
+TOOLS=()
+BASES=()
 
 die() {
   echo "[build-all] $*" >&2
@@ -35,9 +36,34 @@ detect_host_platform() {
   esac
 }
 
+load_env_file() {
+  if [[ -f "${ENV_FILE}" ]]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "${ENV_FILE}"
+    set +a
+  fi
+}
+
+split_list() {
+  local raw="$1"
+  local -n out=$2
+  read -r -a out <<< "${raw}"
+}
+
+init_supported_lists() {
+  split_list "${AICAGE_TOOLS}" TOOLS
+  split_list "${AICAGE_BASES}" BASES
+  [[ ${#TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty; update ${ENV_FILE}."
+  [[ ${#BASES[@]} -gt 0 ]] || die "AICAGE_BASES is empty; update ${ENV_FILE}."
+}
+
 if [[ ${1:-} == "-h" || ${1:-} == "--help" ]]; then
   usage
 fi
+
+load_env_file
+init_supported_lists
 
 host_platform="$(detect_host_platform)"
 platform_override=""
@@ -60,21 +86,23 @@ done
 
 platforms=()
 if [[ -n "${platform_override}" ]]; then
-  platforms=("${platform_override}")
-  echo "[build-all] Building platform ${platforms[0]}." >&2
+  split_list "${platform_override}" platforms
+  echo "[build-all] Building platform ${platforms[*]}." >&2
+elif [[ -n "${AICAGE_PLATFORMS:-${PLATFORMS:-}}" ]]; then
+  split_list "${AICAGE_PLATFORMS:-${PLATFORMS:-}}" platforms
+  echo "[build-all] Building platforms ${platforms[*]} (from env)." >&2
 else
   default_platforms=("linux/amd64" "linux/arm64")
-  host_normalized="${host_platform}"
   for p in "${default_platforms[@]}"; do
-    if [[ "${p}" != "${host_normalized}" ]]; then
+    if [[ "${p}" != "${host_platform}" ]]; then
       platforms+=("${p}")
     fi
   done
-  platforms+=("${host_normalized}")
+  platforms+=("${host_platform}")
   echo "[build-all] Building platforms ${platforms[*]} (host last)." >&2
 fi
 
-platform_arg=(--platform "$(IFS=,; echo "${platforms[*]}")")
+platform_arg=(--platform "${platforms[*]}")
 
 for tool in "${TOOLS[@]}"; do
   for base in "${BASES[@]}"; do
