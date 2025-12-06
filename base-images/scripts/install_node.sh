@@ -13,8 +13,10 @@ case "${TARGETARCH}" in
     ;;
 esac
 
-curl -fsSL "https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-${NODE_DIST_ARCH}.tar.xz" \
-  | tar -xJ -C /usr/local --strip-components=1
+if ! command -v node >/dev/null 2>&1; then
+  curl -fsSL "https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-${NODE_DIST_ARCH}.tar.xz" \
+    | tar -xJ -C /usr/local --strip-components=1
+fi
 
 ln -sf /usr/local/bin/node /usr/bin/node
 ln -sf /usr/local/bin/npm /usr/bin/npm
