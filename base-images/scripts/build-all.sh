@@ -22,7 +22,7 @@ or environment (.env).
 Options:
   --platform <value>  Build only a single platform (e.g., linux/amd64)
   --push              Push images instead of loading locally
-  --version <value>   Override AICAGE_BASE_VERSION
+  --version <value>   Override AICAGE_VERSION
   -h, --help          Show this help and exit
 USAGE
   exit 1
@@ -104,8 +104,8 @@ for base in "${BASES[@]}"; do
   local_platforms="${platforms[*]}"
   echo "[build-base-all] Building ${base} (platforms: ${local_platforms})" >&2
   if [[ -n "${push_flag}" ]]; then
-    "${BASE_DIR}/scripts/build.sh" --base "${base}" "${platform_arg[@]}" "${push_flag}" --version "${AICAGE_BASE_VERSION}"
+    "${BASE_DIR}/scripts/build.sh" --base "${base}" "${platform_arg[@]}" "${push_flag}" --version "${AICAGE_VERSION}"
   else
-    "${BASE_DIR}/scripts/build.sh" --base "${base}" "${platform_arg[@]}" --version "${AICAGE_BASE_VERSION}"
+    "${BASE_DIR}/scripts/build.sh" --base "${base}" "${platform_arg[@]}" --version "${AICAGE_VERSION}"
   fi
 done
