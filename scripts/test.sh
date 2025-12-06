@@ -3,7 +3,6 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SMOKE_DIR="${ROOT_DIR}/tests/smoke"
-PULL_IMAGE=1
 TOOL_FILTER=""
 BATS_ARGS=()
 IMAGE_REF=""
@@ -14,8 +13,6 @@ Usage: scripts/test.sh <image-ref> [options] [-- <bats-args>]
 
 Options:
   --tool <name>   Only run the smoke suite for the specified tool
-  --pull          Pull the image before testing (default)
-  --no-pull       Skip docker pull (use local image)
   -h, --help      Show this help and exit
 
 Examples:
@@ -48,18 +45,6 @@ parse_args() {
         TOOL_FILTER="$2"
         shift 2
         ;;
-      --tool=*)
-        TOOL_FILTER="${1#*=}"
-        shift
-        ;;
-      --pull)
-        PULL_IMAGE=1
-        shift
-        ;;
-      --no-pull)
-        PULL_IMAGE=0
-        shift
-        ;;
       -h|--help)
         usage
         ;;
@@ -67,6 +52,9 @@ parse_args() {
         shift
         BATS_ARGS=("$@")
         break
+        ;;
+      -*)
+        usage
         ;;
       *)
         if [[ -z "${IMAGE_REF}" ]]; then
@@ -104,13 +92,6 @@ run_tests() {
 
   require_cmd docker
   require_cmd bats
-
-  if (( PULL_IMAGE )); then
-    log "Pulling ${IMAGE_REF}"
-    if ! docker pull "${IMAGE_REF}"; then
-      log "Warning: docker pull failed. Proceeding with local image if available."
-    fi
-  fi
 
   log "Running smoke tests via bats"
   AICAGE_IMAGE="${IMAGE_REF}" bats "${bats_path}" "${BATS_ARGS[@]}"

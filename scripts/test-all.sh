@@ -6,7 +6,6 @@ ENV_FILE="${ROOT_DIR}/.env"
 TOOLS=(cline codex droid)
 BASES=(act ubuntu)
 
-PULL_IMAGE=1
 BATS_ARGS=()
 
 usage() {
@@ -14,16 +13,14 @@ usage() {
 Usage: scripts/test-all.sh [options] [-- <bats-args>]
 
 Runs smoke tests for every <tool>-<base> combination. Image references are derived from
-repository/version values (defaults align with scripts/build.sh). Options are forwarded to
+repository/version values (defaults align with scripts/build.sh). Bats args after -- are forwarded to
 each scripts/test.sh invocation.
 
 Options:
-  --pull          Pull images before testing (default)
-  --no-pull       Skip docker pull (use local images)
   -h, --help      Show this help and exit
 
 Examples:
-  scripts/test-all.sh --no-pull
+  scripts/test-all.sh
   scripts/test-all.sh -- --filter test_runtime_user_creation
 USAGE
   exit 1
@@ -41,14 +38,6 @@ load_env_file() {
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --pull)
-        PULL_IMAGE=1
-        shift
-        ;;
-      --no-pull)
-        PULL_IMAGE=0
-        shift
-        ;;
       -h|--help)
         usage
         ;;
@@ -71,16 +60,11 @@ main() {
   local repository="${AICAGE_REPOSITORY:-${REPOSITORY:-wuodan/aicage}}"
   local version="${AICAGE_VERSION:-${VERSION:-latest}}"
 
-  local pull_flag=("--pull")
-  if (( PULL_IMAGE == 0 )); then
-    pull_flag=("--no-pull")
-  fi
-
   for tool in "${TOOLS[@]}"; do
     for base in "${BASES[@]}"; do
       local image="${repository}:${tool}-${base}-${version}"
       echo "[test-all] Testing ${image}" >&2
-      "${ROOT_DIR}/scripts/test.sh" "${image}" --tool "${tool}" "${pull_flag[@]}" -- "${BATS_ARGS[@]}"
+      "${ROOT_DIR}/scripts/test.sh" "${image}" --tool "${tool}" -- "${BATS_ARGS[@]}"
     done
   done
 }

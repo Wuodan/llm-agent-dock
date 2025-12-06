@@ -2,14 +2,13 @@
 
 ## Project Layout
 - `Dockerfile`, `docker-bake.hcl`: build matrix for base × tool variants.
-- `scripts/`: build/test helpers (`dev/bootstrap.sh`, `build.sh`, `test.sh`).
+- `scripts/`: build/test helpers (`build.sh`, `test.sh`).
 - `tests/smoke/`: Bats smoke suites per tool.
 - `doc/`: user-facing docs and optional lightweight task notes.
 
 ## Build & Test
-- Bootstrap (when needed): `scripts/dev/bootstrap.sh`
 - Build a variant: `scripts/build.sh <tool> <base> [--platform linux/amd64 --load]`
-- Test an image: `scripts/test.sh <image-ref> [--tool <name>] [--no-pull]`
+- Test an image: `scripts/test.sh <image-ref> [--tool <name>]`
 - Helpful prereqs: `docker info`, `bats --version`
 
 ## Coding Style

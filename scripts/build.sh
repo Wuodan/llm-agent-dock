@@ -17,16 +17,14 @@ Usage: scripts/build.sh <tool> <base> [options]
 
 Options:
   --platform <value>   Override platform list (default: env or linux/amd64,linux/arm64)
-  --push               Push images to the registry (sets --push on bake)
   --load               Load images into the local docker image store
   --print              Show bake configuration without building
   --no-cache           Disable build cache
-  --set k=v            Forward extra bake --set expressions
   -h, --help           Show this help and exit
 
 Examples:
   scripts/build.sh cline ubuntu
-  scripts/build.sh codex act --platform linux/amd64 --push
+  scripts/build.sh codex act --platform linux/amd64 --load
 USAGE
   exit 1
 }
@@ -53,13 +51,12 @@ load_env_file() {
 
 require_docker() {
   if ! command -v docker >/dev/null 2>&1; then
-    die "Docker CLI not found. Install Docker or run scripts/dev/bootstrap.sh first."
+    die "Docker CLI not found. Install Docker (with Buildx) first."
   fi
 }
 
 parse_args() {
   PLATFORM_OVERRIDE=""
-  EXTRA_SET_ARGS=()
   BAKE_FLAGS=()
   TOOL=""
   BASE=""
@@ -71,21 +68,8 @@ parse_args() {
         PLATFORM_OVERRIDE="$2"
         shift 2
         ;;
-      --platform=*)
-        PLATFORM_OVERRIDE="${1#*=}"
-        shift
-        ;;
-      --push|--load|--print|--no-cache)
+      --load|--print|--no-cache)
         BAKE_FLAGS+=("$1")
-        shift
-        ;;
-      --set)
-        [[ $# -ge 2 ]] || die "--set requires key=value"
-        EXTRA_SET_ARGS+=("$2")
-        shift 2
-        ;;
-      --set=*)
-        EXTRA_SET_ARGS+=("${1#*=}")
         shift
         ;;
       -h|--help)
@@ -94,6 +78,9 @@ parse_args() {
       --)
         shift
         break
+        ;;
+      -*)
+        die "Unknown option '$1'"
         ;;
       *)
         if [[ -z "${TOOL}" ]]; then
@@ -138,14 +125,6 @@ main() {
       "${target}" \
       --set "*.platform=${platforms}"
   )
-
-  if ((${#EXTRA_SET_ARGS[@]})); then
-    local set_entry
-    for set_entry in "${EXTRA_SET_ARGS[@]}"; do
-      [[ -z "${set_entry}" ]] && continue
-      cmd+=(--set "${set_entry}")
-    done
-  fi
 
   cmd+=("${BAKE_FLAGS[@]}")
 

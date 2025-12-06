@@ -3,11 +3,20 @@
 This project builds and tests Docker images that package AI coding agents. Use this guide when you
 need to develop, extend, or debug the build/test tooling.
 
+## Prerequisites
+- Docker CLI with Buildx enabled (`docker buildx version`).
+- QEMU/binfmt for multi-arch builds (provided by Docker Desktop; otherwise install manually).
+- Bats (`bats --version`) to run smoke tests.
+
+Example setup (Debian/Ubuntu):
+```bash
+sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
+```
+
 ## Repo layout
 - `Dockerfile` — single definition used for every base × tool combination.
 - `docker-bake.hcl` — targets for each matrix entry plus a `matrix` group.
 - `scripts/`
-  - `dev/bootstrap.sh` — creates/uses a Buildx builder, enables binfmt.
   - `build.sh` — wraps `docker buildx bake` with guardrails.
   - `build-all.sh` — builds every tool/base combination, forwarding build flags.
   - `test.sh` — runs smoke tests via Bats.
@@ -16,17 +25,6 @@ need to develop, extend, or debug the build/test tooling.
   - `entrypoint.sh` — runtime user bootstrap (creates UID/GID, workspace, drops to gosu).
 - `tests/smoke/` — Bats smoke suites per tool.
 
-## Prerequisites
-- Docker CLI with Buildx (`docker buildx version`).
-- binfmt/QEMU if you want multi-arch builds (`scripts/dev/bootstrap.sh` tries to configure it).
-- Bats (`bats --version`) to run smoke tests.
-
-## Bootstrap
-Ensures a Buildx builder, and attempts binfmt setup:
-```bash
-scripts/dev/bootstrap.sh
-```
-
 `.env` variables (edit to override):
 - `AICAGE_REPOSITORY` (default `wuodan/aicage`)
 - `AICAGE_VERSION` (default `dev`)
@@ -34,11 +32,12 @@ scripts/dev/bootstrap.sh
 
 ## Build
 ```bash
-scripts/build.sh <tool> <base> [--platform list] [--push|--load] [--print] [--set k=v]
+scripts/build.sh <tool> <base> [--platform list] [--load] [--print]
 ```
 - `tool`: `cline`, `codex`, `droid`
 - `base`: `act`, `ubuntu`
 - Images are tagged `${REPOSITORY}:<tool>-<base>-<version>` from `.env` (or env vars).
+- Publishing to a registry is handled by CI; `scripts/build.sh` only builds locally.
 
 Examples:
 ```bash
@@ -52,20 +51,16 @@ scripts/build-all.sh --load
 scripts/build.sh cline act --print
 ```
 
-Quick-start prerequisites: Docker with Buildx and (for multi-arch) binfmt/QEMU. For first-time
-setup, run `scripts/dev/bootstrap.sh` to create a builder, seed `.env`, and enable binfmt.
-
 ## Test (smoke)
 Run all suites or filter by tool:
 ```bash
-scripts/test.sh wuodan/aicage:codex-ubuntu-dev --tool codex --no-pull
+scripts/test.sh wuodan/aicage:codex-ubuntu-dev --tool codex
 ```
-- `--pull` is on by default; add `--no-pull` for local images.
 - `AICAGE_IMAGE` can be set manually when running Bats directly.
 
 Test the full matrix using derived tags:
 ```bash
-scripts/test-all.sh --no-pull
+scripts/test-all.sh
 ```
 
 Smoke suites live in `tests/smoke/` (one per tool). Install `bats` to run the suites (e.g.,
@@ -97,5 +92,5 @@ code into `/workspace` and pass your host IDs, e.g.
 
 ## Troubleshooting
 - **Missing bats**: `npm install -g bats` or `brew install bats-core`.
-- **Multi-arch failures**: rerun `scripts/dev/bootstrap.sh` to recreate builder and reconfigure
-  binfmt; pass `--platform linux/amd64` to build single-arch.
+- **Multi-arch failures**: recreate a buildx builder and reconfigure binfmt; pass
+  `--platform linux/amd64` to build single-arch.
