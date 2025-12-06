@@ -40,8 +40,6 @@ scripts/build.sh <tool> <base> [--platform list]
 - `tool` values come from `.env` (`AICAGE_TOOLS`).
 - `base` values come from `.env` (`AICAGE_BASES`) and are paired with aliases in `AICAGE_BASE_ALIASES`.
 - Images are tagged `${REPOSITORY}:<tool>-<base-alias>-<version>`.
-- Builds are always loaded into the local Docker image store; publishing to a registry is handled by
-  CI.
 
 Examples:
 ```bash
