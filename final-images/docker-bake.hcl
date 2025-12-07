@@ -10,6 +10,11 @@ variable "AICAGE_PLATFORMS" {
   description = "Space-separated platform list (linux/amd64 linux/arm64)."
 }
 
+variable "AICAGE_CACHE_DIR" {
+  description = "Local cache root for builds."
+  default     = ".buildx-cache"
+}
+
 # Single flexible target; scripts set TOOL/BASE_IMAGE/tags dynamically via --set.
 target "agent" {
   context = "./final-images"

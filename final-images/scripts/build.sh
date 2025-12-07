@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FINAL_DIR="${ROOT_DIR}/final-images"
+BASE_DIR="${ROOT_DIR}/base-images"
 SUPPORTED_TOOLS=()
 SUPPORTED_BASES=()
 SUPPORTED_BASE_ALIASES=()
@@ -139,16 +140,21 @@ main() {
 
   local cmd=("env" "${env_prefix[@]}" \
     docker buildx bake \
+      -f "${BASE_DIR}/docker-bake.hcl" \
       -f "${FINAL_DIR}/docker-bake.hcl" \
+      base \
       agent \
-      --set "agent.args.BASE_IMAGE=${base_image}" \
+      --set "base.args.BASE_IMAGE=${BASE}" \
+      --set "base.tags=${base_image}" \
+      --set "agent.contexts.base=target:base" \
+      --set "agent.args.BASE_IMAGE=base" \
       --set "agent.args.TOOL=${TOOL}" \
       --set "agent.tags=${tag}" \
       --set "agent.labels.org.opencontainers.image.description=${description}" \
       "${PUSH_MODE}"
   )
 
-  echo "[build] Target=${target} Platforms=${platforms_str} Repo=${AICAGE_REPOSITORY} Version=${AICAGE_VERSION} BaseImage=${base_image} Mode=${PUSH_MODE}" >&2
+  echo "[build] Target=${target} Platforms=${platforms_str} Repo=${AICAGE_REPOSITORY} Version=${AICAGE_VERSION} BaseImage=${base_image} Mode=${PUSH_MODE} (building base+agent together)" >&2
   "${cmd[@]}"
 }
 

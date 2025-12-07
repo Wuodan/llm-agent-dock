@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG BASE_IMAGE=wuodan/aicage-base:ubuntu-base-dev
+ARG BASE_IMAGE=base
 ARG TOOL=codex
 
 FROM ${BASE_IMAGE} AS runtime
