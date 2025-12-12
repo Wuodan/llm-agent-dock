@@ -24,7 +24,8 @@ contains() {
 load_env_file() {
   local env_file="${ROOT_DIR}/.env"
 
-  while IFS= read -r line; do
+  # The read condition handles files that omit a trailing newline.
+  while IFS= read -r line || [[ -n "${line}" ]]; do
     [[ -z "${line}" || "${line}" =~ ^[[:space:]]*# ]] && continue
     if [[ "${line}" =~ ^([^=]+)=(.*)$ ]]; then
       local key="${BASH_REMATCH[1]}"
