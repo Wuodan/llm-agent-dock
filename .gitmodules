@@ -1,0 +1,3 @@
+[submodule "aicage-base"]
+	path = aicage-base
+	url = git@github.com:Wuodan/aicage-base.git
