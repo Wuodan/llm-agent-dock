@@ -1,3 +1,2 @@
----
 base_image: fedora:latest
 os_installer: scripts/os-installers/install_os_packages_redhat.sh

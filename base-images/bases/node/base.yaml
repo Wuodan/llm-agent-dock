@@ -1,3 +1,2 @@
----
 base_image: node:lts-slim
 os_installer: scripts/os-installers/install_os_packages_debian.sh
