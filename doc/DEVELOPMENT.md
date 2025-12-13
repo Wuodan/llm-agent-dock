@@ -14,7 +14,8 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 ```
 
 ## Repo layout
-- `base-images/` — standalone base image Dockerfile, Bake file, scripts, and smoke tests.
+- `aicage-base/` — submodule with base image Dockerfile, Bake file, scripts, and smoke tests (rooted
+  at the submodule).
 - `final-images/` — agent Dockerfile/Bake plus all agent build/test scripts and installers.
   - `scripts/` — build/test helpers (agent-specific).
   - `tests/smoke/` — Bats smoke suites for agents.
@@ -27,18 +28,20 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 - `AICAGE_PLATFORMS` (default `linux/amd64 linux/arm64`, space-separated)
 - `AICAGE_TOOLS` (default `cline codex droid`, space-separated)
 - `AICAGE_BASE_REPOSITORY` (default `wuodan/aicage-base`, must differ from `AICAGE_REPOSITORY`)
-- Base definitions live in `base-images/bases/<alias>/base.yaml` with keys:
+- `AICAGE_BASE_ALIASES` is optional; when unset we auto-discover `<alias>-latest` tags from
+  `${AICAGE_BASE_REPOSITORY}` via Docker Hub and `docker images`.
+- Base definitions live in `aicage-base/bases/<alias>/base.yaml` with keys:
   - `base_image` (upstream image reference, e.g., `fedora:latest`)
   - `os_installer` (relative path to the install script to run, e.g., `scripts/install_os_packages_redhat.sh`)
-- `yq` is required for parsing `base.yaml` files (install from https://github.com/mikefarah/yq/).
+- `yq` is required for parsing `base.yaml` files inside the `aicage-base` submodule.
 
 ## Build
 ### Base images
 ```bash
-base-images/scripts/build.sh --base <alias> [--platform list] [--version <tag>]
-base-images/scripts/build-all.sh [--platform list]
+cd aicage-base && scripts/build.sh --base <alias> [--platform list] [--version <tag>]
+cd aicage-base && scripts/build-all.sh [--platform list]
 ```
-- `base` values come from folders in `base-images/bases/` (folder name is the alias, files define upstream and installer).
+- `base` values come from folders in `aicage-base/bases/` (folder name is the alias, files define upstream and installer).
 - Images are tagged `${AICAGE_BASE_REPOSITORY}:<base-alias>-<AICAGE_VERSION>`.
 
 ### Agent (final) images
@@ -47,7 +50,8 @@ final-images/scripts/build.sh --tool <tool> --base <alias> [--platform list] [--
 final-images/scripts/build-all.sh [--platform list]
 ```
 - `tool` values come from `.env` (`AICAGE_TOOLS`).
-- `base` values come from `base-images/bases/` (folder name is the alias).
+- `base` values come from `${AICAGE_BASE_REPOSITORY}:*-latest` tags; override with
+  `AICAGE_BASE_ALIASES` to pin a subset.
 - Images are tagged `${REPOSITORY}:<tool>-<base-alias>-<version>`.
 
 ## Test (smoke)
@@ -67,7 +71,7 @@ Smoke suites live in `final-images/tests/smoke/` (one per tool). Install `bats` 
 
 Base images also have a smoke sweep:
 ```bash
-base-images/scripts/test-all.sh
+cd aicage-base && scripts/test-all.sh
 ```
 
 ## Runtime user
@@ -78,10 +82,10 @@ code into `/workspace` and pass your host IDs, e.g.
 `-e AICAGE_UID=$(id -u) -e AICAGE_GID=$(id -g) -e AICAGE_USER=$(id -un)`.
 
 ## Publish workflows
-- Base images: `.github/workflows/build-base.yml` builds on base changes (amd64 smoke) and publishes
-  multi-arch base images to Docker Hub (`wuodan/aicage-base`) on `base-*` tags.
-- Agent images: `.github/workflows/build-publish.yml` builds/tests agents and publishes to
-  `wuodan/aicage` on tags, consuming the published base images.
+- Base images: `aicage-base/.github/workflows/base-images.yml` builds/tests on tags only and
+  publishes multi-arch base images to `${AICAGE_BASE_REPOSITORY}`.
+- Agent images: `.github/workflows/final-images.yml` builds/tests agents on tags only and publishes
+  to `${AICAGE_REPOSITORY}`, consuming `${AICAGE_BASE_REPOSITORY}:*-latest` tags.
 
 ## Adding a tool
 1) Create `final-images/scripts/installers/install_<tool>.sh` (executable) that installs the agent;
@@ -91,9 +95,9 @@ code into `/workspace` and pass your host IDs, e.g.
 4) Update README tables to mention the tool.
 
 ## Adding a base
-1) Create `base-images/bases/<alias>/base.yaml` with `base_image` and `os_installer`.  
+1) Create `aicage-base/bases/<alias>/base.yaml` with `base_image` and `os_installer`.  
 2) Extend the Dockerfile only if the base needs extra packages/config.  
-3) Update README tables to mention the base and alias.
+3) Update README tables to mention the base and alias (and propagate to `aicage-base` if needed).
 
 ## Coding style
 - Bash: `#!/usr/bin/env bash`, `set -euo pipefail`, two-space indent, descriptive functions.

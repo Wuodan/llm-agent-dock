@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FINAL_DIR="${ROOT_DIR}/final-images"
 TOOLS=()
+BASES=()
 
 BATS_ARGS=()
 
@@ -35,7 +36,10 @@ source "${ROOT_DIR}/scripts/common.sh"
 
 init_supported_lists() {
   split_list "${AICAGE_TOOLS}" TOOLS
+  ensure_base_aliases
+  split_list "${AICAGE_BASE_ALIASES}" BASES
   [[ ${#TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty."
+  [[ ${#BASES[@]} -gt 0 ]] || die "AICAGE_BASE_ALIASES is empty."
 }
 
 parse_args() {
@@ -65,8 +69,7 @@ main() {
   local version="${AICAGE_VERSION}"
 
   for tool in "${TOOLS[@]}"; do
-    for base_dir in "${ROOT_DIR}/base-images/bases"/*; do
-      base_alias="$(basename "${base_dir}")"
+    for base_alias in "${BASES[@]}"; do
       local image="${repository}:${tool}-${base_alias}-latest"
       echo "[test-all] Testing ${image}" >&2
       "${FINAL_DIR}/scripts/test.sh" --image "${image}" -- "${BATS_ARGS[@]}"

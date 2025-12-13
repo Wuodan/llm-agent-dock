@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FINAL_DIR="${ROOT_DIR}/final-images"
 SUPPORTED_TOOLS=()
+SUPPORTED_BASES=()
 
 die() {
   echo "[build] $*" >&2
@@ -16,7 +17,7 @@ Usage: final-images/scripts/build.sh --tool <tool> --base <alias> [options]
 
 Options:
   --tool <value>       Tool name to build (required)
-  --base <value>       Base alias to consume (required; must match base-images/bases folder)
+  --base <value>       Base alias to consume (required; must match available base tags)
   --platform <value>   Override platform list (default: env or linux/amd64,linux/arm64)
   --push               Push the image instead of loading it locally
   --version <value>    Override AICAGE_VERSION for this build
@@ -34,7 +35,10 @@ source "${ROOT_DIR}/scripts/common.sh"
 
 init_supported_lists() {
   split_list "${AICAGE_TOOLS}" SUPPORTED_TOOLS
+  ensure_base_aliases
+  split_list "${AICAGE_BASE_ALIASES}" SUPPORTED_BASES
   [[ ${#SUPPORTED_TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty."
+  [[ ${#SUPPORTED_BASES[@]} -gt 0 ]] || die "AICAGE_BASE_ALIASES is empty."
   [[ -n "${AICAGE_BASE_REPOSITORY:-}" ]] || die "AICAGE_BASE_REPOSITORY is empty."
   [[ -n "${AICAGE_VERSION:-}" ]] || die "AICAGE_VERSION is empty."
   if [[ "${AICAGE_BASE_REPOSITORY}" == "${AICAGE_REPOSITORY}" ]]; then
@@ -102,8 +106,7 @@ main() {
   init_supported_lists
 
   contains "${TOOL}" "${SUPPORTED_TOOLS[@]}" || die "Unsupported tool '${TOOL}'. Valid: ${SUPPORTED_TOOLS[*]}"
-  # Validate the base alias by reading a field from its definition.
-  get_base_field "${BASE_ALIAS}" base_image >/dev/null
+  contains "${BASE_ALIAS}" "${SUPPORTED_BASES[@]}" || die "Unsupported base '${BASE_ALIAS}'. Valid: ${SUPPORTED_BASES[*]}"
 
   local raw_platforms="${PLATFORM_OVERRIDE:-${AICAGE_PLATFORMS:-${PLATFORMS:-}}}"
   [[ -n "${raw_platforms}" ]] || die "Platform list is empty; set AICAGE_PLATFORMS or use --platform."

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_DEFINITIONS_DIR="${ROOT_DIR}/base-images/bases"
-
 _die() {
   if command -v die >/dev/null 2>&1; then
     die "$@"
@@ -48,17 +46,57 @@ split_list() {
   read -r -a out <<< "${raw}"
 }
 
-get_base_field() {
-  local alias="$1"
-  local field="$2"
-  local base_dir="${BASE_DEFINITIONS_DIR}/${alias}"
-  local definition_file="${base_dir}/base.yaml"
+discover_base_aliases() {
+  local repo="${AICAGE_BASE_REPOSITORY:-}"
+  [[ -n "${repo}" ]] || _die "AICAGE_BASE_REPOSITORY is empty; set it in .env."
 
-  [[ -d "${base_dir}" ]] || _die "Base alias '${alias}' not found under ${BASE_DEFINITIONS_DIR}"
-  [[ -f "${definition_file}" ]] || _die "Missing base.yaml for '${alias}'"
+  local -a aliases=()
+  if command -v docker >/dev/null 2>&1; then
+    while IFS=' ' read -r image_repo image_tag; do
+      [[ "${image_repo}" == "${repo}" && "${image_tag}" == *-latest ]] || continue
+      aliases+=("${image_tag%-latest}")
+    done < <(docker images --format '{{.Repository}} {{.Tag}}' "${repo}" 2>/dev/null || true)
+  fi
 
-  local value
-  value="$(yq -er ".${field}" "${definition_file}")" || _die "Failed to read ${field} from ${definition_file}"
-  [[ -n "${value}" && "${value}" != "null" ]] || _die "${field} missing in ${definition_file}"
-  printf '%s\n' "${value}"
+  if [[ ${#aliases[@]} -eq 0 ]]; then
+    local hub_repo="${repo#docker.io/}"
+    if [[ "${hub_repo}" == */* && "${hub_repo}" != *.*/* ]]; then
+      if command -v curl >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
+        mapfile -t aliases < <(python3 - "${hub_repo}" <<'PY'
+import json
+import sys
+import urllib.request
+
+repo = sys.argv[1]
+url = f"https://registry.hub.docker.com/v2/repositories/{repo}/tags?page_size=100"
+aliases = set()
+
+while url:
+    with urllib.request.urlopen(url) as resp:  # noqa: S310 (trusted URL)
+        data = json.load(resp)
+    for name in (item.get("name", "") for item in data.get("results", [])):
+        if name.endswith("-latest"):
+            aliases.add(name[:-7])
+    url = data.get("next")
+
+for alias in sorted(aliases):
+    print(alias)
+PY
+)
+      else
+        _die "curl and python3 are required to discover base aliases for ${repo}."
+      fi
+    else
+      _die "Automatic base alias discovery supports Docker Hub repos (namespace/name). Set AICAGE_BASE_ALIASES manually."
+    fi
+  fi
+
+  [[ ${#aliases[@]} -gt 0 ]] || _die "No base aliases discovered for ${repo}; set AICAGE_BASE_ALIASES explicitly."
+  printf '%s\n' "${aliases[*]}"
+}
+
+ensure_base_aliases() {
+  if [[ -z "${AICAGE_BASE_ALIASES:-}" ]]; then
+    AICAGE_BASE_ALIASES="$(discover_base_aliases)"
+  fi
 }

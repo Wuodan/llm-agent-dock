@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FINAL_DIR="${ROOT_DIR}/final-images"
 TOOLS=()
+BASES=()
 
 die() {
   echo "[build-all] $*" >&2
@@ -31,7 +32,10 @@ source "${ROOT_DIR}/scripts/common.sh"
 
 init_supported_lists() {
   split_list "${AICAGE_TOOLS}" TOOLS
+  ensure_base_aliases
+  split_list "${AICAGE_BASE_ALIASES}" BASES
   [[ ${#TOOLS[@]} -gt 0 ]] || die "AICAGE_TOOLS is empty."
+  [[ ${#BASES[@]} -gt 0 ]] || die "AICAGE_BASE_ALIASES is empty."
 }
 
 if [[ ${1:-} == "-h" || ${1:-} == "--help" ]]; then
@@ -87,8 +91,7 @@ if [[ -n "${version_override}" ]]; then
 fi
 
 for tool in "${TOOLS[@]}"; do
-  for base_dir in "${ROOT_DIR}/base-images/bases"/*; do
-    base_alias="$(basename "${base_dir}")"
+  for base_alias in "${BASES[@]}"; do
     local_platforms="${platforms[*]}"
     echo "[build-all] Building ${tool}-${base_alias} (platforms: ${local_platforms})" >&2
     if [[ -n "${push_flag}" ]]; then
