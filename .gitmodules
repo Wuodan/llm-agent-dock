@@ -1,0 +1,3 @@
+[submodule "aicage-image-base"]
+	path = aicage-image-base
+	url = git@github.com:Wuodan/aicage-image-base.git
