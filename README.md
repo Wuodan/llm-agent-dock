@@ -8,6 +8,7 @@ base OS, pull the tag, and you get a ready-to-run shell with the agent preinstal
 - Prebuilt tags for `cline`, `codex`, and `droid`.
 - Base choices live in the `aicage-image-base` submodule (`bases/<alias>/base.yaml` → upstream image +
   installer).
+- Agent build/test sources live in the `aicage-image` submodule.
 - Multi-arch images (`linux/amd64` and `linux/arm64`) via Buildx.
 - Thin images: agent install only; you bring your own API keys.
 
@@ -18,7 +19,7 @@ Tags follow `${REPOSITORY}:<tool>-<base-alias>-<version>`.
 Default repo: `wuodan/aicage` on Docker Hub. Base layers live separately at
 `wuodan/aicage-image-base` and are pulled by the agent builds.
 
-Tools and platforms are configured in `.env`. Base aliases come from tags on
+Tools and platforms are configured in `aicage-image/.env`. Base aliases come from tags on
 `${AICAGE_BASE_REPOSITORY}:*-latest` (discovered automatically); their definitions live in the
 `aicage-image-base/bases/` folders (alias = folder name, `base.yaml` describes upstream image and
 installer script).
@@ -46,7 +47,8 @@ docker run -it --rm \
   bash
 ```
 
-Swap `codex` for `cline` or `droid`, and use the base alias from `.env` (e.g., `act` or `ubuntu`).
+Swap `codex` for `cline` or `droid`, and use the base alias from `aicage-image/.env` (e.g., `act` or
+`ubuntu`).
 
 The image boots as root, then `scripts/entrypoint.sh` creates a matching user/group from
 `AICAGE_UID`/`AICAGE_GID` (defaults `1000`) and switches into it with `gosu`. `/workspace` is
@@ -75,20 +77,20 @@ cd aicage-image-base && scripts/test-all.sh
 Publish flow:
 
 - Base pipeline: `aicage-image-base/.github/workflows/base-images.yml` (tags only; pushes to Docker Hub).
-- Agent pipeline: `.github/workflows/final-images.yml` (tags only; pushes agent images, consuming
-  whatever `${AICAGE_BASE_REPOSITORY}:*-latest` tags Docker Hub exposes).
+- Agent pipeline: `aicage-image/.github/workflows/final-images.yml` (tags only; pushes agent images,
+  consuming whatever `${AICAGE_BASE_REPOSITORY}:*-latest` tags Docker Hub exposes).
 
 ## Final images (agents)
 
-Agent builds now live under `final-images/`. Commands:
+Agent builds now live under the `aicage-image/` submodule. Commands:
 
 ```bash
 # Build and load a single agent image
-final-images/scripts/build.sh --tool codex --base ubuntu --platform linux/amd64
+cd aicage-image && scripts/build.sh --tool codex --base ubuntu --platform linux/amd64
 
 # Build the full matrix
-final-images/scripts/build-all.sh --platform linux/amd64
+cd aicage-image && scripts/build-all.sh --platform linux/amd64
 
 # Run smoke tests
-final-images/scripts/test-all.sh
+cd aicage-image && scripts/test-all.sh
 ```

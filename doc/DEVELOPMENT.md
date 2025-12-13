@@ -16,13 +16,12 @@ sudo apt install docker.io docker-buildx-plugin qemu-user-static bats
 ## Repo layout
 - `aicage-image-base/` — submodule with base image Dockerfile, Bake file, scripts, and smoke tests (rooted
   at the submodule).
-- `final-images/` — agent Dockerfile/Bake plus all agent build/test scripts and installers.
+- `aicage-image/` — submodule with agent Dockerfile/Bake plus all agent build/test scripts and installers.
   - `scripts/` — build/test helpers (agent-specific).
   - `tests/smoke/` — Bats smoke suites for agents.
-- `.env` — shared matrix/config for both base and final images.
-- `scripts/dev/` — developer utilities unrelated to image builds.
+- `.env` — each submodule includes its own defaults for build/test matrices.
 
-`.env` variables (edit to override):
+`.env` variables (edit to override inside each submodule):
 - `AICAGE_REPOSITORY` (default `wuodan/aicage`)
 - `AICAGE_VERSION` (default `dev`)
 - `AICAGE_PLATFORMS` (default `linux/amd64 linux/arm64`, space-separated)
@@ -46,10 +45,10 @@ cd aicage-image-base && scripts/build-all.sh [--platform list]
 
 ### Agent (final) images
 ```bash
-final-images/scripts/build.sh --tool <tool> --base <alias> [--platform list] [--version <tag>]
-final-images/scripts/build-all.sh [--platform list]
+cd aicage-image && scripts/build.sh --tool <tool> --base <alias> [--platform list] [--version <tag>]
+cd aicage-image && scripts/build-all.sh [--platform list]
 ```
-- `tool` values come from `.env` (`AICAGE_TOOLS`).
+- `tool` values come from `aicage-image/.env` (`AICAGE_TOOLS`).
 - `base` values come from `${AICAGE_BASE_REPOSITORY}:*-latest` tags; override with
   `AICAGE_BASE_ALIASES` to pin a subset.
 - Images are tagged `${REPOSITORY}:<tool>-<base-alias>-<version>`.
@@ -57,16 +56,16 @@ final-images/scripts/build-all.sh [--platform list]
 ## Test (smoke)
 Run all suites or filter by tool:
 ```bash
-final-images/scripts/test.sh --image wuodan/aicage:codex-node-dev --tool codex
+cd aicage-image && scripts/test.sh --image wuodan/aicage:codex-node-dev --tool codex
 ```
 - `AICAGE_IMAGE` can be set manually when running Bats directly.
 
 Test the full matrix using derived tags:
 ```bash
-final-images/scripts/test-all.sh
+cd aicage-image && scripts/test-all.sh
 ```
 
-Smoke suites live in `final-images/tests/smoke/` (one per tool). Install `bats` to run the suites (e.g.,
+Smoke suites live in `aicage-image/tests/smoke/` (one per tool). Install `bats` to run the suites (e.g.,
 `npm install -g bats`).
 
 Base images also have a smoke sweep:
@@ -84,14 +83,14 @@ code into `/workspace` and pass your host IDs, e.g.
 ## Publish workflows
 - Base images: `aicage-image-base/.github/workflows/base-images.yml` builds/tests on tags only and
   publishes multi-arch base images to `${AICAGE_BASE_REPOSITORY}`.
-- Agent images: `.github/workflows/final-images.yml` builds/tests agents on tags only and publishes
+- Agent images: `aicage-image/.github/workflows/final-images.yml` builds/tests agents on tags only and publishes
   to `${AICAGE_REPOSITORY}`, consuming `${AICAGE_BASE_REPOSITORY}:*-latest` tags.
 
 ## Adding a tool
-1) Create `final-images/scripts/installers/install_<tool>.sh` (executable) that installs the agent;
+1) Create `aicage-image/scripts/installers/install_<tool>.sh` (executable) that installs the agent;
    fail fast on errors.  
-2) Add the tool to `AICAGE_TOOLS` in `.env`.  
-3) Add a smoke suite at `final-images/tests/smoke/<tool>.bats`.  
+2) Add the tool to `AICAGE_TOOLS` in `aicage-image/.env`.  
+3) Add a smoke suite at `aicage-image/tests/smoke/<tool>.bats`.  
 4) Update README tables to mention the tool.
 
 ## Adding a base
