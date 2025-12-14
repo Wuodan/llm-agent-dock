@@ -1,79 +1,247 @@
 # Task: Write `aicage` software
 
-## Introduction
+## Purpose
 
-`aicage` is my wrapper to run CLI coding agents (called 'tools` below, examples are: codex, cline, droid, ...) in Docker to separate them from the host OS and disks.
+`aicage` is a CLI wrapper to run coding agents (called *tools*, e.g. `codex`, `cline`, `droid`) inside Docker containers, isolating them from the host OS while still integrating cleanly with local projects.
 
-I already have a setup which produces docker images on hub.docker.com, for example `wuodan/aicage:codex-ubuntu-latest`.
+Docker images are built and published by the related projects **`aicage-image`** and **`aicage-image-base`** (not by end users).
 
-Those images all stem from a few base-images (ubuntu, fedora, ...) and have a tool installed in them. In `wuodan/aicage:codex-ubuntu-latest` the base-image is `ubuntu` and the tool is `codex`.
+In normal usage, `aicage` consumes the prebuilt images published under:
 
-Now I want to write the actual `aicage` software to use those images.
+* `wuodan/aicage`
 
-The basic form of usage will be:
-1. Navigate to your local project folder
-2. Run `aicage codex`
+Future extensions may allow user-defined images, but this is **out of scope for v1**.
 
-`aicage` shall then do everything needed to start the docker container with all necessary settings.
+Each image is defined by:
 
-Examples of such settings:
-- mount current host folder as volume
-- mount a host folder to persist `tool` settings (`host-tool-settings`)
-- optionally additional docker settings (share host VPN, enable docker container to use host docker, etc.)
+* a **tool** (codex, cline, …)
+* a **base image** (ubuntu, fedora, …)
 
-### Full description of `aicage` run options
+`aicage` is responsible only for **selecting, configuring, and running** these images.
 
-`aicage <docker run arguments (optional)> <tool> <tool arguments (optional)>`
+---
+
+## Basic Usage
+
+```bash
+cd <project>
+aicage codex
+```
+
+This starts the appropriate Docker container with:
+
+* current directory mounted as a volume
+* persistent tool configuration mounted from the host
+* optional user-defined `docker run` arguments
+
+---
+
+## CLI Syntax
+
+```bash
+aicage <docker-run-args?> <tool> <tool-args?>
+```
+
 or
-`aicage <docker run arguments (optional)> -- <tool> <tool arguments (optional)>` with `--` to help parsing
 
+```bash
+aicage <docker-run-args?> -- <tool> <tool-args?>
+```
 
-## Details
+Notes:
 
-Here I describe some details of how `aicage` shall function.
+* `<docker-run-args>` are passed verbatim to `docker run`
+* `<tool-args>` are passed verbatim to the tool inside the container
+* `<tool-args>` are **never persisted**
+* `--` is supported to disambiguate parsing
 
-### `aicage-folder` on host
+---
 
-Similar to the tools, I want aicage to use a folder `~/.aicage` to persist things.
+## Project Definition
 
-### Question user what he wants
+A **project** is identified by the **absolute path of the current working directory** when `aicage` is invoked.
 
-For some (or all) settings, aicage shall ask the user what he wants.
+No git detection or repo heuristics are used.
 
-But we don't want to ask user the same questions on each start. So most questions shall give the users these choices:
-- Set forever and don't ask again
-- Set for this one run only (possibly store the value and suggest this value next time).
+---
 
-#### Scope of questions
+## Image Selection
 
-Some questions can have a global scope and some questions are specific to a project (aka host-folder).
+Docker images always follow this naming rule:
 
-Examples of global or project questions:
-- Which base-image to use. This might also be project specific in some cases (use-case for later enhancement.)
-- Which folder to use for `host-tool-settings` for a given project. Options can be:
-  - Use `~/.codex`, the same folder the tool uses when running directly on the host. Thus the credentials and settings are shared.
-  - Use a "tool" subfolder of `aicage-folder` on host. Settings are then shared across runs of aicage but not the same as tool on host directly.
-  - Use "tool and project" specific subfolder of `aicage-folder` on host. I'm not sure if I want to implement this yet. The tools themselves do not offer this option afaik.
-- Storing of <docker run arguments (optional)>: Per project
+```
+<tool>-<base>-latest
+```
 
-### <docker run arguments (optional)>
+Examples:
 
-The full form of running `aicage` shall be like
-`aicage <docker run arguments (optional)> <tool> <tool arguments (optional)>`
-or
-`aicage <docker run arguments (optional)> -- <tool> <tool arguments (optional)>`
+* `codex-ubuntu-latest`
+* `cline-fedora-latest`
 
-The `<tool arguments (optional)>` are not persisted.
+### Base Image Selection
 
-The idea of the <docker run arguments (optional)> is that a user can place native docker-run arguments. for example when:
+* The **tool** is always taken from the CLI argument
+* The **base image** is selected per project+tool
 
-- container shall use host VPN (Linux): `--network=host`
-- container shall use host gateway: `--add-host=host.docker.internal:host-gateway`
+A **central default base image** must exist in the code (single variable).
 
-`aicage` shall just store them as string and use them when it executes `docker run`. aicage shall not have a list of possible arguments!
+Behavior:
 
-### Installation of aicage
+* On first use, the default base is **suggested** to the user
+* The user may accept it or choose another available base
+* The chosen base is persisted for future runs
 
-To avoid problems on Windows, `aicage` shall not be written in bash but rather in python or typescript/node.  
-With python aicage can easily be installed on the host with `pipx`, with node it can be installed with `npm`.
-This choice must be made pretty early and I want you to give me arguments pro/contra either of them, then we discuss and I make that choice.
+#### Available Base Images
+
+Available base images must be determined dynamically.
+
+`aicage` must reuse the same logic already implemented in the **`aicage-image`** project:
+
+* Query Docker Hub API
+* Read all tags from the image repository
+* Derive valid base images from tags
+
+Instead of `wuodan/aicage-image-base`, the repository to query here is:
+
+* `wuodan/aicage`
+
+This logic must not be re-invented.
+
+---
+
+## Image Pulling
+
+* `aicage` always pulls the image before running it (`docker pull`)
+* Future enhancements may add smarter behavior, but **v1 always pulls**
+
+---
+
+## Host Persistence (`~/.aicage`)
+
+`aicage` stores all persistent state under:
+
+```
+~/.aicage/
+```
+
+This includes:
+
+* global configuration
+* per-project configuration
+* per-tool configuration
+
+Exact layout is an implementation detail, but **both global and project scopes must be supported in v1**.
+
+---
+
+## Tool Configuration Mounts
+
+Each tool uses a specific configuration directory on the host (e.g. `~/.codex`, `~/.factory`).
+
+Important constraints:
+
+* `aicage` does **not** hardcode tool-specific paths
+* Tool configuration paths are provided via **Docker image LABELs**
+* `aicage` reads these labels to determine which host directory to mount
+
+This keeps tool knowledge out of `aicage` itself.
+
+---
+
+## Docker Run Arguments
+
+* Docker arguments are treated as **one opaque string**
+* `aicage` does not validate, parse, or interpret them
+* Arguments may include networking, host access, etc.
+
+Example:
+
+```bash
+aicage "--network=host --add-host=host.docker.internal:host-gateway" codex
+```
+
+### Persistence and Precedence
+
+Docker arguments may come from multiple sources.
+
+Precedence (highest wins):
+
+1. CLI-provided docker args
+2. project-stored docker args
+3. global defaults
+
+Arguments are concatenated as strings in that order.
+
+---
+
+## Interactive Questions
+
+Some settings require user decisions (e.g. base image choice).
+
+Rules:
+
+* Questions are asked interactively when possible
+* Answers can be stored for future runs
+* Users should not be repeatedly asked the same question
+
+### Non-interactive Behavior
+
+If `aicage` requires user input and **stdin is not a TTY**:
+
+* `aicage` must **crash immediately**
+* The error message must clearly state which decision is missing
+* No defaults or guesses are allowed in v1
+
+---
+
+## Dry Run Mode
+
+`aicage` must support:
+
+```bash
+aicage --dry-run ...
+```
+
+Behavior:
+
+* Print the fully resolved `docker run` command
+* Do not execute it
+* Useful for debugging and scripting
+
+---
+
+## Non-Goals (v1)
+
+`aicage` explicitly does **not**:
+
+* manage Docker installation
+* validate Docker arguments
+* inspect container internals
+* contain tool-specific logic beyond reading image labels
+
+---
+
+## Implementation Constraints
+
+* Language: **Python**
+* Intended installation method: `pipx`
+* Must work on Linux, macOS, and Windows
+* Avoid shell-specific behavior
+
+---
+
+## Summary
+
+`aicage` is a thin, predictable orchestration layer:
+
+* no hidden magic
+* no implicit defaults
+* no Docker semantics
+
+Its job is to reliably turn:
+
+```bash
+aicage codex
+```
+
+into a correct, debuggable `docker run` invocation.
