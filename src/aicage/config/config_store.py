@@ -11,6 +11,8 @@ from .errors import ConfigError
 from .global_config import GlobalConfig
 from .project_config import ProjectConfig
 
+CONFIG_FILENAME = "config.yaml"
+
 
 class SettingsStore:
     """
@@ -22,7 +24,7 @@ class SettingsStore:
         self.projects_dir = self.base_dir / "projects"
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self.projects_dir.mkdir(parents=True, exist_ok=True)
-        self.global_config_path = self.base_dir / "config.yaml"
+        self.global_config_path = self.base_dir / CONFIG_FILENAME
         self._ensure_global_config()
 
     def _load_yaml(self, path: Path) -> Dict[str, Any]:
@@ -77,7 +79,7 @@ class SettingsStore:
         Locate the packaged default config.yaml.
         """
         try:
-            resource = resources.files("aicage").joinpath("config.yaml")
+            resource = resources.files("aicage.config").joinpath(CONFIG_FILENAME)
         except Exception as exc:  # pragma: no cover - unexpected packaging issue
             raise ConfigError(f"Failed to locate packaged config.yaml: {exc}") from exc
         if not resource.exists():  # pragma: no cover - unexpected packaging issue
