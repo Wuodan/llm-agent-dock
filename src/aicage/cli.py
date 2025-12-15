@@ -194,8 +194,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
     try:
         dry_run, cli_docker_args, tool, tool_args = parse_cli(argv)
-        root_config_path = Path(__file__).resolve().parents[2] / "config.yaml"
-        central = load_central_config(root_config_path)
+        store = SettingsStore()
+        central = load_central_config(store.central_config())
         repository = central.get("AICAGE_REPOSITORY")
         default_base = central.get("AICAGE_DEFAULT_BASE")
         if not repository:
@@ -204,7 +204,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             raise CliError("AICAGE_DEFAULT_BASE missing from config.yaml.")
 
         project_path = Path.cwd().resolve()
-        store = SettingsStore()
         global_cfg = store.load_global()
         project_cfg = store.load_project(project_path)
         tool_project_cfg = project_cfg.get("tools", {}).get(tool, {})

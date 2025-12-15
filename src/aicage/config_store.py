@@ -1,6 +1,8 @@
 import hashlib
 import json
 import os
+import shutil
+from importlib import resources
 from pathlib import Path
 from typing import Any, Dict
 
@@ -40,6 +42,8 @@ class SettingsStore:
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self.projects_dir.mkdir(parents=True, exist_ok=True)
         self.global_path = self.base_dir / "config.json"
+        self.central_config_path = self.base_dir / "config.yaml"
+        self._ensure_central_config()
 
     def _load_json(self, path: Path) -> Dict[str, Any]:
         if not path.exists():
@@ -88,3 +92,29 @@ class SettingsStore:
             "tools": data.get("tools", {}),
         }
         self._save_json(self._project_path(project_realpath), payload)
+
+    def _ensure_central_config(self) -> None:
+        """
+        Create the central config file with defaults if it does not exist.
+        """
+        if not self.central_config_path.exists():
+            packaged = self._packaged_config_path()
+            shutil.copyfile(packaged, self.central_config_path)
+
+    def central_config(self) -> Path:
+        """
+        Returns the path to the central config file under the base directory.
+        """
+        return self.central_config_path
+
+    def _packaged_config_path(self) -> Path:
+        """
+        Locate the packaged default config.yaml.
+        """
+        try:
+            resource = resources.files("aicage").joinpath("config.yaml")
+        except Exception as exc:  # pragma: no cover - unexpected packaging issue
+            raise ConfigError(f"Failed to locate packaged config.yaml: {exc}") from exc
+        if not resource.exists():  # pragma: no cover - unexpected packaging issue
+            raise ConfigError("Packaged config.yaml is missing.")
+        return Path(resource)

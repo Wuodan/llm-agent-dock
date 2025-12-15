@@ -70,6 +70,9 @@ class ConfigStoreTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             base_dir = Path(tmp_dir)
             store = SettingsStore(base_dir=base_dir)
+            central_path = store.central_config()
+            self.assertTrue(central_path.exists())
+            self.assertIn("AICAGE_REPOSITORY: wuodan/aicage", central_path.read_text())
 
             global_cfg = store.load_global()
             self.assertEqual({"docker_args": "", "tools": {}}, global_cfg)
