@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import List, Sequence, Tuple
 
-from .config_store import ConfigError, SettingsStore
+from .config import ConfigError, SettingsStore
 from .discovery import DiscoveryError, discover_base_aliases
 
 

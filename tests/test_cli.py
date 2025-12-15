@@ -10,7 +10,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from aicage import cli  # noqa: E402
-from aicage.config_store import GlobalConfig, ProjectConfig, SettingsStore  # noqa: E402
+from aicage.config import GlobalConfig, ProjectConfig, SettingsStore  # noqa: E402
 from aicage.discovery import discover_base_aliases  # noqa: E402
 
 
