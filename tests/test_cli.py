@@ -75,7 +75,7 @@ class ConfigStoreTests(TestCase):
             global_path = store.global_config()
             self.assertTrue(global_path.exists())
             global_data = yaml.safe_load(global_path.read_text())
-            self.assertEqual("wuodan/aicage", global_data["AICAGE_REPOSITORY"])
+            self.assertEqual("wuodan/aicage", global_data["image_repository"])
 
             global_cfg = store.load_global()
             self.assertEqual("wuodan/aicage", global_cfg.repository)
@@ -90,7 +90,7 @@ class ConfigStoreTests(TestCase):
             reloaded_global = store.load_global()
             self.assertEqual(global_cfg, reloaded_global)
             updated_global = yaml.safe_load(global_path.read_text())
-            self.assertEqual("wuodan/aicage", updated_global["AICAGE_REPOSITORY"])
+            self.assertEqual("wuodan/aicage", updated_global["image_repository"])
             self.assertEqual("--network=host", updated_global["docker_args"])
             self.assertEqual({"codex": {"base": "ubuntu"}}, updated_global["tools"])
 

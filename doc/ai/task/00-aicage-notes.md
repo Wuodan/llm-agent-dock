@@ -25,10 +25,9 @@ Runtime expectations
   central config default base.
 
 State layout
-- Central config file in repo root (`config.yaml`) defines `AICAGE_REPOSITORY` and
-  `AICAGE_DEFAULT_BASE`.
+- Packaged global config (`config/config.yaml`) defines `image_repository` and `default_image_base`.
 - Persistent state lives under `~/.aicage/` with global config (`config.yaml`) and per-project files
-  keyed by cwd realpath hash (`projects/<hash>.json`). Both support stored docker args and per-tool
+  keyed by cwd realpath hash (`projects/<hash>.yaml`). Both support stored docker args and per-tool
   base choices.
 
 Outstanding considerations

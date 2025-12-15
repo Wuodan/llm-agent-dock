@@ -1,3 +1,3 @@
 # aicage settings
-AICAGE_REPOSITORY: wuodan/aicage
-AICAGE_DEFAULT_BASE: ubuntu
+image_repository: wuodan/aicage
+default_image_base: ubuntu
