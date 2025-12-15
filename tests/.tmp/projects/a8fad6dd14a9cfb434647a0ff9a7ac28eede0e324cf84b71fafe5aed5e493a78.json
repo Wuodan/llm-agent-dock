@@ -1,9 +1,0 @@
-{
-  "docker_args": "--add-host=host.docker.internal:host-gateway",
-  "path": "/home/stefan/development/github/Wuodan/aicage/tests/.tmp/project",
-  "tools": {
-    "codex": {
-      "base": "fedora"
-    }
-  }
-}
