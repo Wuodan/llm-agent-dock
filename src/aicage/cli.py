@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import List, Sequence, Tuple
 
-from .config_store import ConfigError, SettingsStore, load_central_config
+from .config_store import ConfigError, SettingsStore
 from .discovery import DiscoveryError, discover_base_aliases
 
 
@@ -195,19 +195,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         dry_run, cli_docker_args, tool, tool_args = parse_cli(argv)
         store = SettingsStore()
-        central = load_central_config(store.central_config())
-        repository = central.get("AICAGE_REPOSITORY")
-        default_base = central.get("AICAGE_DEFAULT_BASE")
-        if not repository:
-            raise CliError("AICAGE_REPOSITORY missing from config.yaml.")
-        if not default_base:
-            raise CliError("AICAGE_DEFAULT_BASE missing from config.yaml.")
-
-        project_path = Path.cwd().resolve()
         global_cfg = store.load_global()
+        repository = global_cfg.repository
+        default_base = global_cfg.default_base
+        project_path = Path.cwd().resolve()
         project_cfg = store.load_project(project_path)
-        tool_project_cfg = project_cfg.get("tools", {}).get(tool, {})
-        tool_global_cfg = global_cfg.get("tools", {}).get(tool, {})
+        tool_project_cfg = project_cfg.tools.get(tool, {})
+        tool_global_cfg = global_cfg.tools.get(tool, {})
 
         base = tool_project_cfg.get("base") or tool_global_cfg.get("base")
         available_bases: List[str] = []
@@ -227,9 +221,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             if not available_bases:
                 raise CliError(f"No base images found for tool '{tool}' (repository={repository}).")
             base = prompt_for_base(tool, default_base, available_bases)
-            tools_cfg = project_cfg.setdefault("tools", {})
-            tool_entry = tools_cfg.setdefault(tool, {})
-            tool_entry["base"] = base
+            project_cfg.tools.setdefault(tool, {})["base"] = base
             store.save_project(project_path, project_cfg)
 
         image_tag = f"{tool}-{base}-latest"
@@ -243,7 +235,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         tool_mount_container = Path("/aicage/tool-config")
 
         merged_docker_args = " ".join(
-            part for part in [global_cfg.get("docker_args", ""), project_cfg.get("docker_args", ""), cli_docker_args] if part
+            part for part in [global_cfg.docker_args, project_cfg.docker_args, cli_docker_args] if part
         ).strip()
 
         extra_env = ["-e", f"AICAGE_TOOL_PATH={tool_path_label}"]

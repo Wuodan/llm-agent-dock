@@ -10,7 +10,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from aicage import cli  # noqa: E402
-from aicage.config_store import SettingsStore  # noqa: E402
+from aicage.config_store import GlobalConfig, ProjectConfig, SettingsStore  # noqa: E402
 from aicage.discovery import discover_base_aliases  # noqa: E402
 
 
@@ -72,27 +72,35 @@ class ConfigStoreTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             base_dir = Path(tmp_dir)
             store = SettingsStore(base_dir=base_dir)
-            central_path = store.central_config()
-            self.assertTrue(central_path.exists())
-            self.assertIn("AICAGE_REPOSITORY: wuodan/aicage", central_path.read_text())
+            global_path = store.global_config()
+            self.assertTrue(global_path.exists())
+            global_data = yaml.safe_load(global_path.read_text())
+            self.assertEqual("wuodan/aicage", global_data["AICAGE_REPOSITORY"])
 
             global_cfg = store.load_global()
-            self.assertEqual({"docker_args": "", "tools": {}}, global_cfg)
+            self.assertEqual("wuodan/aicage", global_cfg.repository)
+            self.assertEqual("ubuntu", global_cfg.default_base)
+            self.assertEqual("", global_cfg.docker_args)
+            self.assertEqual({}, global_cfg.tools)
 
-            global_cfg["docker_args"] = "--network=host"
-            global_cfg["tools"]["codex"] = {"base": "ubuntu"}
+            global_cfg.docker_args = "--network=host"
+            global_cfg.tools["codex"] = {"base": "ubuntu"}
             store.save_global(global_cfg)
 
             reloaded_global = store.load_global()
             self.assertEqual(global_cfg, reloaded_global)
+            updated_global = yaml.safe_load(global_path.read_text())
+            self.assertEqual("wuodan/aicage", updated_global["AICAGE_REPOSITORY"])
+            self.assertEqual("--network=host", updated_global["docker_args"])
+            self.assertEqual({"codex": {"base": "ubuntu"}}, updated_global["tools"])
 
             project_path = base_dir / "project"
             project_path.mkdir(parents=True, exist_ok=True)
             project_cfg = store.load_project(project_path)
-            self.assertEqual({"path": str(project_path), "docker_args": "", "tools": {}}, project_cfg)
+            self.assertEqual(ProjectConfig(path=str(project_path), docker_args="", tools={}), project_cfg)
 
-            project_cfg["docker_args"] = "--add-host=host.docker.internal:host-gateway"
-            project_cfg["tools"]["codex"] = {"base": "fedora"}
+            project_cfg.docker_args = "--add-host=host.docker.internal:host-gateway"
+            project_cfg.tools["codex"] = {"base": "fedora"}
             store.save_project(project_path, project_cfg)
 
             reloaded_project = store.load_project(project_path)
@@ -102,7 +110,7 @@ class ConfigStoreTests(TestCase):
             self.assertEqual(1, len(yaml_files))
             with yaml_files[0].open("r", encoding="utf-8") as handle:
                 raw = yaml.safe_load(handle)
-            self.assertEqual(project_cfg, raw)
+            self.assertEqual(project_cfg.to_mapping(), raw)
 
 
 class PromptTests(TestCase):
