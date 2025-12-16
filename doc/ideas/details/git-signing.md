@@ -95,12 +95,6 @@ Mount the directory returned by `gpgconf` into the container user’s home:
 host:<GNUPGHOME>  →  container:/home/<user>/.gnupg
 ```
 
-Also set (if needed):
-
-```bash
-GNUPGHOME=/home/<user>/.gnupg
-```
-
 ### Do I need to mount a gpg-agent socket?
 
 **No. Not required.**

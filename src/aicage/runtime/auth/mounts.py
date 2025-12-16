@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from aicage.runtime.run_args import MountSpec
-from aicage.runtime import _env_vars
-
 from ._git_config import resolve_git_config_path
 from ._gpg import resolve_gpg_home
 from .prompts import prompt_yes_no
@@ -49,18 +47,8 @@ def store_mount_preferences(tool_cfg: Dict[str, Any], prefs: MountPreferences) -
     tool_cfg["mounts"] = prefs.to_mapping()
 
 
-def _home_relative_target(host_path: Path, default_relative: str) -> str:
-    host_home = Path.home().resolve()
-    try:
-        relative = host_path.resolve().relative_to(host_home)
-    except ValueError:
-        return default_relative
-    return f"~/{relative}"
-
-
-def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List[MountSpec], List[str], bool]:
+def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List[MountSpec], bool]:
     mounts: List[MountSpec] = []
-    env: List[str] = []
     updated = False
 
     git_config = resolve_git_config_path()
@@ -69,9 +57,7 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
             prefs.gitconfig = prompt_yes_no(f"Mount Git config from '{git_config}'?", default=False)
             updated = True
         if prefs.gitconfig:
-            target = _home_relative_target(git_config, "~/.gitconfig")
             mounts.append(MountSpec(host_path=git_config, container_path=GITCONFIG_MOUNT))
-            env.append(f"{_env_vars.AICAGE_GITCONFIG_TARGET}={target}")
 
     if is_commit_signing_enabled(project_path):
         signing_format = resolve_signing_format(project_path)
@@ -82,9 +68,7 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
                     prefs.ssh = prompt_yes_no(f"Mount SSH directory '{ssh_dir}' for Git signing?", default=False)
                     updated = True
                 if prefs.ssh:
-                    target = _home_relative_target(ssh_dir, "~/.ssh")
                     mounts.append(MountSpec(host_path=ssh_dir, container_path=SSH_MOUNT))
-                    env.append(f"{_env_vars.AICAGE_SSH_TARGET}={target}")
         else:
             gpg_home = resolve_gpg_home()
             if gpg_home and gpg_home.exists():
@@ -92,13 +76,6 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
                     prefs.gnupg = prompt_yes_no(f"Mount GnuPG home '{gpg_home}' for Git signing?", default=False)
                     updated = True
                 if prefs.gnupg:
-                    target = _home_relative_target(gpg_home, "~/.gnupg")
                     mounts.append(MountSpec(host_path=gpg_home, container_path=GPG_HOME_MOUNT))
-                    env.extend(
-                        [
-                            f"{_env_vars.AICAGE_GNUPG_TARGET}={target}",
-                            f"{_env_vars.GNUPGHOME}={target}",
-                        ]
-                    )
 
-    return mounts, env, updated
+    return mounts, updated

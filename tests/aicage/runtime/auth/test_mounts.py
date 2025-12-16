@@ -24,13 +24,10 @@ class AuthMountTests(TestCase):
             ), mock.patch(
                 "aicage.runtime.auth.mounts.prompt_yes_no", return_value=True
             ):
-                mounts, env, updated = auth_mounts.build_auth_mounts(Path("/repo"), prefs)
+                mounts, updated = auth_mounts.build_auth_mounts(Path("/repo"), prefs)
 
         self.assertTrue(updated)
         self.assertEqual({gitconfig, gnupg}, {mount.host_path for mount in mounts})
-        self.assertIn("AICAGE_GITCONFIG_TARGET=~/.gitconfig", env)
-        self.assertIn("AICAGE_GNUPG_TARGET=~/.gnupg", env)
-        self.assertIn("GNUPGHOME=~/.gnupg", env)
 
     def test_build_auth_mounts_uses_existing_ssh_preference(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -46,9 +43,8 @@ class AuthMountTests(TestCase):
             ), mock.patch(
                 "aicage.runtime.auth.mounts.prompt_yes_no"
             ) as prompt_mock:
-                mounts, env, updated = auth_mounts.build_auth_mounts(Path("/repo"), prefs)
+                mounts, updated = auth_mounts.build_auth_mounts(Path("/repo"), prefs)
 
         prompt_mock.assert_not_called()
         self.assertFalse(updated)
         self.assertEqual(ssh_dir, mounts[0].host_path)
-        self.assertIn("AICAGE_SSH_TARGET=~/.ssh", env)

@@ -56,7 +56,7 @@ class MainFlowTests(TestCase):
             ), mock.patch(
                 "aicage.cli.assemble_docker_run", return_value=["docker", "run", "--flag"]
             ) as assemble_mock, mock.patch(
-                "aicage.cli.build_auth_mounts", return_value=([], [], False)
+                "aicage.cli.build_auth_mounts", return_value=([], False)
             ), mock.patch("aicage.cli.subprocess.run") as run_mock:
                 exit_code = cli.main([])
 
@@ -112,7 +112,7 @@ class MainFlowTests(TestCase):
             ), mock.patch("sys.stderr", new_callable=io.StringIO) as stderr, mock.patch(
                 "sys.stdout", new_callable=io.StringIO
             ) as stdout, mock.patch(
-                "aicage.cli.build_auth_mounts", return_value=([], [], False)
+                "aicage.cli.build_auth_mounts", return_value=([], False)
             ):
                 exit_code = cli.main([])
 

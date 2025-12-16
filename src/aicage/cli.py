@@ -226,7 +226,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
 
         prefs = load_mount_preferences(tool_cfg)
-        auth_mounts, auth_env, prefs_updated = build_auth_mounts(context.project_path, prefs)
+        auth_mounts, prefs_updated = build_auth_mounts(context.project_path, prefs)
         if prefs_updated:
             store_mount_preferences(tool_cfg, prefs)
         project_dirty = project_dirty or prefs_updated
@@ -239,7 +239,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             merged_docker_args=merged_docker_args,
             tool_args=parsed.tool_args,
             tool_path_label=tool_path_label,
-            env=auth_env,
             mounts=auth_mounts,
         )
 
