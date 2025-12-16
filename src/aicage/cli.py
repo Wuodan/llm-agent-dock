@@ -93,7 +93,10 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
 def prompt_for_base(tool: str, default_base: str, available: List[str]) -> str:
     ensure_tty_for_prompt()
     choices = ", ".join(available) if available else "none discovered"
-    prompt = f"Select base image for '{tool}' [{default_base}] (options: {choices}): "
+    prompt = (
+        f"Select base image for '{tool}' (pick the runtime you want inside the container) "
+        f"[{default_base}] (options: {choices}): "
+    )
     response = input(prompt).strip()
     choice = response or default_base
     if available and choice not in available:

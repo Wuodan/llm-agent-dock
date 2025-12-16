@@ -55,7 +55,7 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
     if git_config and git_config.exists():
         if prefs.gitconfig is None:
             prefs.gitconfig = prompt_yes_no(
-                f"Mount Git config from '{git_config}' so commits keep your host identity?", default=True
+                f"Mount Git config from '{git_config}' so Git uses your usual name/email?", default=True
             )
             updated = True
         if prefs.gitconfig:
@@ -67,7 +67,9 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
             ssh_dir = default_ssh_dir()
             if ssh_dir.exists():
                 if prefs.ssh is None:
-                    prefs.ssh = prompt_yes_no(f"Mount SSH directory '{ssh_dir}' for Git signing?", default=False)
+                    prefs.ssh = prompt_yes_no(
+                        f"Mount SSH keys from '{ssh_dir}' so Git signing works like on your host?", default=False
+                    )
                     updated = True
                 if prefs.ssh:
                     mounts.append(MountSpec(host_path=ssh_dir, container_path=SSH_MOUNT))
@@ -75,7 +77,9 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
             gpg_home = resolve_gpg_home()
             if gpg_home and gpg_home.exists():
                 if prefs.gnupg is None:
-                    prefs.gnupg = prompt_yes_no(f"Mount GnuPG home '{gpg_home}' for Git signing?", default=False)
+                    prefs.gnupg = prompt_yes_no(
+                        f"Mount GnuPG keys from '{gpg_home}' so Git signing works like on your host?", default=False
+                    )
                     updated = True
                 if prefs.gnupg:
                     mounts.append(MountSpec(host_path=gpg_home, container_path=GPG_HOME_MOUNT))
