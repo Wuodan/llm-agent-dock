@@ -54,7 +54,9 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
     git_config = resolve_git_config_path()
     if git_config and git_config.exists():
         if prefs.gitconfig is None:
-            prefs.gitconfig = prompt_yes_no(f"Mount Git config from '{git_config}'?", default=False)
+            prefs.gitconfig = prompt_yes_no(
+                f"Mount Git config from '{git_config}' so commits keep your host identity?", default=True
+            )
             updated = True
         if prefs.gitconfig:
             mounts.append(MountSpec(host_path=git_config, container_path=GITCONFIG_MOUNT))
