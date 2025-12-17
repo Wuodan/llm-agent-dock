@@ -28,6 +28,7 @@ See [Why cage agents?](#why-cage-agents) for the full rationale.
   aicage claude
   aicage cline
   aicage codex
+  aicage copilot
   aicage droid
   ```
 
@@ -48,12 +49,13 @@ All base images have the same stack of tools installed.
 
 ## Agents
 
-| CLI    | Agent       | Homepage                                                                           |
-|--------|-------------|------------------------------------------------------------------------------------|
-| claude | Claude Code | [https://claude.com/product/claude-code](https://claude.com/product/claude-code)   |
-| cline  | Cline CLI   | [https://docs.cline.bot/cline-cli](https://docs.cline.bot/cline-cli/overview)      |
-| codex  | Codex CLI   | [https://developers.openai.com/codex/cli](https://developers.openai.com/codex/cli) |
-| droid  | Factory CLI | [https://factory.ai/product/cli](https://factory.ai/product/cli)                   |
+| CLI     | Agent              | Homepage                                                                           |
+|---------|--------------------|------------------------------------------------------------------------------------|
+| claude  | Claude Code        | [https://claude.com/product/claude-code](https://claude.com/product/claude-code)   |
+| cline   | Cline CLI          | [https://docs.cline.bot/cline-cli](https://docs.cline.bot/cline-cli/overview)      |
+| codex   | Codex CLI          | [https://developers.openai.com/codex/cli](https://developers.openai.com/codex/cli) |
+| copilot | GitHub Copilot CLI | [https://github.com/features/copilot/cli](https://github.com/features/copilot/cli) |
+| droid   | Factory CLI        | [https://factory.ai/product/cli](https://factory.ai/product/cli)                   |
 
 Your existing CLI config for each tool is mounted inside the container so you can keep using your
 preferences and credentials.
