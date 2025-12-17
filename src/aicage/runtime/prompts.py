@@ -34,7 +34,7 @@ def _supports_arrow_prompt() -> bool:
     return sys.stdin.isatty() and sys.stdout.isatty() and os.environ.get("TERM") not in {None, "", "dumb"}
 
 
-def _arrow_select(options: Sequence[str], default: str) -> str:
+def _arrow_select(title: str, options: Sequence[str], default: str) -> str:
     default_idx = options.index(default) if default in options else 0
 
     def _ui(stdscr: Any) -> str:
@@ -44,13 +44,14 @@ def _arrow_select(options: Sequence[str], default: str) -> str:
         instructions = "Use arrow keys to choose, type to enter a name, Enter to confirm."
         while True:
             stdscr.clear()
-            stdscr.addstr(0, 0, instructions)
+            stdscr.addstr(0, 0, title)
+            stdscr.addstr(1, 0, instructions)
             for idx, option in enumerate(options):
                 prefix = ">" if idx == selected else " "
                 suffix = " (default)" if option == default else ""
-                stdscr.addstr(idx + 2, 0, f"{prefix} {option}{suffix}")
+                stdscr.addstr(idx + 3, 0, f"{prefix} {option}{suffix}")
             manual = "".join(typed)
-            stdscr.addstr(len(options) + 3, 0, f"Manual entry: {manual}")
+            stdscr.addstr(len(options) + 4, 0, f"Manual entry: {manual}")
             key = stdscr.get_wch()
             if isinstance(key, str):
                 if key in {"\n", "\r"}:
@@ -78,26 +79,22 @@ def _arrow_select(options: Sequence[str], default: str) -> str:
 
 def prompt_for_base(request: BaseSelectionRequest) -> str:
     ensure_tty_for_prompt()
+    title = f"Select base image for '{request.tool}' (runtime to use inside the container):"
+    if request.available and _supports_arrow_prompt():
+        try:
+            return _arrow_select(title, request.available, request.default_base)
+        except Exception:
+            # Fall back to numeric/text input on any terminal/curses issue.
+            pass
+
     if request.available:
-        title = f"Select base image for '{request.tool}' (runtime to use inside the container):"
         print(title)
         for idx, base in enumerate(request.available, start=1):
             suffix = " (default)" if base == request.default_base else ""
             print(f"  {idx}) {base}{suffix}")
-
-        if _supports_arrow_prompt():
-            try:
-                return _arrow_select(request.available, request.default_base)
-            except Exception:
-                # Fall back to numeric/text input on any terminal/curses issue.
-                pass
-
         prompt = f"Enter number or name [{request.default_base}]: "
     else:
-        prompt = (
-            f"Select base image for '{request.tool}' (runtime to use inside the container) "
-            f"[{request.default_base}]: "
-        )
+        prompt = f"{title} [{request.default_base}]: "
 
     response = input(prompt).strip()
     if not response:

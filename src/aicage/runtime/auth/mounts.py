@@ -2,9 +2,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from aicage.runtime.run_args import MountSpec
 from aicage.runtime.prompts import prompt_yes_no
-
+from aicage.runtime.run_args import MountSpec
 from ._git_config import resolve_git_config_path
 from ._gpg import resolve_gpg_home
 from ._signing import is_commit_signing_enabled, resolve_signing_format
@@ -71,7 +70,7 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
             if ssh_dir.exists():
                 if prefs.ssh is None:
                     prefs.ssh = prompt_yes_no(
-                        f"Mount SSH keys from '{ssh_dir}' so Git signing works like on your host?", default=False
+                        f"Mount SSH keys from '{ssh_dir}' so Git signing works like on your host?", default=True
                     )
                     updated = True
                 if prefs.ssh:
@@ -81,7 +80,7 @@ def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> Tuple[List
             if gpg_home and gpg_home.exists():
                 if prefs.gnupg is None:
                     prefs.gnupg = prompt_yes_no(
-                        f"Mount GnuPG keys from '{gpg_home}' so Git signing works like on your host?", default=False
+                        f"Mount GnuPG keys from '{gpg_home}' so Git signing works like on your host?", default=True
                     )
                     updated = True
                 if prefs.gnupg:
