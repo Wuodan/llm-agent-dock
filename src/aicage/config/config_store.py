@@ -2,6 +2,7 @@ import hashlib
 import os
 import shutil
 from importlib import resources
+from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import Any, Dict
 
@@ -31,7 +32,8 @@ class SettingsStore:
         self.global_config_path = self.base_dir / _CONFIG_FILENAME
         self._ensure_global_config()
 
-    def _load_yaml(self, path: Path) -> Dict[str, Any]:
+    @staticmethod
+    def _load_yaml(path: Path) -> Dict[str, Any]:
         if not path.exists():
             return {}
         try:
@@ -41,7 +43,8 @@ class SettingsStore:
         except yaml.YAMLError as exc:
             raise ConfigError(f"Failed to parse YAML config at {path}: {exc}") from exc
 
-    def _save_yaml(self, path: Path, data: Dict[str, Any]) -> None:
+    @staticmethod
+    def _save_yaml(path: Path, data: Dict[str, Any]) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w", encoding="utf-8") as handle:
             yaml.safe_dump(data, handle, sort_keys=True)
@@ -69,8 +72,9 @@ class SettingsStore:
         Create the global config file with defaults if it does not exist.
         """
         if not self.global_config_path.exists():
-            packaged = self._packaged_config_path()
-            shutil.copyfile(packaged, self.global_config_path)
+            resource = self._packaged_config_resource()
+            with resources.as_file(resource) as packaged_path:
+                shutil.copyfile(packaged_path, self.global_config_path)
 
     def global_config(self) -> Path:
         """
@@ -78,7 +82,8 @@ class SettingsStore:
         """
         return self.global_config_path
 
-    def _packaged_config_path(self) -> Path:
+    @staticmethod
+    def _packaged_config_resource() -> Traversable:
         """
         Locate the packaged default config.yaml.
         """
@@ -86,6 +91,6 @@ class SettingsStore:
             resource = resources.files("aicage.config").joinpath(_CONFIG_FILENAME)
         except Exception as exc:  # pragma: no cover - unexpected packaging issue
             raise ConfigError(f"Failed to locate packaged config.yaml: {exc}") from exc
-        if not resource.exists():  # pragma: no cover - unexpected packaging issue
+        if not resource.is_file():  # pragma: no cover - unexpected packaging issue
             raise ConfigError("Packaged config.yaml is missing.")
-        return Path(resource)
+        return resource

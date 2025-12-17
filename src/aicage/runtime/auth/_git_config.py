@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from ._exec import _capture_stdout
+from ._exec import capture_stdout
 
 __all__ = ["resolve_git_config_path"]
 
 
 def resolve_git_config_path() -> Path | None:
-    stdout = _capture_stdout(["git", "config", "--global", "--show-origin", "--list"])
+    stdout = capture_stdout(["git", "config", "--global", "--show-origin", "--list"])
     if not stdout:
         return None
     for line in stdout.splitlines():

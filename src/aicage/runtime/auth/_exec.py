@@ -2,10 +2,10 @@ import subprocess
 from pathlib import Path
 from typing import List
 
-__all__ = []
+__all__ = ["capture_stdout"]
 
 
-def _capture_stdout(command: List[str], cwd: Path | None = None) -> str | None:
+def capture_stdout(command: List[str], cwd: Path | None = None) -> str | None:
     try:
         result = subprocess.run(
             command, check=True, capture_output=True, text=True, cwd=str(cwd) if cwd else None

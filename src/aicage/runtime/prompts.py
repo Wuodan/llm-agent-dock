@@ -2,7 +2,7 @@ import curses
 import os
 import sys
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import Any, List, Sequence
 
 from aicage.errors import CliError
 
@@ -37,7 +37,7 @@ def _supports_arrow_prompt() -> bool:
 def _arrow_select(options: Sequence[str], default: str) -> str:
     default_idx = options.index(default) if default in options else 0
 
-    def _ui(stdscr: "curses._CursesWindow") -> str:
+    def _ui(stdscr: Any) -> str:
         curses.curs_set(0)
         selected = default_idx
         typed: List[str] = []
@@ -70,6 +70,8 @@ def _arrow_select(options: Sequence[str], default: str) -> str:
                 selected = (selected - 1) % len(options)
             elif key == curses.KEY_DOWN:
                 selected = (selected + 1) % len(options)
+
+        return default
 
     return curses.wrapper(_ui)
 
