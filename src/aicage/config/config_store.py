@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import hashlib
 import os
 import shutil
 from importlib import resources
-from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import Any, Dict
 
@@ -83,9 +84,11 @@ class SettingsStore:
         return self.global_config_path
 
     @staticmethod
-    def _packaged_config_resource() -> Traversable:
+    def _packaged_config_resource() -> Any:
         """
         Locate the packaged default config.yaml.
+        Any return type keeps Python 3.10 happy since Traversable lives under
+        importlib.resources.abc only in 3.11+.
         """
         try:
             resource = resources.files("aicage.config").joinpath(_CONFIG_FILENAME)
