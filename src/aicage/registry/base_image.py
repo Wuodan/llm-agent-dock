@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 from aicage.config.context import ConfigContext
 from aicage.errors import CliError
 from aicage.runtime.prompts import BaseSelectionRequest, prompt_for_base
-from .discovery import _RegistryDiscoveryError, _discover_base_aliases
+from .discovery import RegistryDiscoveryError, discover_base_aliases
 
 
 @dataclass
@@ -65,8 +65,8 @@ def _discover_available_bases(
     remote_bases: List[str] = []
     local_bases: List[str] = []
     try:
-        remote_bases = _discover_base_aliases(repository, registry_api_url, registry_token_url, tool)
-    except _RegistryDiscoveryError as exc:
+        remote_bases = discover_base_aliases(repository, registry_api_url, registry_token_url, tool)
+    except RegistryDiscoveryError as exc:
         print(f"[aicage] Warning: {exc}. Continuing with local images.", file=sys.stderr)
     try:
         local_bases = _discover_local_bases(repository_ref, tool)

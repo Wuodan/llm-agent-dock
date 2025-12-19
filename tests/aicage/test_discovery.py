@@ -1,7 +1,7 @@
 import json
 from unittest import TestCase, mock
 
-from aicage.registry.discovery import _RegistryDiscoveryError, _discover_base_aliases
+from aicage.registry.discovery import RegistryDiscoveryError, discover_base_aliases
 
 
 class DiscoveryTests(TestCase):
@@ -38,7 +38,7 @@ class DiscoveryTests(TestCase):
             raise AssertionError(f"Unexpected URL {url}")
 
         with mock.patch("urllib.request.urlopen", fake_urlopen):
-            aliases = _discover_base_aliases(
+            aliases = discover_base_aliases(
                 "aicage/aicage",
                 "https://ghcr.io/v2",
                 "https://ghcr.io/token?service=ghcr.io&scope=repository",
@@ -52,8 +52,8 @@ class DiscoveryTests(TestCase):
             raise OSError("network down")
 
         with mock.patch("urllib.request.urlopen", fake_urlopen):
-            with self.assertRaises(_RegistryDiscoveryError):
-                _discover_base_aliases(
+            with self.assertRaises(RegistryDiscoveryError):
+                discover_base_aliases(
                     "aicage/aicage",
                     "https://ghcr.io/v2",
                     "https://ghcr.io/token?service=ghcr.io&scope=repository",
@@ -77,8 +77,8 @@ class DiscoveryTests(TestCase):
             return FakeResponse()
 
         with mock.patch("urllib.request.urlopen", fake_urlopen):
-            with self.assertRaises(_RegistryDiscoveryError):
-                _discover_base_aliases(
+            with self.assertRaises(RegistryDiscoveryError):
+                discover_base_aliases(
                     "aicage/aicage",
                     "https://ghcr.io/v2",
                     "https://ghcr.io/token?service=ghcr.io&scope=repository",

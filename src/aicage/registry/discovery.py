@@ -3,11 +3,11 @@ import re
 import urllib.request
 from typing import Any, Dict, List, Mapping, Tuple
 
-class _RegistryDiscoveryError(Exception):
+class RegistryDiscoveryError(Exception):
     """Raised when registry discovery fails."""
 
 
-def _discover_base_aliases(
+def discover_base_aliases(
     repository: str,
     registry_api_url: str,
     registry_token_url: str,
@@ -35,7 +35,7 @@ def _fetch_pull_token(registry_token_url: str, repository: str) -> str:
     data, _ = _fetch_json(url, None)
     token = data.get("token")
     if not token:
-        raise _RegistryDiscoveryError(f"Missing token while querying registry for {repository}.")
+        raise RegistryDiscoveryError(f"Missing token while querying registry for {repository}.")
     return token
 
 
@@ -46,12 +46,12 @@ def _fetch_json(url: str, headers: Dict[str, str] | None) -> Tuple[Dict[str, Any
             payload = response.read().decode("utf-8")
             response_headers = response.headers
     except Exception as exc:  # pylint: disable=broad-except
-        raise _RegistryDiscoveryError(f"Failed to query registry endpoint {url}: {exc}") from exc
+        raise RegistryDiscoveryError(f"Failed to query registry endpoint {url}: {exc}") from exc
 
     try:
         data = json.loads(payload)
     except json.JSONDecodeError as exc:
-        raise _RegistryDiscoveryError(f"Invalid JSON from registry endpoint {url}: {exc}") from exc
+        raise RegistryDiscoveryError(f"Invalid JSON from registry endpoint {url}: {exc}") from exc
     return data, response_headers
 
 
