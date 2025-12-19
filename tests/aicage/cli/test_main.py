@@ -15,7 +15,7 @@ class MainFlowTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             project_path = Path(tmp_dir)
             global_cfg = GlobalConfig(
-                repository="wuodan/aicage",
+                repository="aicage/aicage",
                 default_base="ubuntu",
                 docker_args="--global",
                 tools={"codex": {"base": "fedora"}},
@@ -49,7 +49,7 @@ class MainFlowTests(TestCase):
                 global_cfg=global_cfg,
             )
             selection = BaseImageSelection(
-                image_ref="wuodan/aicage:codex-debian-latest",
+                image_ref="aicage/aicage:codex-debian-latest",
                 tool_path_label=str(project_path / ".codex"),
                 tool_config_host=project_path / ".codex",
                 project_dirty=False,
@@ -75,7 +75,7 @@ class MainFlowTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             project_path = Path(tmp_dir)
             global_cfg = GlobalConfig(
-                repository="wuodan/aicage",
+                repository="aicage/aicage",
                 default_base="ubuntu",
                 docker_args="--global",
                 tools={},
@@ -102,7 +102,7 @@ class MainFlowTests(TestCase):
 
             store = FakeStore(global_cfg, project_cfg)
             selection = BaseImageSelection(
-                image_ref="wuodan/aicage:codex-alpine-latest",
+                image_ref="aicage/aicage:codex-alpine-latest",
                 tool_path_label=str(project_path / ".codex"),
                 tool_config_host=project_path / ".codex",
                 project_dirty=True,
@@ -135,7 +135,7 @@ class MainFlowTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             project_path = Path(tmp_dir)
             global_cfg = GlobalConfig(
-                repository="wuodan/aicage",
+                repository="aicage/aicage",
                 default_base="ubuntu",
                 docker_args="",
                 tools={},

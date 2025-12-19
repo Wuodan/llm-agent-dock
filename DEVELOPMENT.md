@@ -14,5 +14,5 @@ advanced/power users who want to tweak or extend things.
 
 ## Related projects (build docker images)
 
-- [aicage-image-base/](https://github.com/Wuodan/aicage-image-base): builds base OS layers.
-- [aicage-image/](https://github.com/Wuodan/aicage-image): builds tools/coding agents on those bases.
+- [aicage-image-base/](https://github.com/aicage/aicage-image-base): builds base OS layers.
+- [aicage-image/](https://github.com/aicage/aicage-image): builds tools/coding agents on those bases.

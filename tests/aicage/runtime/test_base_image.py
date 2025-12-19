@@ -19,7 +19,7 @@ class BaseImageResolutionTests(TestCase):
                 store=mock.Mock(),
                 project_path=project_path,
                 project_cfg=ProjectConfig(path=str(project_path), docker_args="", tools={}),
-                global_cfg=GlobalConfig(repository="wuodan/aicage", default_base="ubuntu", docker_args="", tools={}),
+                global_cfg=GlobalConfig(repository="aicage/aicage", default_base="ubuntu", docker_args="", tools={}),
             )
             tool_cfg = {"base": "debian"}
             with mock.patch("aicage.runtime.base_image._pull_image"), mock.patch(
@@ -29,7 +29,7 @@ class BaseImageResolutionTests(TestCase):
 
             self.assertIsInstance(selection, BaseImageSelection)
             self.assertFalse(selection.project_dirty)
-            self.assertEqual("wuodan/aicage:codex-debian-latest", selection.image_ref)
+            self.assertEqual("aicage/aicage:codex-debian-latest", selection.image_ref)
             self.assertEqual(tool_dir, selection.tool_config_host)
 
     def test_resolve_prompts_and_marks_dirty(self) -> None:
@@ -41,7 +41,7 @@ class BaseImageResolutionTests(TestCase):
                 store=mock.Mock(),
                 project_path=project_path,
                 project_cfg=ProjectConfig(path=str(project_path), docker_args="", tools={}),
-                global_cfg=GlobalConfig(repository="wuodan/aicage", default_base="ubuntu", docker_args="", tools={}),
+                global_cfg=GlobalConfig(repository="aicage/aicage", default_base="ubuntu", docker_args="", tools={}),
             )
             tool_cfg: dict = {}
             with mock.patch(
@@ -64,7 +64,7 @@ class BaseImageResolutionTests(TestCase):
             store=mock.Mock(),
             project_path=Path("/tmp/project"),
             project_cfg=ProjectConfig(path="/tmp/project", docker_args="", tools={}),
-            global_cfg=GlobalConfig(repository="wuodan/aicage", default_base="ubuntu", docker_args="", tools={}),
+            global_cfg=GlobalConfig(repository="aicage/aicage", default_base="ubuntu", docker_args="", tools={}),
         )
         tool_cfg: dict = {}
         with mock.patch("aicage.runtime.base_image._discover_available_bases", return_value=[]):

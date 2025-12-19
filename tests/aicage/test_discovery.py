@@ -28,7 +28,7 @@ class DiscoveryTests(TestCase):
             return FakeResponse()
 
         with mock.patch("urllib.request.urlopen", fake_urlopen):
-            aliases = discover_base_aliases("wuodan/aicage", "codex")
+            aliases = discover_base_aliases("aicage/aicage", "codex")
 
         self.assertEqual(["debian", "ubuntu"], aliases)
 
@@ -38,7 +38,7 @@ class DiscoveryTests(TestCase):
 
         with mock.patch("urllib.request.urlopen", fake_urlopen):
             with self.assertRaises(DiscoveryError):
-                discover_base_aliases("wuodan/aicage", "codex")
+                discover_base_aliases("aicage/aicage", "codex")
 
     def test_discover_base_aliases_invalid_json(self) -> None:
         class FakeResponse:
@@ -53,4 +53,4 @@ class DiscoveryTests(TestCase):
 
         with mock.patch("urllib.request.urlopen", fake_urlopen):
             with self.assertRaises(DiscoveryError):
-                discover_base_aliases("wuodan/aicage", "codex")
+                discover_base_aliases("aicage/aicage", "codex")

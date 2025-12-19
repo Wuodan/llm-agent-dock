@@ -31,7 +31,7 @@ class PromptTests(TestCase):
     def test_assemble_includes_workspace_mount(self) -> None:
         with mock.patch("aicage.runtime.run_args._resolve_user_ids", return_value=[]):
             run_args = DockerRunArgs(
-                image_ref="wuodan/aicage:codex-ubuntu-latest",
+                image_ref="aicage/aicage:codex-ubuntu-latest",
                 project_path=Path("/work/project"),
                 tool_config_host=Path("/host/.codex"),
                 tool_mount_container=Path("/aicage/tool-config"),
@@ -53,7 +53,7 @@ class PromptTests(TestCase):
                 "-v",
                 "/host/.codex:/aicage/tool-config",
                 "--network=host",
-                "wuodan/aicage:codex-ubuntu-latest",
+                "aicage/aicage:codex-ubuntu-latest",
                 "--flag",
             ],
             cmd,

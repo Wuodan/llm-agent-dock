@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Count and sanity-check Docker Hub tags for wuodan/aicage against your expected base/tool matrix.
+# Count and sanity-check Docker Hub tags for aicage/aicage against your expected base/tool matrix.
 # Assumptions:
 # - Tag names contain BOTH the tool token and the base token somewhere in the tag name
 #   (e.g. "codex-ubuntu-latest", "cline-debian-0.0.1", etc.)
 # - If your tag scheme differs, adjust match_tag() below.
 
-repo="wuodan/aicage"
+repo="aicage/aicage"
 page_size=100
 
 bases=(act ubuntu fedora node alpine debian)
