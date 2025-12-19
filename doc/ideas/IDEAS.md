@@ -14,25 +14,11 @@ The '-latest' tag can remain as it makes handling much easier.
 
 ### New agent version triggers image build
 
-See pipeines in https://github.com/Wuodan/factoryai-droid-docker:
+See pipelines in https://github.com/Wuodan/factoryai-droid-docker:
 - one scheduled checks for new version and triggers
 - build pipeline
 
 `droid` here is actually complicated (wget script, parse version) while other tools can be queried with npm or pipx.
-
-## Read image metadata from remote images
-
-Now we use hub.docker API to read all image tags, then parse the image tags to get available images for a given tool:
-<tool>-<base>-latest (example: codex-fedora-latest -> given tool `codex` base `fedora` is available)
-
-It works but is limited to this one information. Will not work for custom user images nicely.
-
-Better would be to read image metadata, there we can store more and better.
-
-But docker itself can read full metadata only for local images. `skopeo` can do it for remote images.
-
-To use `skopeo` in `aicage` it has to be either installed (pre-requisite) or we bundle the skopeo binary.  
-See [details/bundling-go-binary-in-pypi.md](details/bundling-go-binary-in-pypi.md) for bundling binary.
 
 ## Match working directory in container to host project folder name
 
@@ -58,40 +44,9 @@ new local image is built.
 
 This might also be helpful or fulfill most custom image use-cases.
 
-
-## More CLI Coding Agents – Landscape Snapshot
-
-Reference list and inspiration:
-https://github.com/toolstud-io/LlmBrains  
-(LLM Brains JetBrains plugin – simple dropdown launcher for externally installed CLI agents)
-
-### Core / Major Players (still highly relevant)
-- **Claude Code** (`claude`) – Anthropic
-- **Codex CLI** (`codex`) – OpenAI
-- **GitHub Copilot CLI** (`copilot`)
-- **Gemini CLI** (`gemini`) – Google
-- **Qwen Code** (`qwen`) – Alibaba
-- **OpenCode** (`opencode`)
-
-### Missing but Worth Considering
-- **Cline** – autonomous coding agent, popular with Claude/OpenAI backends
-- **Cursor CLI** – terminal companion to Cursor IDE workflows
-- **ForgeCode** – community‑driven CLI coding agent
-- **Cosine / similar community CLIs** – occasionally referenced in agent roundups
-
-### Niche / Secondary (useful, but not mainstream)
-- **Amp CLI** (Sourcegraph)
-- **Crush** (Charm)
-- **Droid** (Factory AI)
-- **Goose** (Block)
-- **Grok CLI** (xAI)
-- **Qodo**
-- **VT Code**
-- **Warp CLI** (terminal with agent features, not a pure coding agent)
-
 ## Rename user in Ubuntu
 
-Normally we use the user name from the host. But on `ubuntu` there already is a user with UID 1000 and we don't touch 
+Normally we use the username from the host. But on `ubuntu` there already is a user with UID 1000, and we don't touch 
 it. I heard in this case renaming user (same UID) is safe.
 
 ## Change working dir in image
