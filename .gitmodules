@@ -1,6 +1,6 @@
 [submodule "aicage-image-base"]
 	path = aicage-image-base
-	url = git@github.com:Wuodan/aicage-image-base.git
+	url = git@github.com:aicage/aicage-image-base.git
 [submodule "aicage-image"]
 	path = aicage-image
-	url = git@github.com:Wuodan/aicage-image.git
+	url = git@github.com:aicage/aicage-image.git
