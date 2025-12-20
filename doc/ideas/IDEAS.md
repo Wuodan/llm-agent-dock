@@ -44,11 +44,6 @@ new local image is built.
 
 This might also be helpful or fulfill most custom image use-cases.
 
-## Rename user in Ubuntu
-
-Normally we use the username from the host. But on `ubuntu` there already is a user with UID 1000, and we don't touch 
-it. I heard in this case renaming user (same UID) is safe.
-
 ## Change working dir in image
 
 Now we mount the project into `/workspace` and sometimes this might not feel "like on the host".  
