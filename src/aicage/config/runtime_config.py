@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from contextlib import ExitStack, contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, List
-
-import portalocker
+from typing import List
 
 from aicage.config.config_store import SettingsStore
 from aicage.config.context import ConfigContext
-from aicage.config.errors import ConfigError
+from aicage.config.file_locking import lock_config_files
 from aicage.registry import select_tool_image
 from aicage.runtime.auth.mounts import (
     MountPreferences,
@@ -20,8 +17,6 @@ from aicage.runtime.auth.mounts import (
 from aicage.runtime.run_args import MountSpec
 
 __all__ = ["MountPreferencesSnapshot", "RunConfig", "load_run_config"]
-
-_LOCK_TIMEOUT_SECONDS = 30
 
 
 @dataclass(frozen=True)
@@ -48,7 +43,7 @@ def load_run_config(tool: str) -> RunConfig:
     global_config_path = store.global_config()
     project_config_path = store.project_config_path(project_path)
 
-    with _lock_config_files(global_config_path, project_config_path):
+    with lock_config_files(global_config_path, project_config_path):
         store.ensure_global_config()
         global_cfg = store.load_global()
         project_cfg = store.load_project(project_path)
@@ -76,22 +71,6 @@ def load_run_config(tool: str) -> RunConfig:
             mounts=mounts,
             mount_preferences=_freeze_mount_preferences(prefs),
         )
-
-
-@contextmanager
-def _lock_config_files(global_config_path: Path, project_config_path: Path) -> Iterator[None]:
-    try:
-        with ExitStack() as stack:
-            stack.enter_context(_lock_file(global_config_path))
-            stack.enter_context(_lock_file(project_config_path))
-            yield
-    except portalocker.exceptions.LockException as exc:  # pragma: no cover - rare file lock failure
-        raise ConfigError(f"Failed to lock configuration files: {exc}") from exc
-
-
-def _lock_file(path: Path) -> portalocker.Lock:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return portalocker.Lock(str(path), timeout=_LOCK_TIMEOUT_SECONDS, mode="a+")
 
 
 def _freeze_mount_preferences(prefs: MountPreferences) -> MountPreferencesSnapshot:
