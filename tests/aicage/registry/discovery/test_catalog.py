@@ -76,7 +76,8 @@ class DiscoveryTests(TestCase):
             def __exit__(self, exc_type, exc, tb):
                 return False
 
-            def read(self) -> bytes:
+            @staticmethod
+            def read() -> bytes:
                 return b"not-json"
 
             headers = {}
