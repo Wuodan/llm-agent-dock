@@ -25,13 +25,14 @@ class SettingsStore:
     Persists global and per-project configuration under ~/.aicage.
     """
 
-    def __init__(self, base_dir: Path | None = None) -> None:
+    def __init__(self, base_dir: Path | None = None, ensure_global_config: bool = True) -> None:
         self.base_dir = base_dir or Path(os.path.expanduser(_DEFAULT_BASE_DIR))
         self.projects_dir = self.base_dir / _PROJECTS_SUBDIR
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self.projects_dir.mkdir(parents=True, exist_ok=True)
         self.global_config_path = self.base_dir / _CONFIG_FILENAME
-        self._ensure_global_config()
+        if ensure_global_config:
+            self._ensure_global_config()
 
     @staticmethod
     def _load_yaml(path: Path) -> Dict[str, Any]:
@@ -68,11 +69,14 @@ class SettingsStore:
     def save_project(self, project_realpath: Path, config: ProjectConfig) -> None:
         self._save_yaml(self._project_path(project_realpath), config.to_mapping())
 
-    def _ensure_global_config(self) -> None:
+    def ensure_global_config(self) -> None:
         """
         Create the global config file with defaults if it does not exist.
         """
-        if not self.global_config_path.exists():
+        self._ensure_global_config()
+
+    def _ensure_global_config(self) -> None:
+        if not self.global_config_path.exists() or self.global_config_path.stat().st_size == 0:
             resource = self._packaged_config_resource()
             with resources.as_file(resource) as packaged_path:
                 shutil.copyfile(packaged_path, self.global_config_path)
@@ -82,6 +86,12 @@ class SettingsStore:
         Returns the path to the global config file under the base directory.
         """
         return self.global_config_path
+
+    def project_config_path(self, project_realpath: Path) -> Path:
+        """
+        Returns the path to a project's config file under the base directory.
+        """
+        return self._project_path(project_realpath)
 
     @staticmethod
     def _packaged_config_resource() -> Any:

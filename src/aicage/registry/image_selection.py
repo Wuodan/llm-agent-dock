@@ -5,10 +5,10 @@ from aicage.errors import CliError
 from aicage.runtime.prompts import BaseSelectionRequest, prompt_for_base
 from .discovery.catalog import discover_tool_bases
 
-__all__ = ["resolve_tool_image"]
+__all__ = ["pull_image", "select_tool_image"]
 
 
-def _pull_image(image_ref: str) -> None:
+def pull_image(image_ref: str) -> None:
     pull_result = subprocess.run(["docker", "pull", image_ref], capture_output=True, text=True)
     if pull_result.returncode == 0:
         return
@@ -28,7 +28,7 @@ def _pull_image(image_ref: str) -> None:
     )
 
 
-def resolve_tool_image(tool: str, context: ConfigContext) -> str:
+def select_tool_image(tool: str, context: ConfigContext) -> str:
     tool_cfg = context.project_cfg.tools.setdefault(tool, {})
     base = tool_cfg.get("base") or context.global_cfg.tools.get(tool, {}).get("base")
     repository_ref = context.image_repository_ref()
@@ -49,7 +49,4 @@ def resolve_tool_image(tool: str, context: ConfigContext) -> str:
 
     image_tag = f"{tool}-{base}-latest"
     image_ref = f"{repository_ref}:{image_tag}"
-
-    _pull_image(image_ref)
-
     return image_ref

@@ -9,7 +9,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [{ name = "Stefan Kuhn" }]
-dependencies = ["PyYAML"]
+dependencies = ["PyYAML", "portalocker"]
 dynamic = ["version"]
 
 [project.scripts]

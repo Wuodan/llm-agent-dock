@@ -18,14 +18,14 @@ class DockerInvocationTests(TestCase):
     def test_pull_image_success_and_warning(self) -> None:
         pull_ok = FakeCompleted(returncode=0)
         with mock.patch("aicage.registry.image_selection.subprocess.run", return_value=pull_ok) as run_mock:
-            image_selection._pull_image("repo:tag")
+            image_selection.pull_image("repo:tag")
         run_mock.assert_called_once_with(["docker", "pull", "repo:tag"], capture_output=True, text=True)
 
         pull_fail = FakeCompleted(returncode=1, stderr="timeout")
         inspect_ok = FakeCompleted(returncode=0)
         with mock.patch("aicage.registry.image_selection.subprocess.run", side_effect=[pull_fail, inspect_ok]):
             with mock.patch("sys.stderr", new_callable=io.StringIO) as stderr:
-                image_selection._pull_image("repo:tag")
+                image_selection.pull_image("repo:tag")
         self.assertIn("Warning", stderr.getvalue())
 
     def test_pull_image_raises_on_missing_local(self) -> None:
@@ -33,7 +33,7 @@ class DockerInvocationTests(TestCase):
         inspect_fail = FakeCompleted(returncode=1, stderr="missing", stdout="")
         with mock.patch("aicage.registry.image_selection.subprocess.run", side_effect=[pull_fail, inspect_fail]):
             with self.assertRaises(CliError):
-                image_selection._pull_image("repo:tag")
+                image_selection.pull_image("repo:tag")
 
     def test_discover_local_bases_and_errors(self) -> None:
         list_output = "\n".join(

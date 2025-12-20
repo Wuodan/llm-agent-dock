@@ -28,9 +28,8 @@ class ImageSelectionTests(TestCase):
                     tools={},
                 ),
             )
-            with mock.patch("aicage.registry.image_selection._pull_image"):
-                context.project_cfg.tools["codex"] = {"base": "debian"}
-                selection = image_selection.resolve_tool_image("codex", context)
+            context.project_cfg.tools["codex"] = {"base": "debian"}
+            selection = image_selection.select_tool_image("codex", context)
 
             self.assertIsInstance(selection, str)
             self.assertEqual("ghcr.io/aicage/aicage:codex-debian-latest", selection)
@@ -58,11 +57,9 @@ class ImageSelectionTests(TestCase):
             with mock.patch(
                 "aicage.registry.discovery.catalog.discover_tool_bases", return_value=["alpine", "ubuntu"]
             ), mock.patch(
-                "aicage.registry.image_selection._pull_image"
-            ), mock.patch(
                 "aicage.registry.image_selection.prompt_for_base", return_value="alpine"
             ):
-                image_selection.resolve_tool_image("codex", context)
+                image_selection.select_tool_image("codex", context)
 
             self.assertEqual("alpine", context.project_cfg.tools["codex"]["base"])
             store.save_project.assert_called_once_with(project_path, context.project_cfg)
@@ -84,4 +81,4 @@ class ImageSelectionTests(TestCase):
         )
         with mock.patch("aicage.registry.discovery.catalog.discover_tool_bases", return_value=[]):
             with self.assertRaises(CliError):
-                image_selection.resolve_tool_image("codex", context)
+                image_selection.select_tool_image("codex", context)

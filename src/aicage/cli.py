@@ -5,9 +5,10 @@ from typing import List, Sequence
 
 from aicage.config import ConfigError
 from aicage.cli_parse import parse_cli
-from aicage.config.context import ConfigContext, build_config_context
+from aicage.config import RunConfig, load_run_config
 from aicage.cli_types import ParsedArgs
 from aicage.errors import CliError
+from aicage.registry import pull_image
 from aicage.runtime.run_args import DockerRunArgs, assemble_docker_run
 from aicage.runtime.run_plan import build_run_args
 
@@ -18,8 +19,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parsed_argv: Sequence[str] = argv if argv is not None else sys.argv[1:]
     try:
         parsed: ParsedArgs = parse_cli(parsed_argv)
-        context: ConfigContext = build_config_context()
-        run_args: DockerRunArgs = build_run_args(context=context, parsed=parsed)
+        run_config: RunConfig = load_run_config(parsed.tool)
+        pull_image(run_config.image_ref)
+        run_args: DockerRunArgs = build_run_args(config=run_config, parsed=parsed)
 
         run_cmd: List[str] = assemble_docker_run(run_args)
 
