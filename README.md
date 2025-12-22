@@ -71,6 +71,9 @@ preferences and credentials.
 ## aicage options
 
 - `--dry-run` prints the composed `docker run` command without executing it.
+- `--entrypoint PATH` mounts a custom entrypoint script to `/usr/local/bin/entrypoint.sh`.
+- `--docker` mounts `/run/docker.sock` into the container to enable Docker-in-Docker workflows.
+- `--config print` prints the project config path and its contents.
 
 ## Why cage agents?
 
