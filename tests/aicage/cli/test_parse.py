@@ -12,6 +12,9 @@ class ParseCliTests(TestCase):
         self.assertEqual("--network=host", parsed.docker_args)
         self.assertEqual("codex", parsed.tool)
         self.assertEqual(["--foo"], parsed.tool_args)
+        self.assertIsNone(parsed.entrypoint)
+        self.assertFalse(parsed.docker_socket)
+        self.assertIsNone(parsed.config_action)
 
     def test_parse_with_separator(self) -> None:
         parsed = parse_cli(["--dry-run", "--", "codex", "--bar"])
@@ -19,6 +22,9 @@ class ParseCliTests(TestCase):
         self.assertEqual("", parsed.docker_args)
         self.assertEqual("codex", parsed.tool)
         self.assertEqual(["--bar"], parsed.tool_args)
+        self.assertIsNone(parsed.entrypoint)
+        self.assertFalse(parsed.docker_socket)
+        self.assertIsNone(parsed.config_action)
 
     def test_parse_without_docker_args(self) -> None:
         parsed = parse_cli(["codex", "--flag"])
@@ -26,6 +32,9 @@ class ParseCliTests(TestCase):
         self.assertEqual("", parsed.docker_args)
         self.assertEqual("codex", parsed.tool)
         self.assertEqual(["--flag"], parsed.tool_args)
+        self.assertIsNone(parsed.entrypoint)
+        self.assertFalse(parsed.docker_socket)
+        self.assertIsNone(parsed.config_action)
 
     def test_parse_help_exits(self) -> None:
         with mock.patch("sys.stdout", new_callable=io.StringIO) as stdout:
@@ -45,3 +54,14 @@ class ParseCliTests(TestCase):
     def test_parse_requires_tool_name(self) -> None:
         with self.assertRaises(CliError):
             parse_cli([""])
+
+    def test_parse_config_print(self) -> None:
+        parsed = parse_cli(["--config", "print"])
+        self.assertEqual("print", parsed.config_action)
+        self.assertEqual("", parsed.docker_args)
+        self.assertEqual("", parsed.tool)
+        self.assertEqual([], parsed.tool_args)
+
+    def test_parse_config_print_rejects_args(self) -> None:
+        with self.assertRaises(CliError):
+            parse_cli(["--config", "print", "codex"])

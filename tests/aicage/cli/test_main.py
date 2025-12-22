@@ -34,6 +34,21 @@ def _build_run_config(project_path: Path, image_ref: str) -> RunConfig:
 
 
 class MainFlowTests(TestCase):
+    def test_main_config_print(self) -> None:
+        with (
+            mock.patch(
+                "aicage.cli.parse_cli",
+                return_value=cli.ParsedArgs(False, "", "", [], None, False, "print"),
+            ),
+            mock.patch("aicage.cli._print_project_config") as print_mock,
+            mock.patch("aicage.cli.load_run_config") as load_mock,
+        ):
+            exit_code = cli.main([])
+
+        self.assertEqual(0, exit_code)
+        print_mock.assert_called_once()
+        load_mock.assert_not_called()
+
     def test_main_uses_project_base(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             project_path = Path(tmp_dir)
@@ -48,7 +63,10 @@ class MainFlowTests(TestCase):
                 ["--flag"],
             )
             with (
-                mock.patch("aicage.cli.parse_cli", return_value=cli.ParsedArgs(False, "--cli", "codex", ["--flag"])),
+                mock.patch(
+                    "aicage.cli.parse_cli",
+                    return_value=cli.ParsedArgs(False, "--cli", "codex", ["--flag"], None, False, None),
+                ),
                 mock.patch("aicage.cli.load_run_config", return_value=run_config),
                 mock.patch("aicage.cli.pull_image"),
                 mock.patch("aicage.cli.build_run_args", return_value=run_args),
@@ -78,7 +96,10 @@ class MainFlowTests(TestCase):
                 ["--flag"],
             )
             with (
-                mock.patch("aicage.cli.parse_cli", return_value=cli.ParsedArgs(True, "--cli", "codex", ["--flag"])),
+                mock.patch(
+                    "aicage.cli.parse_cli",
+                    return_value=cli.ParsedArgs(True, "--cli", "codex", ["--flag"], None, False, None),
+                ),
                 mock.patch("aicage.cli.load_run_config", return_value=run_config),
                 mock.patch("aicage.cli.pull_image"),
                 mock.patch("aicage.cli.build_run_args", return_value=run_args),
@@ -100,7 +121,10 @@ class MainFlowTests(TestCase):
                 "ghcr.io/aicage/aicage:codex-ubuntu-latest",
             )
             with (
-                mock.patch("aicage.cli.parse_cli", return_value=cli.ParsedArgs(True, "", "codex", [])),
+                mock.patch(
+                    "aicage.cli.parse_cli",
+                    return_value=cli.ParsedArgs(True, "", "codex", [], None, False, None),
+                ),
                 mock.patch("aicage.cli.load_run_config", return_value=run_config),
                 mock.patch("aicage.cli.pull_image"),
                 mock.patch("aicage.cli.build_run_args", side_effect=CliError("No base images found")),

@@ -47,7 +47,9 @@ def load_mount_preferences(tool_cfg: dict[str, Any]) -> MountPreferences:
 
 
 def store_mount_preferences(tool_cfg: dict[str, Any], prefs: MountPreferences) -> None:
-    tool_cfg["mounts"] = prefs.to_mapping()
+    mounts = tool_cfg.get("mounts", {}) or {}
+    mounts.update(prefs.to_mapping())
+    tool_cfg["mounts"] = mounts
 
 
 def build_auth_mounts(project_path: Path, prefs: MountPreferences) -> tuple[list[MountSpec], bool]:

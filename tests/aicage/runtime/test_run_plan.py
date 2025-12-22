@@ -19,7 +19,7 @@ class RunPlanTests(TestCase):
             mounts=[],
             mount_preferences=mock.Mock(),
         )
-        parsed = ParsedArgs(False, "--cli", "codex", ["--flag"])
+        parsed = ParsedArgs(False, "--cli", "codex", ["--flag"], None, False, None)
         tool_config = ToolConfig(tool_path="~/.codex", tool_config_host=Path("/tmp/.codex"))
 
         with mock.patch("aicage.runtime.run_plan.resolve_tool_config", return_value=tool_config):
@@ -40,7 +40,7 @@ class RunPlanTests(TestCase):
             mounts=[mount],
             mount_preferences=mock.Mock(),
         )
-        parsed = ParsedArgs(False, "", "codex", [])
+        parsed = ParsedArgs(False, "", "codex", [], None, False, None)
         tool_config = ToolConfig(tool_path="~/.codex", tool_config_host=Path("/tmp/.codex"))
 
         with mock.patch("aicage.runtime.run_plan.resolve_tool_config", return_value=tool_config):

@@ -17,6 +17,9 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
     """
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--dry-run", action="store_true", help="Print docker run command without executing.")
+    parser.add_argument("--entrypoint", help="Override the container entrypoint with a host path.")
+    parser.add_argument("--docker", action="store_true", help="Mount the host Docker socket into the container.")
+    parser.add_argument("--config", help="Perform config actions such as 'print'.")
     parser.add_argument("-h", "--help", action="store_true", help="Show help message and exit.")
     opts: argparse.Namespace
     remaining: list[str]
@@ -25,13 +28,29 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
     if opts.help:
         usage: str = (
             "Usage:\n"
-            "  aicage [--dry-run] [<docker-args>] <tool> [-- <tool-args>]\n"
-            "  aicage [--dry-run] [<docker-args>] -- <tool> <tool-args>\n\n"
+            "  aicage [--dry-run] [--docker] [--entrypoint PATH] [<docker-args>] <tool> [-- <tool-args>]\n"
+            "  aicage [--dry-run] [--docker] [--entrypoint PATH] [<docker-args>] -- <tool> <tool-args>\n"
+            "  aicage --config print\n\n"
             "<docker-args> is a single string of docker run flags (optional).\n"
             "<tool-args> are passed verbatim to the tool.\n"
         )
         print(usage)
         sys.exit(0)
+
+    if opts.config:
+        if opts.config != "print":
+            raise CliError(f"Unknown config action: {opts.config}")
+        if remaining or opts.entrypoint or opts.docker or opts.dry_run:
+            raise CliError("No additional arguments are allowed with --config.")
+        return ParsedArgs(
+            opts.dry_run,
+            "",
+            "",
+            [],
+            opts.entrypoint,
+            opts.docker,
+            opts.config,
+        )
 
     if not remaining:
         raise CliError("Missing arguments. Provide a tool name (and optional docker args).")
@@ -60,4 +79,12 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
     if not tool:
         raise CliError("Tool name is required.")
 
-    return ParsedArgs(opts.dry_run, docker_args, tool, tool_args)
+    return ParsedArgs(
+        opts.dry_run,
+        docker_args,
+        tool,
+        tool_args,
+        opts.entrypoint,
+        opts.docker,
+        None,
+    )
