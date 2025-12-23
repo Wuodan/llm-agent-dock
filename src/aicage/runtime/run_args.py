@@ -8,6 +8,7 @@ from ._env_vars import (
     AICAGE_TOOL_PATH,
     AICAGE_UID,
     AICAGE_USER,
+    AICAGE_WORKSPACE,
 )
 
 __all__ = ["MountSpec", "DockerRunArgs", "merge_docker_args", "assemble_docker_run"]
@@ -55,11 +56,13 @@ def _resolve_user_ids() -> list[str]:
 def assemble_docker_run(args: DockerRunArgs) -> list[str]:
     cmd: list[str] = ["docker", "run", "--rm", "-it"]
     cmd.extend(_resolve_user_ids())
+    cmd.extend(["-e", f"{AICAGE_WORKSPACE}={args.project_path}"])
     if args.tool_path:
         cmd.extend(["-e", f"{AICAGE_TOOL_PATH}={args.tool_path}"])
     for env in args.env:
         cmd.extend(["-e", env])
     cmd.extend(["-v", f"{args.project_path}:/workspace"])
+    cmd.extend(["-v", f"{args.project_path}:{args.project_path}"])
     cmd.extend(["-v", f"{args.tool_config_host}:{args.tool_mount_container}"])
     for mount in args.mounts:
         suffix = ":ro" if mount.read_only else ""
