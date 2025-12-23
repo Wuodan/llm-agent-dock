@@ -20,21 +20,6 @@ See pipelines in https://github.com/Wuodan/factoryai-droid-docker:
 
 `droid` here is actually complicated (wget script, parse version) while other tools can be queried with npm or pipx.
 
-## Match working directory in container to host project folder name
-
-Using /workspace in container gets confusing. At minimum use the same folder name as host, much better would be to use 
-the full path as on host.
-
-The full path in container is also written to agent config (on host) so a match to host path would be really nice but 
-might not work on Windows.
-
-## Change working dir in image
-
-Now we mount the project into `/workspace` and sometimes this might not feel "like on the host".  
-At the minimum, work in a subfolder of `/workspace` with same dir name as on host.  
-This does NOT require a new ENV var to the container as there will be only ONE subfolder to /workspace and the 
-entrypoint.sh can simply `cd` into that.
-
 ## Enable and document custom images by user
 
 I can build and use locally but need to use the same image-names. It would be nice if we could (by config?) add any 
