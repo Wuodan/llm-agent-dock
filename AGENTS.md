@@ -14,6 +14,17 @@ follow [DEVELOPMENT.md](DEVELOPMENT.md) for workflows.
 - Disabling linters via comments (e.g., `# noqa`) is a last resort; analyze and fix first, and only
   add suppressions with explicit approval.
 
+## General coding guidelines
+
+I come from Java and greatly value `Clean Code` and `Separation/Encapsulation`.  
+Meaning:
+- I want to see datatypes explicitly.
+- I want clean capsulation with private/public visibility. Default is always private and visibility is only increased 
+  when needed - for files, classes, methods, variables ... everywhere. If this is violated I stop my review immediately
+  so get this right.
+- pass wrapping objects when you can, don't split wrapping objects into variables
+- Respect `doc/python-test-structure-guidelines.md` when it comes to writing Python tests.
+
 ## Repo structure
 
 - [README.md](README.md) (users)
