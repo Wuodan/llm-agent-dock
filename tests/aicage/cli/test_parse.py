@@ -22,6 +22,13 @@ class ParseCliTests(TestCase):
         self.assertEqual("", parsed.docker_args)
         self.assertEqual("codex", parsed.tool)
         self.assertEqual(["--bar"], parsed.tool_args)
+
+    def test_parse_with_separator_and_docker_args(self) -> None:
+        parsed = parse_cli(["--dry-run", "-v", "/run/docker.sock:/run/docker.sock", "--", "codex", "--bar"])
+        self.assertTrue(parsed.dry_run)
+        self.assertEqual("-v /run/docker.sock:/run/docker.sock", parsed.docker_args)
+        self.assertEqual("codex", parsed.tool)
+        self.assertEqual(["--bar"], parsed.tool_args)
         self.assertIsNone(parsed.entrypoint)
         self.assertFalse(parsed.docker_socket)
         self.assertIsNone(parsed.config_action)
@@ -65,3 +72,20 @@ class ParseCliTests(TestCase):
     def test_parse_config_print_rejects_args(self) -> None:
         with self.assertRaises(CliError):
             parse_cli(["--config", "print", "codex"])
+
+    def test_parse_cli_flags_before_separator(self) -> None:
+        parsed = parse_cli(
+            [
+                "--docker",
+                "--entrypoint",
+                "/tmp/entrypoint.sh",
+                "--dry-run",
+                "--",
+                "codex",
+            ]
+        )
+        self.assertTrue(parsed.dry_run)
+        self.assertTrue(parsed.docker_socket)
+        self.assertEqual("/tmp/entrypoint.sh", parsed.entrypoint)
+        self.assertEqual("", parsed.docker_args)
+        self.assertEqual("codex", parsed.tool)
