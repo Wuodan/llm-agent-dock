@@ -1,5 +1,6 @@
 import io
 import subprocess
+from datetime import datetime, timezone
 from unittest import TestCase, mock
 
 from aicage.errors import CliError
@@ -14,29 +15,55 @@ class FakeCompleted:
         self.returncode = returncode
 
 
+class FakeProcess:
+    def __init__(self, output: str = "", returncode: int = 0) -> None:
+        self.stdout = io.StringIO(output)
+        self.returncode = returncode
+
+    def wait(self) -> int:
+        return self.returncode
+
+
 class DockerInvocationTests(TestCase):
     def test_pull_image_success_and_warning(self) -> None:
-        pull_ok = FakeCompleted(returncode=0)
-        with mock.patch("aicage.registry.image_selection.subprocess.run", return_value=pull_ok) as run_mock:
+        pull_ok = FakeProcess(returncode=0)
+        with (
+            mock.patch("aicage.registry.image_selection.Path.open", mock.mock_open()),
+            mock.patch("aicage.registry.image_selection.subprocess.Popen", return_value=pull_ok) as popen_mock,
+            mock.patch("aicage.registry.image_selection.subprocess.run") as run_mock,
+            mock.patch("sys.stdout", new_callable=io.StringIO),
+        ):
             image_selection.pull_image("repo:tag")
-        run_mock.assert_called_once_with(
-            ["docker", "pull", "repo:tag"],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
+        popen_mock.assert_called_once()
+        run_mock.assert_not_called()
 
-        pull_fail = FakeCompleted(returncode=1, stderr="timeout")
+        pull_fail = FakeProcess(output="timeout\n", returncode=1)
         inspect_ok = FakeCompleted(returncode=0)
-        with mock.patch("aicage.registry.image_selection.subprocess.run", side_effect=[pull_fail, inspect_ok]):
-            with mock.patch("sys.stderr", new_callable=io.StringIO) as stderr:
-                image_selection.pull_image("repo:tag")
+        fixed_time = datetime(2025, 12, 24, 15, 42, 0, tzinfo=timezone.utc)
+        with (
+            mock.patch("aicage.registry.image_selection.datetime") as datetime_mock,
+            mock.patch("aicage.registry.image_selection.Path.open", mock.mock_open()),
+            mock.patch("aicage.registry.image_selection.subprocess.Popen", return_value=pull_fail),
+            mock.patch("aicage.registry.image_selection.subprocess.run", return_value=inspect_ok),
+            mock.patch("sys.stderr", new_callable=io.StringIO) as stderr,
+            mock.patch("sys.stdout", new_callable=io.StringIO),
+        ):
+            datetime_mock.now.return_value = fixed_time
+            image_selection.pull_image("repo:tag")
         self.assertIn("Warning", stderr.getvalue())
 
     def test_pull_image_raises_on_missing_local(self) -> None:
-        pull_fail = FakeCompleted(returncode=1, stderr="network down", stdout="")
+        pull_fail = FakeProcess(output="network down\n", returncode=1)
         inspect_fail = FakeCompleted(returncode=1, stderr="missing", stdout="")
-        with mock.patch("aicage.registry.image_selection.subprocess.run", side_effect=[pull_fail, inspect_fail]):
+        fixed_time = datetime(2025, 12, 24, 15, 42, 0, tzinfo=timezone.utc)
+        with (
+            mock.patch("aicage.registry.image_selection.datetime") as datetime_mock,
+            mock.patch("aicage.registry.image_selection.Path.open", mock.mock_open()),
+            mock.patch("aicage.registry.image_selection.subprocess.Popen", return_value=pull_fail),
+            mock.patch("aicage.registry.image_selection.subprocess.run", return_value=inspect_fail),
+            mock.patch("sys.stdout", new_callable=io.StringIO),
+        ):
+            datetime_mock.now.return_value = fixed_time
             with self.assertRaises(CliError):
                 image_selection.pull_image("repo:tag")
 
