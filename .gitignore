@@ -11,3 +11,6 @@ dist/
 .roomodes
 # may contain API-keys
 .roo/mcp.json
+
+# For local pipeline tests with `act`
+.secrets
