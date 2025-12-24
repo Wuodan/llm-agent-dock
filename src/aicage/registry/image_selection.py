@@ -49,7 +49,7 @@ def _get_local_digest(image_ref: str, repository: str) -> str | None:
     return None
 
 
-def _get_remote_digest(image_ref: str) -> str | None:
+def _get_remote_digests(image_ref: str) -> set[str] | None:
     inspect = subprocess.run(
         ["docker", "manifest", "inspect", "--verbose", image_ref],
         check=False,
@@ -60,31 +60,48 @@ def _get_remote_digest(image_ref: str) -> str | None:
         return None
 
     try:
-        payload: dict[str, Any] = json.loads(inspect.stdout)
+        payload: Any = json.loads(inspect.stdout)
     except json.JSONDecodeError:
         return None
 
-    descriptor = payload.get("Descriptor")
-    if isinstance(descriptor, dict):
-        digest = descriptor.get("digest")
-        if isinstance(digest, str) and digest:
-            return digest
+    digests: set[str] = set()
 
-    config = payload.get("config")
-    if isinstance(config, dict):
-        digest = config.get("digest")
-        if isinstance(digest, str) and digest:
-            return digest
+    def collect_digest(entry: Any) -> None:
+        if not isinstance(entry, dict):
+            return
+        descriptor = entry.get("Descriptor")
+        if isinstance(descriptor, dict):
+            digest = descriptor.get("digest")
+            if isinstance(digest, str) and digest:
+                digests.add(digest)
+        manifest_digest = entry.get("digest")
+        if isinstance(manifest_digest, str) and manifest_digest:
+            digests.add(manifest_digest)
+        config = entry.get("config")
+        if isinstance(config, dict):
+            config_digest = config.get("digest")
+            if isinstance(config_digest, str) and config_digest:
+                digests.add(config_digest)
+        manifests = entry.get("manifests")
+        if isinstance(manifests, list):
+            for manifest in manifests:
+                collect_digest(manifest)
 
-    return None
+    if isinstance(payload, list):
+        for item in payload:
+            collect_digest(item)
+    else:
+        collect_digest(payload)
+
+    return digests or None
 
 
 def pull_image(image_ref: str) -> None:
     repository = _repository_from_ref(image_ref)
     local_digest = _get_local_digest(image_ref, repository)
     if local_digest is not None:
-        remote_digest = _get_remote_digest(image_ref)
-        if remote_digest is not None and remote_digest == local_digest:
+        remote_digests = _get_remote_digests(image_ref)
+        if remote_digests is not None and local_digest in remote_digests:
             print(f"[aicage] Image {image_ref} is up to date.")
             return
 
