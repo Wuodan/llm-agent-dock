@@ -4,7 +4,7 @@ from unittest import TestCase, mock
 from aicage.config.global_config import GlobalConfig
 from aicage.config.runtime_config import RunConfig
 from aicage.registry import _remote_query
-from aicage.registry.discovery._remote import RegistryDiscoveryError
+from aicage.registry.remote_api import RegistryDiscoveryError
 
 
 class FakeResponse:
@@ -42,7 +42,7 @@ class RemoteQueryTests(TestCase):
     def test_get_remote_repo_digest_returns_none_on_token_error(self) -> None:
         with (
             mock.patch(
-                "aicage.registry._remote_query._fetch_pull_token",
+                "aicage.registry._remote_query.fetch_pull_token",
                 side_effect=RegistryDiscoveryError("boom"),
             ),
             mock.patch("aicage.registry._remote_query.urllib.request.urlopen") as urlopen_mock,
@@ -53,7 +53,7 @@ class RemoteQueryTests(TestCase):
 
     def test_get_remote_repo_digest_with_token(self) -> None:
         with (
-            mock.patch("aicage.registry._remote_query._fetch_pull_token", return_value="abc"),
+            mock.patch("aicage.registry._remote_query.fetch_pull_token", return_value="abc"),
             mock.patch(
                 "aicage.registry._remote_query.urllib.request.urlopen",
                 return_value=FakeResponse({"Docker-Content-Digest": "sha256:remote"}),

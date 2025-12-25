@@ -5,13 +5,13 @@ import urllib.request
 from collections.abc import Mapping
 
 from aicage.config.runtime_config import RunConfig
-from aicage.registry.discovery._remote import RegistryDiscoveryError, _fetch_pull_token
+from aicage.registry.remote_api import RegistryDiscoveryError, fetch_pull_token
 
 
 def get_remote_repo_digest(run_config: RunConfig) -> str | None:
     reference = _parse_reference(run_config.image_ref)
     try:
-        token = _fetch_pull_token(run_config.global_cfg)
+        token = fetch_pull_token(run_config.global_cfg)
     except RegistryDiscoveryError:
         return None
     url = (

@@ -7,9 +7,10 @@ if TYPE_CHECKING:
     from aicage.config.context import ConfigContext
 
 from aicage.errors import CliError
+from aicage.registry.remote_api import RegistryDiscoveryError
 
 from ._local import discover_local_bases
-from ._remote import RegistryDiscoveryError, discover_base_aliases
+from ._remote import discover_base_aliases
 
 
 def discover_tool_bases(context: ConfigContext, tool: str) -> list[str]:

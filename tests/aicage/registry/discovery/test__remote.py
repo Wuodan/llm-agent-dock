@@ -28,25 +28,12 @@ class RemoteDiscoveryTests(TestCase):
         )
 
         with (
-            mock.patch("aicage.registry.discovery._remote._fetch_pull_token", fake_fetch_token),
-            mock.patch("aicage.registry.discovery._remote._fetch_json", fake_fetch_json),
+            mock.patch("aicage.registry.discovery._remote.fetch_pull_token", fake_fetch_token),
+            mock.patch("aicage.registry.discovery._remote.fetch_json", fake_fetch_json),
         ):
             aliases = registry_remote.discover_base_aliases(context, "codex")
 
         self.assertEqual(["debian", "ubuntu"], aliases)
-
-    def test_fetch_pull_token_missing_token(self) -> None:
-        def fake_fetch_json(url: str, headers: dict[str, str] | None):
-            return {}, {}
-
-        with mock.patch("aicage.registry.discovery._remote._fetch_json", fake_fetch_json):
-            with self.assertRaises(registry_remote.RegistryDiscoveryError):
-                registry_remote._fetch_pull_token(
-                    mock.Mock(
-                        image_registry_api_token_url="https://example.test/token",
-                        image_repository="repo",
-                    )
-                )
 
     def test_parse_next_link(self) -> None:
         header = '<https://example.test/next?page=2>; rel="next", <https://example.test/last>; rel="last"'
