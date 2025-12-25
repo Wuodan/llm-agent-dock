@@ -5,6 +5,7 @@ from unittest import TestCase, mock
 
 from aicage import cli
 from aicage.config import ConfigError, RunConfig
+from aicage.config.global_config import GlobalConfig
 from aicage.errors import CliError
 from aicage.runtime.run_args import DockerRunArgs
 
@@ -26,6 +27,13 @@ def _build_run_config(project_path: Path, image_ref: str) -> RunConfig:
         project_path=project_path,
         tool="codex",
         image_ref=image_ref,
+        global_cfg=GlobalConfig(
+            image_registry="ghcr.io",
+            image_registry_api_url="https://ghcr.io/v2",
+            image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
+            image_repository="aicage/aicage",
+            default_image_base="ubuntu",
+        ),
         global_docker_args="--global",
         project_docker_args="--project",
         mounts=[],

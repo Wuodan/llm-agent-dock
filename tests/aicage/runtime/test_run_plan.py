@@ -3,6 +3,7 @@ from unittest import TestCase, mock
 
 from aicage.cli_types import ParsedArgs
 from aicage.config import RunConfig
+from aicage.config.global_config import GlobalConfig
 from aicage.runtime.run_plan import build_run_args
 from aicage.runtime.tool_config import ToolConfig
 
@@ -14,6 +15,7 @@ class RunPlanTests(TestCase):
             project_path=project_path,
             tool="codex",
             image_ref="ghcr.io/aicage/aicage:codex-ubuntu-latest",
+            global_cfg=self._get_global_config(),
             global_docker_args="--global",
             project_docker_args="--project",
             mounts=[],
@@ -35,6 +37,7 @@ class RunPlanTests(TestCase):
             project_path=project_path,
             tool="codex",
             image_ref="ghcr.io/aicage/aicage:codex-ubuntu-latest",
+            global_cfg=self._get_global_config(),
             global_docker_args="",
             project_docker_args="",
             mounts=[mount],
@@ -47,3 +50,13 @@ class RunPlanTests(TestCase):
             run_args = build_run_args(config, parsed)
 
         self.assertEqual([mount], run_args.mounts)
+
+    @staticmethod
+    def _get_global_config() -> GlobalConfig:
+        return GlobalConfig(
+            image_registry="ghcr.io",
+            image_registry_api_url="https://ghcr.io/v2",
+            image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
+            image_repository="aicage/aicage",
+            default_image_base="ubuntu",
+        )

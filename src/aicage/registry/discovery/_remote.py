@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from aicage.config.context import ConfigContext
+from aicage.config.global_config import GlobalConfig
 
 
 class RegistryDiscoveryError(Exception):
@@ -16,7 +17,7 @@ class RegistryDiscoveryError(Exception):
 
 def discover_base_aliases(context: ConfigContext, tool: str) -> list[str]:
     aliases: set[str] = set()
-    token = _fetch_pull_token(context.global_cfg.image_registry_api_token_url, context.global_cfg.image_repository)
+    token = _fetch_pull_token(context.global_cfg)
     page_url = f"{context.global_cfg.image_registry_api_url}/{context.global_cfg.image_repository}/tags/list?n=1000"
 
     while page_url:
@@ -34,12 +35,14 @@ def discover_base_aliases(context: ConfigContext, tool: str) -> list[str]:
     return sorted(aliases)
 
 
-def _fetch_pull_token(registry_token_url: str, repository: str) -> str:
-    url = f"{registry_token_url}:{repository}:pull"
+def _fetch_pull_token(global_cfg: GlobalConfig) -> str:
+    url = f"{global_cfg.image_registry_api_token_url}:{global_cfg.image_repository}:pull"
     data, _ = _fetch_json(url, None)
     token = data.get("token")
     if not token:
-        raise RegistryDiscoveryError(f"Missing token while querying registry for {repository}.")
+        raise RegistryDiscoveryError(
+            f"Missing token while querying registry for {global_cfg.image_repository}."
+        )
     return token
 
 

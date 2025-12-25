@@ -7,6 +7,7 @@ from aicage.cli_types import ParsedArgs
 from aicage.config.config_store import SettingsStore
 from aicage.config.context import ConfigContext
 from aicage.config.file_locking import lock_config_files
+from aicage.config.global_config import GlobalConfig
 from aicage.registry.image_selection import select_tool_image
 from aicage.runtime.auth.mounts import (
     MountPreferences,
@@ -37,6 +38,7 @@ class RunConfig:
     project_path: Path
     tool: str
     image_ref: str
+    global_cfg: GlobalConfig
     global_docker_args: str
     project_docker_args: str
     mounts: list[MountSpec]
@@ -82,6 +84,7 @@ def load_run_config(tool: str, parsed: ParsedArgs | None = None) -> RunConfig:
             project_path=project_path,
             tool=tool,
             image_ref=image_ref,
+            global_cfg=global_cfg,
             global_docker_args=global_cfg.docker_args,
             project_docker_args=tool_cfg.get("docker_args", ""),
             mounts=mounts,

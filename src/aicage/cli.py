@@ -41,7 +41,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print_project_config()
             return 0
         run_config: RunConfig = load_run_config(parsed.tool, parsed)
-        pull_image(run_config.image_ref)
+        pull_image(run_config)
         run_args: DockerRunArgs = build_run_args(config=run_config, parsed=parsed)
 
         run_cmd: list[str] = assemble_docker_run(run_args)

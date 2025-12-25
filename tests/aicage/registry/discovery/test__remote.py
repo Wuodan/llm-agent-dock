@@ -5,7 +5,7 @@ from aicage.registry.discovery import _remote as registry_remote
 
 class RemoteDiscoveryTests(TestCase):
     def test_discover_base_aliases_paginates(self) -> None:
-        def fake_fetch_token(registry_token_url: str, repository: str) -> str:
+        def fake_fetch_token(global_cfg) -> str:
             return "token"
 
         first_page = {"tags": ["codex-ubuntu-latest", "codex-ubuntu-amd64-latest", "other-latest"]}
@@ -41,7 +41,12 @@ class RemoteDiscoveryTests(TestCase):
 
         with mock.patch("aicage.registry.discovery._remote._fetch_json", fake_fetch_json):
             with self.assertRaises(registry_remote.RegistryDiscoveryError):
-                registry_remote._fetch_pull_token("https://example.test/token", "repo")
+                registry_remote._fetch_pull_token(
+                    mock.Mock(
+                        image_registry_api_token_url="https://example.test/token",
+                        image_repository="repo",
+                    )
+                )
 
     def test_parse_next_link(self) -> None:
         header = '<https://example.test/next?page=2>; rel="next", <https://example.test/last>; rel="last"'
