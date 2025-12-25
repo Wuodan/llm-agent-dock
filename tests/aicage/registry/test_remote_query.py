@@ -49,7 +49,7 @@ class RemoteQueryTests(TestCase):
             ),
             mock.patch("aicage.registry._remote_query.urllib.request.urlopen") as urlopen_mock,
         ):
-            digest = _remote_query._get_remote_repo_digest(self._build_run_config("ghcr.io/aicage/aicage:tag"))
+            digest = _remote_query.get_remote_repo_digest(self._build_run_config("ghcr.io/aicage/aicage:tag"))
         self.assertIsNone(digest)
         urlopen_mock.assert_not_called()
 
@@ -61,5 +61,5 @@ class RemoteQueryTests(TestCase):
                 return_value=FakeResponse({"Docker-Content-Digest": "sha256:remote"}),
             ),
         ):
-            digest = _remote_query._get_remote_repo_digest(self._build_run_config("ghcr.io/aicage/aicage:tag"))
+            digest = _remote_query.get_remote_repo_digest(self._build_run_config("ghcr.io/aicage/aicage:tag"))
         self.assertEqual("sha256:remote", digest)

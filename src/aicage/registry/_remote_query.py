@@ -8,7 +8,7 @@ from aicage.config.runtime_config import RunConfig
 from aicage.registry.discovery._remote import RegistryDiscoveryError, _fetch_pull_token
 
 
-def _get_remote_repo_digest(run_config: RunConfig) -> str | None:
+def get_remote_repo_digest(run_config: RunConfig) -> str | None:
     reference = _parse_reference(run_config.image_ref)
     try:
         token = _fetch_pull_token(run_config.global_cfg)

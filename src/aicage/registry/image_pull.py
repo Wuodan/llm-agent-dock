@@ -25,11 +25,11 @@ def pull_image(run_config: RunConfig) -> None:
 
 
 def _decide_pull(run_config: RunConfig) -> _PullDecision:
-    local_digest = _local_query._get_local_repo_digest(run_config)
+    local_digest = _local_query.get_local_repo_digest(run_config)
     if local_digest is None:
         return _PullDecision(should_pull=True)
 
-    remote_digest = _remote_query._get_remote_repo_digest(run_config)
+    remote_digest = _remote_query.get_remote_repo_digest(run_config)
     if remote_digest is None:
         return _PullDecision(should_pull=False)
 

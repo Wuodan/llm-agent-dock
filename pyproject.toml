@@ -36,3 +36,4 @@ select = [
   "PL",            # pylint rules (incl. protected access)
   "SLF",           # flake8-self (private member access)
 ]
+per-file-ignores = { "tests/**" = ["SLF001"] }

@@ -6,7 +6,7 @@ import subprocess
 from aicage.config.runtime_config import RunConfig
 
 
-def _get_local_repo_digest(run_config: RunConfig) -> str | None:
+def get_local_repo_digest(run_config: RunConfig) -> str | None:
     repository = f"{run_config.global_cfg.image_registry}/{run_config.global_cfg.image_repository}"
     inspect = subprocess.run(
         ["docker", "image", "inspect", run_config.image_ref, "--format", "{{json .RepoDigests}}"],

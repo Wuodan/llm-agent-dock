@@ -38,24 +38,24 @@ class LocalQueryTests(TestCase):
             "aicage.registry._local_query.subprocess.run",
             return_value=FakeCompleted(returncode=1, stdout=""),
         ):
-            self.assertIsNone(_local_query._get_local_repo_digest(run_config))
+            self.assertIsNone(_local_query.get_local_repo_digest(run_config))
 
         with mock.patch(
             "aicage.registry._local_query.subprocess.run",
             return_value=FakeCompleted(returncode=0, stdout="not-json"),
         ):
-            self.assertIsNone(_local_query._get_local_repo_digest(run_config))
+            self.assertIsNone(_local_query.get_local_repo_digest(run_config))
 
         with mock.patch(
             "aicage.registry._local_query.subprocess.run",
             return_value=FakeCompleted(returncode=0, stdout='{"bad": "data"}'),
         ):
-            self.assertIsNone(_local_query._get_local_repo_digest(run_config))
+            self.assertIsNone(_local_query.get_local_repo_digest(run_config))
 
         payload = '["ghcr.io/aicage/aicage@sha256:deadbeef", "other@sha256:skip"]'
         with mock.patch(
             "aicage.registry._local_query.subprocess.run",
             return_value=FakeCompleted(returncode=0, stdout=payload),
         ):
-            digest = _local_query._get_local_repo_digest(run_config)
+            digest = _local_query.get_local_repo_digest(run_config)
         self.assertEqual("sha256:deadbeef", digest)
