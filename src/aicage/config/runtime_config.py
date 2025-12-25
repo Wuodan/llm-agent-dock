@@ -49,10 +49,8 @@ def load_run_config(tool: str, parsed: ParsedArgs | None = None) -> RunConfig:
 
         mounts = resolve_mounts(context, tool, parsed)
 
-        docker_args_updated = _persist_docker_args(tool_cfg, parsed)
-
-        if docker_args_updated:
-            store.save_project(project_path, project_cfg)
+        _persist_docker_args(tool_cfg, parsed)
+        store.save_project(project_path, project_cfg)
 
         return RunConfig(
             project_path=project_path,
@@ -63,12 +61,12 @@ def load_run_config(tool: str, parsed: ParsedArgs | None = None) -> RunConfig:
             mounts=mounts,
         )
 
-def _persist_docker_args(tool_cfg: dict[str, object], parsed: ParsedArgs | None) -> bool:
+def _persist_docker_args(tool_cfg: dict[str, object], parsed: ParsedArgs | None) -> None:
     if parsed is None or not parsed.docker_args:
-        return False
+        return
     existing = str(tool_cfg.get("docker_args", ""))
     if existing == parsed.docker_args:
-        return False
+        return
 
     if existing:
         question = (
@@ -80,5 +78,3 @@ def _persist_docker_args(tool_cfg: dict[str, object], parsed: ParsedArgs | None)
 
     if prompt_yes_no(question, default=True):
         tool_cfg["docker_args"] = parsed.docker_args
-        return True
-    return False

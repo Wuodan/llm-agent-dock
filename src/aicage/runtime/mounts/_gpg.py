@@ -20,16 +20,15 @@ def _resolve_gpg_home() -> Path | None:
     return Path(path).expanduser() if path else None
 
 
-def resolve_gpg_mount(project_path: Path, tool_cfg: dict[str, Any]) -> tuple[list[MountSpec], bool]:
-    updated = False
+def resolve_gpg_mount(project_path: Path, tool_cfg: dict[str, Any]) -> list[MountSpec]:
     if not is_commit_signing_enabled(project_path):
-        return [], updated
+        return []
     if resolve_signing_format(project_path) == "ssh":
-        return [], updated
+        return []
 
     gpg_home = _resolve_gpg_home()
     if not gpg_home or not gpg_home.exists():
-        return [], updated
+        return []
 
     mounts_cfg = tool_cfg.get("mounts", {}) or {}
     pref = mounts_cfg.get("gnupg")
@@ -39,8 +38,7 @@ def resolve_gpg_mount(project_path: Path, tool_cfg: dict[str, Any]) -> tuple[lis
         )
         mounts_cfg["gnupg"] = pref
         tool_cfg["mounts"] = mounts_cfg
-        updated = True
 
     if pref:
-        return [MountSpec(host_path=gpg_home, container_path=_GPG_HOME_MOUNT)], updated
-    return [], updated
+        return [MountSpec(host_path=gpg_home, container_path=_GPG_HOME_MOUNT)]
+    return []

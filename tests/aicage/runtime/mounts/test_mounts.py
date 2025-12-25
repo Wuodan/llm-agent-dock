@@ -16,9 +16,8 @@ class MountResolutionTests(TestCase):
                 mock.patch("aicage.runtime.mounts._git_config._resolve_git_config_path", return_value=gitconfig),
                 mock.patch("aicage.runtime.mounts._git_config.prompt_yes_no", return_value=True),
             ):
-                mounts, updated = _git_config.resolve_git_config_mount(tool_cfg)
+                mounts = _git_config.resolve_git_config_mount(tool_cfg)
 
-        self.assertTrue(updated)
         self.assertEqual({"gitconfig": True}, tool_cfg["mounts"])
         self.assertEqual(1, len(mounts))
 
@@ -34,10 +33,9 @@ class MountResolutionTests(TestCase):
                 mock.patch("aicage.runtime.mounts._ssh_keys._default_ssh_dir", return_value=ssh_dir),
                 mock.patch("aicage.runtime.mounts._ssh_keys.prompt_yes_no") as prompt_mock,
             ):
-                mounts, updated = _ssh_keys.resolve_ssh_mount(Path("/repo"), tool_cfg)
+                mounts = _ssh_keys.resolve_ssh_mount(Path("/repo"), tool_cfg)
 
         prompt_mock.assert_not_called()
-        self.assertFalse(updated)
         self.assertEqual(1, len(mounts))
         self.assertEqual(ssh_dir, mounts[0].host_path)
 
@@ -53,9 +51,8 @@ class MountResolutionTests(TestCase):
                 mock.patch("aicage.runtime.mounts._gpg._resolve_gpg_home", return_value=gpg_home),
                 mock.patch("aicage.runtime.mounts._gpg.prompt_yes_no") as prompt_mock,
             ):
-                mounts, updated = _gpg.resolve_gpg_mount(Path("/repo"), tool_cfg)
+                mounts = _gpg.resolve_gpg_mount(Path("/repo"), tool_cfg)
 
         prompt_mock.assert_not_called()
-        self.assertFalse(updated)
         self.assertEqual(1, len(mounts))
         self.assertEqual(gpg_home, mounts[0].host_path)

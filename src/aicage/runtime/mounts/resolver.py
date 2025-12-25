@@ -18,20 +18,17 @@ def resolve_mounts(
 ) -> list[MountSpec]:
     tool_cfg = context.project_cfg.tools.setdefault(tool, {})
 
-    git_mounts, git_updated = resolve_git_config_mount(tool_cfg)
-    ssh_mounts, ssh_updated = resolve_ssh_mount(context.project_path, tool_cfg)
-    gpg_mounts, gpg_updated = resolve_gpg_mount(context.project_path, tool_cfg)
-    entrypoint_mounts, entrypoint_updated = _resolve_entrypoint_mount(
+    git_mounts = resolve_git_config_mount(tool_cfg)
+    ssh_mounts = resolve_ssh_mount(context.project_path, tool_cfg)
+    gpg_mounts = resolve_gpg_mount(context.project_path, tool_cfg)
+    entrypoint_mounts = _resolve_entrypoint_mount(
         tool_cfg,
         parsed.entrypoint if parsed else None,
     )
-    docker_mounts, docker_updated = _resolve_docker_socket_mount(
+    docker_mounts = _resolve_docker_socket_mount(
         tool_cfg,
         parsed.docker_socket if parsed else False,
     )
-
-    if git_updated or ssh_updated or gpg_updated or entrypoint_updated or docker_updated:
-        context.store.save_project(context.project_path, context.project_cfg)
 
     mounts: list[MountSpec] = []
     mounts.extend(git_mounts)

@@ -10,12 +10,11 @@ _DOCKER_SOCKET_PATH = Path("/run/docker.sock")
 def _resolve_docker_socket_mount(
     tool_cfg: dict[str, Any],
     cli_docker_socket: bool,
-) -> tuple[list[MountSpec], bool]:
-    updated = False
+) -> list[MountSpec]:
     mounts_cfg = tool_cfg.get("mounts", {}) or {}
     docker_socket_enabled = cli_docker_socket or bool(mounts_cfg.get("docker"))
     if not docker_socket_enabled:
-        return [], updated
+        return []
 
     mounts = [
         MountSpec(
@@ -28,6 +27,5 @@ def _resolve_docker_socket_mount(
         if prompt_yes_no("Persist mounting the Docker socket for this project?", default=True):
             mounts_cfg["docker"] = True
             tool_cfg["mounts"] = mounts_cfg
-            updated = True
 
-    return mounts, updated
+    return mounts

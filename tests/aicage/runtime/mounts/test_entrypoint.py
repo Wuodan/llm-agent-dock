@@ -35,9 +35,8 @@ class EntrypointMountTests(TestCase):
             mock.patch("aicage.runtime.mounts._entrypoint._validate_entrypoint_path"),
             mock.patch("aicage.runtime.mounts._entrypoint.prompt_yes_no", return_value=True),
         ):
-            mounts, updated = _resolve_entrypoint_mount(tool_cfg, "./entrypoint.sh")
+            mounts = _resolve_entrypoint_mount(tool_cfg, "./entrypoint.sh")
 
-        self.assertTrue(updated)
         self.assertEqual(str(entrypoint_path), tool_cfg["entrypoint"])
         self.assertEqual(1, len(mounts))
         self.assertTrue(mounts[0].read_only)
@@ -50,8 +49,7 @@ class EntrypointMountTests(TestCase):
             mock.patch("aicage.runtime.mounts._entrypoint._validate_entrypoint_path"),
             mock.patch("aicage.runtime.mounts._entrypoint.prompt_yes_no") as prompt_mock,
         ):
-            mounts, updated = _resolve_entrypoint_mount(tool_cfg, None)
+            mounts = _resolve_entrypoint_mount(tool_cfg, None)
 
         prompt_mock.assert_not_called()
-        self.assertFalse(updated)
         self.assertEqual(1, len(mounts))

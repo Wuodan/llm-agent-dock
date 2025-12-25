@@ -25,11 +25,10 @@ def _resolve_git_config_path() -> Path | None:
     return None
 
 
-def resolve_git_config_mount(tool_cfg: dict[str, Any]) -> tuple[list[MountSpec], bool]:
-    updated = False
+def resolve_git_config_mount(tool_cfg: dict[str, Any]) -> list[MountSpec]:
     git_config = _resolve_git_config_path()
     if not git_config or not git_config.exists():
-        return [], updated
+        return []
 
     mounts_cfg = tool_cfg.get("mounts", {}) or {}
     pref = mounts_cfg.get("gitconfig")
@@ -39,8 +38,7 @@ def resolve_git_config_mount(tool_cfg: dict[str, Any]) -> tuple[list[MountSpec],
         )
         mounts_cfg["gitconfig"] = pref
         tool_cfg["mounts"] = mounts_cfg
-        updated = True
 
     if pref:
-        return [MountSpec(host_path=git_config, container_path=_GITCONFIG_MOUNT)], updated
-    return [], updated
+        return [MountSpec(host_path=git_config, container_path=_GITCONFIG_MOUNT)]
+    return []

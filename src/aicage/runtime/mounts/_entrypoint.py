@@ -12,11 +12,10 @@ _ENTRYPOINT_CONTAINER_PATH = Path("/usr/local/bin/entrypoint.sh")
 def _resolve_entrypoint_mount(
     tool_cfg: dict[str, Any],
     cli_entrypoint: str | None,
-) -> tuple[list[MountSpec], bool]:
-    updated = False
+) -> list[MountSpec]:
     entrypoint_value = cli_entrypoint or tool_cfg.get("entrypoint")
     if not entrypoint_value:
-        return [], updated
+        return []
 
     entrypoint_path = _resolve_entrypoint_path(entrypoint_value)
     _validate_entrypoint_path(entrypoint_path)
@@ -31,9 +30,8 @@ def _resolve_entrypoint_mount(
     if cli_entrypoint and tool_cfg.get("entrypoint") is None:
         if prompt_yes_no(f"Persist entrypoint '{entrypoint_path}' for this project?", default=True):
             tool_cfg["entrypoint"] = str(entrypoint_path)
-            updated = True
 
-    return mounts, updated
+    return mounts
 
 
 def _resolve_entrypoint_path(entrypoint: str) -> Path:

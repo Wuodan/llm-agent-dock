@@ -15,16 +15,15 @@ def _default_ssh_dir() -> Path:
     return Path.home() / ".ssh"
 
 
-def resolve_ssh_mount(project_path: Path, tool_cfg: dict[str, Any]) -> tuple[list[MountSpec], bool]:
-    updated = False
+def resolve_ssh_mount(project_path: Path, tool_cfg: dict[str, Any]) -> list[MountSpec]:
     if not is_commit_signing_enabled(project_path):
-        return [], updated
+        return []
     if resolve_signing_format(project_path) != "ssh":
-        return [], updated
+        return []
 
     ssh_dir = _default_ssh_dir()
     if not ssh_dir.exists():
-        return [], updated
+        return []
 
     mounts_cfg = tool_cfg.get("mounts", {}) or {}
     pref = mounts_cfg.get("ssh")
@@ -34,8 +33,7 @@ def resolve_ssh_mount(project_path: Path, tool_cfg: dict[str, Any]) -> tuple[lis
         )
         mounts_cfg["ssh"] = pref
         tool_cfg["mounts"] = mounts_cfg
-        updated = True
 
     if pref:
-        return [MountSpec(host_path=ssh_dir, container_path=_SSH_MOUNT)], updated
-    return [], updated
+        return [MountSpec(host_path=ssh_dir, container_path=_SSH_MOUNT)]
+    return []
