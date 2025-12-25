@@ -20,10 +20,8 @@ class ConfigStoreTests(TestCase):
             global_cfg = store.load_global()
             self.assertEqual("aicage/aicage", global_cfg.image_repository)
             self.assertEqual("ubuntu", global_cfg.default_image_base)
-            self.assertEqual("", global_cfg.docker_args)
             self.assertEqual({}, global_cfg.tools)
 
-            global_cfg.docker_args = "--network=host"
             global_cfg.tools["codex"] = {"base": "ubuntu"}
             store.save_global(global_cfg)
 
@@ -31,7 +29,6 @@ class ConfigStoreTests(TestCase):
             self.assertEqual(global_cfg, reloaded_global)
             updated_global = yaml.safe_load(global_path.read_text())
             self.assertEqual("aicage/aicage", updated_global["image_repository"])
-            self.assertEqual("--network=host", updated_global["docker_args"])
             self.assertEqual({"codex": {"base": "ubuntu"}}, updated_global["tools"])
 
             project_path = base_dir / "project"

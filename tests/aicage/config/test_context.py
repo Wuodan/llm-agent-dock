@@ -18,7 +18,6 @@ class ContextTests(TestCase):
                 image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
                 image_repository="aicage/aicage",
                 default_image_base="ubuntu",
-                docker_args="",
                 tools={},
             ),
         )
@@ -31,7 +30,6 @@ class ContextTests(TestCase):
             image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
             image_repository="aicage/aicage",
             default_image_base="ubuntu",
-            docker_args="",
             tools={},
         )
         project_cfg = ProjectConfig(path="/work/project", tools={})

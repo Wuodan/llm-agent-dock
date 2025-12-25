@@ -16,7 +16,6 @@ class GlobalConfigTests(TestCase):
             "image_registry_api_token_url": "https://ghcr.io/token",
             "image_repository": "aicage/aicage",
             "default_image_base": "ubuntu",
-            "docker_args": "--net=host",
             "tools": {"codex": {"base": "ubuntu"}},
         }
         cfg = GlobalConfig.from_mapping(data)

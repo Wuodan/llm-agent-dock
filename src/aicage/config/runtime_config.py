@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from aicage.cli_types import ParsedArgs
 from aicage.config.config_store import SettingsStore
@@ -21,6 +22,7 @@ from aicage.runtime.extra_mounts import (
     _load_extra_mount_preferences,
     _store_extra_mount_preferences,
 )
+from aicage.runtime.prompts import prompt_yes_no
 from aicage.runtime.run_args import MountSpec
 
 __all__ = ["MountPreferencesSnapshot", "RunConfig", "load_run_config"]
@@ -39,7 +41,6 @@ class RunConfig:
     tool: str
     image_ref: str
     global_cfg: GlobalConfig
-    global_docker_args: str
     project_docker_args: str
     mounts: list[MountSpec]
     mount_preferences: MountPreferencesSnapshot
@@ -64,6 +65,8 @@ def load_run_config(tool: str, parsed: ParsedArgs | None = None) -> RunConfig:
         image_ref = select_tool_image(tool, context)
         tool_cfg = project_cfg.tools.setdefault(tool, {})
 
+        existing_project_docker_args: str = tool_cfg.get("docker_args", "")
+
         prefs = load_mount_preferences(tool_cfg)
         mounts, auth_prefs_updated = build_auth_mounts(project_path, prefs)
 
@@ -73,11 +76,13 @@ def load_run_config(tool: str, parsed: ParsedArgs | None = None) -> RunConfig:
         extra_mounts, extra_prefs_updated = _build_extra_mounts(cli_entrypoint, cli_docker_socket, extra_prefs)
         mounts.extend(extra_mounts)
 
+        docker_args_updated = _persist_docker_args(tool_cfg, parsed)
+
         if auth_prefs_updated:
             store_mount_preferences(tool_cfg, prefs)
         if extra_prefs_updated:
             _store_extra_mount_preferences(tool_cfg, extra_prefs)
-        if auth_prefs_updated or extra_prefs_updated:
+        if auth_prefs_updated or extra_prefs_updated or docker_args_updated:
             store.save_project(project_path, project_cfg)
 
         return RunConfig(
@@ -85,8 +90,7 @@ def load_run_config(tool: str, parsed: ParsedArgs | None = None) -> RunConfig:
             tool=tool,
             image_ref=image_ref,
             global_cfg=global_cfg,
-            global_docker_args=global_cfg.docker_args,
-            project_docker_args=tool_cfg.get("docker_args", ""),
+            project_docker_args=existing_project_docker_args,
             mounts=mounts,
             mount_preferences=_freeze_mount_preferences(prefs),
         )
@@ -98,3 +102,24 @@ def _freeze_mount_preferences(prefs: MountPreferences) -> MountPreferencesSnapsh
         gnupg=prefs.gnupg,
         ssh=prefs.ssh,
     )
+
+
+def _persist_docker_args(tool_cfg: dict[str, Any], parsed: ParsedArgs | None) -> bool:
+    if parsed is None or not parsed.docker_args:
+        return False
+    existing = tool_cfg.get("docker_args", "")
+    if existing == parsed.docker_args:
+        return False
+
+    if existing:
+        question = (
+            f"Persist docker run args '{parsed.docker_args}' for this project "
+            f"(replacing '{existing}')?"
+        )
+    else:
+        question = f"Persist docker run args '{parsed.docker_args}' for this project?"
+
+    if prompt_yes_no(question, default=True):
+        tool_cfg["docker_args"] = parsed.docker_args
+        return True
+    return False

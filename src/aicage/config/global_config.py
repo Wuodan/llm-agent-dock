@@ -13,7 +13,6 @@ class GlobalConfig:
     image_registry_api_token_url: str
     image_repository: str
     default_image_base: str
-    docker_args: str = ""
     tools: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     @classmethod
@@ -34,7 +33,6 @@ class GlobalConfig:
             image_registry_api_token_url=data["image_registry_api_token_url"],
             image_repository=data["image_repository"],
             default_image_base=data["default_image_base"],
-            docker_args=data.get("docker_args", ""),
             tools=data.get("tools", {}) or {},
         )
 
@@ -45,6 +43,5 @@ class GlobalConfig:
             "image_registry_api_token_url": self.image_registry_api_token_url,
             "image_repository": self.image_repository,
             "default_image_base": self.default_image_base,
-            "docker_args": self.docker_args,
             "tools": self.tools,
         }

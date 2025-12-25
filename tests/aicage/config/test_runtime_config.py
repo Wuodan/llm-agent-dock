@@ -15,9 +15,6 @@ class RuntimeConfigTests(TestCase):
             project_path.mkdir()
 
             store = SettingsStore(base_dir=base_dir)
-            global_cfg = store.load_global()
-            global_cfg.docker_args = "--global"
-            store.save_global(global_cfg)
 
             project_cfg = store.load_project(project_path)
             project_cfg.tools["codex"] = {"base": "ubuntu", "docker_args": "--project", "mounts": {"gitconfig": True}}
@@ -36,7 +33,6 @@ class RuntimeConfigTests(TestCase):
                 run_config = load_run_config("codex")
 
         self.assertIsInstance(run_config, RunConfig)
-        self.assertEqual("--global", run_config.global_docker_args)
         self.assertEqual("--project", run_config.project_docker_args)
         self.assertTrue(run_config.mount_preferences.gitconfig)
         self.assertEqual(mounts, run_config.mounts)

@@ -35,7 +35,6 @@ class RemoteQueryTests(TestCase):
                 image_repository="aicage/aicage",
                 default_image_base="ubuntu",
             ),
-            global_docker_args="",
             project_docker_args="",
             mounts=[],
             mount_preferences=mock.Mock(),

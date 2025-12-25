@@ -34,7 +34,6 @@ def _build_run_config(project_path: Path, image_ref: str) -> RunConfig:
             image_repository="aicage/aicage",
             default_image_base="ubuntu",
         ),
-        global_docker_args="--global",
         project_docker_args="--project",
         mounts=[],
         mount_preferences=mock.Mock(),
@@ -111,7 +110,7 @@ class MainFlowTests(TestCase):
             run_args = _build_run_args(
                 project_path,
                 "ghcr.io/aicage/aicage:codex-debian-latest",
-                "--global --project --cli",
+                "--project --cli",
                 ["--flag"],
             )
             with (
@@ -144,7 +143,7 @@ class MainFlowTests(TestCase):
             run_args = _build_run_args(
                 project_path,
                 "ghcr.io/aicage/aicage:codex-alpine-latest",
-                "--global --project --cli",
+                "--project --cli",
                 ["--flag"],
             )
             with (
