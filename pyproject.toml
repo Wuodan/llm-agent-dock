@@ -34,4 +34,5 @@ select = [
   "UP",            # pyupgrade
   "B",             # bugbear
   "PL",            # pylint rules (incl. protected access)
+  "SLF",           # flake8-self (private member access)
 ]
