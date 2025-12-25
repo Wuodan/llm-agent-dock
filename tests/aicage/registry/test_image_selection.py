@@ -17,7 +17,6 @@ class ImageSelectionTests(TestCase):
             store = mock.Mock()
             context = ConfigContext(
                 store=store,
-                project_path=project_path,
                 project_cfg=ProjectConfig(path=str(project_path), tools={}),
                 global_cfg=GlobalConfig(
                     image_registry="ghcr.io",
@@ -42,7 +41,6 @@ class ImageSelectionTests(TestCase):
             store = mock.Mock()
             context = ConfigContext(
                 store=store,
-                project_path=project_path,
                 project_cfg=ProjectConfig(path=str(project_path), tools={}),
                 global_cfg=GlobalConfig(
                     image_registry="ghcr.io",
@@ -66,7 +64,6 @@ class ImageSelectionTests(TestCase):
     def test_resolve_raises_without_bases(self) -> None:
         context = ConfigContext(
             store=mock.Mock(),
-            project_path=Path("/tmp/project"),
             project_cfg=ProjectConfig(path="/tmp/project", tools={}),
             global_cfg=GlobalConfig(
                 image_registry="ghcr.io",

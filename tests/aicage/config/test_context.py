@@ -10,7 +10,6 @@ class ContextTests(TestCase):
     def test_image_repository_ref(self) -> None:
         context = ConfigContext(
             store=mock.Mock(),
-            project_path=Path("/work/project"),
             project_cfg=ProjectConfig(path="/work/project", tools={}),
             global_cfg=GlobalConfig(
                 image_registry="ghcr.io",
@@ -43,6 +42,5 @@ class ContextTests(TestCase):
 
             context = build_config_context()
 
-        self.assertEqual(Path("/work/project"), context.project_path)
         self.assertEqual(global_cfg, context.global_cfg)
         self.assertEqual(project_cfg, context.project_cfg)

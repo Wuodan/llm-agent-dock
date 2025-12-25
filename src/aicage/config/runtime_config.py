@@ -39,7 +39,6 @@ def load_run_config(tool: str, parsed: ParsedArgs | None = None) -> RunConfig:
         project_cfg = store.load_project(project_path)
         context = ConfigContext(
             store=store,
-            project_path=project_path,
             project_cfg=project_cfg,
             global_cfg=global_cfg,
         )

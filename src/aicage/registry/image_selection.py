@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from aicage.config.context import ConfigContext
 from aicage.config.project_config import ToolConfig
 from aicage.errors import CliError
@@ -27,7 +29,7 @@ def select_tool_image(tool: str, context: ConfigContext) -> str:
         )
         base = prompt_for_base(request)
         tool_cfg.base = base
-        context.store.save_project(context.project_path, context.project_cfg)
+        context.store.save_project(Path(context.project_cfg.path), context.project_cfg)
 
     image_tag = f"{tool}-{base}-latest"
     image_ref = f"{repository_ref}:{image_tag}"

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from aicage.cli_types import ParsedArgs
 from aicage.config.context import ConfigContext
 from aicage.runtime.run_args import MountSpec
@@ -19,8 +21,9 @@ def resolve_mounts(
     tool_cfg = context.project_cfg.tools.setdefault(tool, {})
 
     git_mounts = resolve_git_config_mount(tool_cfg)
-    ssh_mounts = resolve_ssh_mount(context.project_path, tool_cfg)
-    gpg_mounts = resolve_gpg_mount(context.project_path, tool_cfg)
+    project_path = Path(context.project_cfg.path)
+    ssh_mounts = resolve_ssh_mount(project_path, tool_cfg)
+    gpg_mounts = resolve_gpg_mount(project_path, tool_cfg)
     entrypoint_mounts = _resolve_entrypoint_mount(
         tool_cfg,
         parsed.entrypoint if parsed else None,
