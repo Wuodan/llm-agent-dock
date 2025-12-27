@@ -23,8 +23,8 @@ def select_tool_image(tool: str, context: ConfigContext) -> str:
 
         request = BaseSelectionRequest(
             tool=tool,
-            default_base=context.global_cfg.default_image_base,
-            available=available_bases,
+            context=context,
+            tool_metadata=tool_metadata,
         )
         base = prompt_for_base(request)
         tool_cfg.base = base
@@ -67,3 +67,4 @@ def _validate_base(
         raise CliError(f"Base '{base}' is not valid for tool '{tool}'.")
     if base not in images_metadata.bases:
         raise CliError(f"Base '{base}' is missing from images metadata.")
+

@@ -1,16 +1,17 @@
 import sys
 from dataclasses import dataclass
 
+from aicage.config.context import ConfigContext
 from aicage.errors import CliError
+from aicage.registry.images_metadata.models import ToolMetadata
 
 __all__ = ["BaseSelectionRequest", "ensure_tty_for_prompt", "prompt_yes_no", "prompt_for_base"]
 
-
-@dataclass
+@dataclass(frozen=True)
 class BaseSelectionRequest:
     tool: str
-    default_base: str
-    available: list[str]
+    context: ConfigContext
+    tool_metadata: ToolMetadata
 
 
 def ensure_tty_for_prompt() -> None:
@@ -30,28 +31,49 @@ def prompt_yes_no(question: str, default: bool = False) -> bool:
 def prompt_for_base(request: BaseSelectionRequest) -> str:
     ensure_tty_for_prompt()
     title = f"Select base image for '{request.tool}' (runtime to use inside the container):"
+    bases = _base_options(request.context, request.tool_metadata)
 
-    if request.available:
+    if bases:
         print(title)
-        for idx, base in enumerate(request.available, start=1):
-            suffix = " (default)" if base == request.default_base else ""
-            print(f"  {idx}) {base}{suffix}")
-        prompt = f"Enter number or name [{request.default_base}]: "
+        for idx, option in enumerate(bases, start=1):
+            suffix = " (default)" if option.base == request.context.global_cfg.default_image_base else ""
+            print(f"  {idx}) {option.base}: {option.description}{suffix}")
+        prompt = f"Enter number or name [{request.context.global_cfg.default_image_base}]: "
     else:
-        prompt = f"{title} [{request.default_base}]: "
+        prompt = f"{title} [{request.context.global_cfg.default_image_base}]: "
 
     response = input(prompt).strip()
     if not response:
-        choice = request.default_base
-    elif response.isdigit() and request.available:
+        choice = request.context.global_cfg.default_image_base
+    elif response.isdigit() and bases:
         idx = int(response)
-        if idx < 1 or idx > len(request.available):
-            raise CliError(f"Invalid choice '{response}'. Pick a number between 1 and {len(request.available)}.")
-        choice = request.available[idx - 1]
+        if idx < 1 or idx > len(bases):
+            raise CliError(f"Invalid choice '{response}'. Pick a number between 1 and {len(bases)}.")
+        choice = bases[idx - 1].base
     else:
         choice = response
 
-    if request.available and choice not in request.available:
-        options = ", ".join(request.available)
+    if bases and choice not in _available_bases(bases):
+        options = ", ".join(_available_bases(bases))
         raise CliError(f"Invalid base '{choice}'. Valid options: {options}")
     return choice
+
+
+@dataclass(frozen=True)
+class _BaseOption:
+    base: str
+    description: str
+
+
+def _base_options(context: ConfigContext, tool_metadata: ToolMetadata) -> list[_BaseOption]:
+    return [
+        _BaseOption(
+            base=base,
+            description=context.images_metadata.bases[base].base_image_description,
+        )
+        for base in sorted(set(tool_metadata.valid_bases))
+    ]
+
+
+def _available_bases(options: list[_BaseOption]) -> list[str]:
+    return [option.base for option in options]
