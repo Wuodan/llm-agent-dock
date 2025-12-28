@@ -17,6 +17,12 @@ aicage = "aicage.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/aicage"]
+shared-data = { "config/config.yaml" = "config/config.yaml", "config/images-metadata.yaml" = "config/images-metadata.yaml" }
+
+[tool.hatch.build]
+include = ["config/config.yaml", "config/images-metadata.yaml"]
+
+[tool.hatch.build.targets.sdist]
 include = ["config/config.yaml", "config/images-metadata.yaml"]
 
 [tool.hatch.version]
