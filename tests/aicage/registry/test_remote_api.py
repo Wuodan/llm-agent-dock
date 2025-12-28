@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 
-from aicage.registry import remote_api
+from aicage.registry import _remote_api
 
 
 class RemoteApiTests(TestCase):
@@ -8,9 +8,9 @@ class RemoteApiTests(TestCase):
         def fake_fetch_json(url: str, headers: dict[str, str] | None):
             return {}, {}
 
-        with mock.patch("aicage.registry.remote_api.fetch_json", fake_fetch_json):
-            with self.assertRaises(remote_api.RegistryDiscoveryError):
-                remote_api.fetch_pull_token(
+        with mock.patch("aicage.registry._remote_api._fetch_json", fake_fetch_json):
+            with self.assertRaises(_remote_api.RegistryDiscoveryError):
+                _remote_api.fetch_pull_token(
                     mock.Mock(
                         image_registry_api_token_url="https://example.test/token",
                         image_repository="repo",

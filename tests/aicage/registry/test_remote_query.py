@@ -4,8 +4,8 @@ from unittest import TestCase, mock
 from aicage.config.global_config import GlobalConfig
 from aicage.config.runtime_config import RunConfig
 from aicage.registry import _remote_query
+from aicage.registry._remote_api import RegistryDiscoveryError
 from aicage.registry.images_metadata.models import ImagesMetadata
-from aicage.registry.remote_api import RegistryDiscoveryError
 
 
 class FakeResponse:

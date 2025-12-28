@@ -15,7 +15,7 @@ class RegistryDiscoveryError(Exception):
 
 def fetch_pull_token(global_cfg: GlobalConfig) -> str:
     url = f"{global_cfg.image_registry_api_token_url}:{global_cfg.image_repository}:pull"
-    data, _ = fetch_json(url, None)
+    data, _ = _fetch_json(url, None)
     token = data.get("token")
     if not token:
         raise RegistryDiscoveryError(
@@ -24,7 +24,7 @@ def fetch_pull_token(global_cfg: GlobalConfig) -> str:
     return token
 
 
-def fetch_json(url: str, headers: dict[str, str] | None) -> tuple[dict[str, Any], Mapping[str, str]]:
+def _fetch_json(url: str, headers: dict[str, str] | None) -> tuple[dict[str, Any], Mapping[str, str]]:
     request = urllib.request.Request(url, headers=headers or {})
     try:
         with urllib.request.urlopen(request) as response:

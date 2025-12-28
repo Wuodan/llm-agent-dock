@@ -5,7 +5,7 @@ import urllib.request
 from collections.abc import Mapping
 
 from aicage.config.runtime_config import RunConfig
-from aicage.registry.remote_api import RegistryDiscoveryError, fetch_pull_token
+from aicage.registry._remote_api import RegistryDiscoveryError, fetch_pull_token
 
 
 def get_remote_repo_digest(run_config: RunConfig) -> str | None:
