@@ -44,7 +44,7 @@ Cons:
 Current direction:
 
 - One git repo containing both images (KISS).
-- Suggested repo name: `aicage-images-local` (alternatives: `aicage-images-builder`, `aicage-builder`).
+- Repo name: `aicage/aicage-image-util`.
 
 Other options:
 
