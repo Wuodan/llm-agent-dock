@@ -23,7 +23,14 @@ shared-data = { "config/config.yaml" = "config/config.yaml", "config/images-meta
 include = ["config/config.yaml", "config/images-metadata.yaml"]
 
 [tool.hatch.build.targets.sdist]
-include = ["config/config.yaml", "config/images-metadata.yaml"]
+include = [
+  "src/aicage/**",
+  "config/config.yaml",
+  "config/images-metadata.yaml",
+  "LICENSE",
+  "README.md",
+  "pyproject.toml",
+]
 
 [tool.hatch.version]
 source = "vcs"
