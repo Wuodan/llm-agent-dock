@@ -108,6 +108,24 @@ should be possible with good planning.
 This new way of adding agents and building them locally is `aicage` internal. The documentation must be for `aicage`
 developers and not for users.
 
+### Custom local agents
+
+Users shall be able to define their own local agents in `~/.aicage/custom/agent/<AGENT>/`.
+This is intended for private or experimental agents that are not part of `aicage-image`.
+
+Structure should match `agents/<AGENT>/` from `aicage-image` as closely as possible:
+
+- `agent.yml` with agent metadata and configuration.
+- `install.sh` for agent installation during image build.
+- `version.sh` to determine the agent version for update checks.
+- Optional additional files referenced by `install.sh`.
+
+Behavior:
+
+- Those agents are treated like non-redistributable agents regarding version checks, image update checks, and
+  local building.
+- They are visible to users in the same way as other agents, but only on the local machine.
+
 ### Extensions for final-images
 
 Some users will definitely want to add packages to final images.
