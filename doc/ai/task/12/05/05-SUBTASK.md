@@ -1,42 +1,42 @@
-# Subtask 05: Custom local agents
+# Subtask 05: Local build pipeline for non-redistributable agents
 
 ## Goal
 
-Allow users to define local agents under ~/.aicage/custom/agent/ and integrate them into discovery,
-selection, version checks, and local builds.
+Add local image build and update logic for non-redistributable agents, including metadata tracking
+and logging.
 
 ## Rationale
 
-Custom agents should reuse the same local build pipeline as non-redistributable agents with minimal
-delta, so this work is best built on the core pipeline.
+This is the core feature that enables non-redistributable agents to run on user machines without
+shipping images.
 
 ## Dependencies
 
 - Architecture decisions from Subtask 01.
-- Runtime discovery/version checks from Subtask 03.
-- Local build pipeline from Subtask 04.
+- Runtime discovery/version checks from Subtask 04.
 - Task 12 overview: doc/ai/task/12/12-TASK.md
 - Agent workflow rules: AGENTS.md
 
 ## Scope
 
-- Discover custom agents from ~/.aicage/custom/agent/.
-- Validate their agent.yml with existing schema.
-- Include them in selection lists and local build logic.
+- Decide when to build or rebuild local agent-base images.
+- Implement local image naming and tagging rules.
+- Store build metadata and logs under ~/.aicage/.
+- Integrate build behavior into the existing aicage run flow.
 
 ## Out of scope
 
-- Extensions and custom base images.
-- End-user documentation for extensions.
+- Extension images and custom base images.
+- User-facing extension documentation.
 
 ## Expected outputs
 
-- Local custom agents behave like non-redistributable agents at runtime.
-- Tests cover discovery and build behavior for custom agents.
+- Local builds for non-redistributable agents work end-to-end.
+- Clear, testable build/update decision logic.
 
 ## Sequencing
 
-Run after Subtask 04.
+Run after Subtask 04. Forms the baseline for local custom agents and extensions.
 
 ## Notes
 

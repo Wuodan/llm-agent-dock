@@ -21,7 +21,7 @@ metadata. Getting these aligned first avoids rework and conflicting assumptions.
 
 - Decide how non-redistributable agents are represented in agent metadata (flag or folder structure).
 - Decide how local custom agents and custom base images are discovered and how their metadata is validated.
-- Define the local metadata layout under ~/.aicage/ for build state, versions, and selection.
+- Define whether any local metadata is stored under ~/.aicage/ for build state and versions.
 - Decide on aicage-builder image strategy (split images vs single image, fallback rules).
 - Identify any schema changes required for agent.yml and the new extension.yml.
 
@@ -33,6 +33,9 @@ metadata. Getting these aligned first avoids rework and conflicting assumptions.
 ## Expected outputs
 
 - Approved architecture decisions documented in this subtask folder.
+- Non-redistributable agents represented via a required agent.yml flag.
+- No local state files for build/update decisions; deterministic tags and real image inspection only.
+- No logs or cache under ~/.aicage/; build logs go to /tmp.
 - Clear constraints and assumptions for all later subtasks.
 
 ## Sequencing

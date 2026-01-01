@@ -1,39 +1,40 @@
-# Subtask 07: Custom local base images
+# Subtask 07: Extensions for final images
 
 ## Goal
 
-Allow users to define custom base images under ~/.aicage/custom/image-base/ and integrate them into
-selection and local build/update logic.
+Implement extension discovery, selection, and build/update logic for extended final images, and add
+end-user documentation for extension authoring.
 
 ## Rationale
 
-Custom bases add complexity across selection and updates. They should be layered after the local
-build pipeline and extensions are stable.
+Extensions add a new selection and build layer that should not destabilize the base local build and
+update logic. Deferring them ensures the extension flow can reuse stable local build primitives and
+keeps earlier subtasks focused.
 
 ## Dependencies
 
 - Architecture decisions from Subtask 01.
-- Runtime discovery/version checks from Subtask 03.
-- Local build pipeline from Subtask 04.
-- Extensions flow from Subtask 06.
+- Runtime discovery/version checks from Subtask 04.
+- Local build pipeline from Subtask 05.
 - Task 12 overview: doc/ai/task/12/12-TASK.md
 - Agent workflow rules: AGENTS.md
 
 ## Scope
 
-- Discover custom base definitions and validate base.yml.
-- Build local base images with the defined naming rules.
-- Update checks based on root_image and agent version.
-- Integrate custom bases into selection flow with extensions.
+- Discover extensions under ~/.aicage/custom/extension/.
+- Implement extension selection and extended image naming rules.
+- Build/update extended images based on upstream final image updates.
+- Add end-user documentation for extension.yml, Dockerfile, and scripts.
 
 ## Out of scope
 
+- Custom base images.
 - CI strategy for non-redistributable agents.
 
 ## Expected outputs
 
-- Custom base images build and update locally.
-- Selection flow includes custom bases without breaking existing behavior.
+- Extended images build and update correctly with clear logging.
+- Documentation provides a complete, usable extension authoring guide.
 
 ## Sequencing
 

@@ -1,40 +1,43 @@
-# Subtask 08: CI and test strategy for non-redistributable agents
+# Subtask 08: Custom local base images
 
 ## Goal
 
-Define and implement CI/test strategy for non-redistributable agents without publishing images.
+Allow users to define custom base images under ~/.aicage/custom/image-base/ and integrate them into
+selection and local build/update logic.
 
 ## Rationale
 
-The current CI rebuild detection relies on published images. A replacement mechanism is required to
-validate non-redistributable agent/base combinations.
+Custom bases add complexity across selection and updates. They should be layered after the local
+build pipeline and extensions are stable.
 
 ## Dependencies
 
 - Architecture decisions from Subtask 01.
-- Metadata packaging from Subtask 02.
+- Runtime discovery/version checks from Subtask 04.
+- Local build pipeline from Subtask 05.
+- Extensions flow from Subtask 07.
 - Task 12 overview: doc/ai/task/12/12-TASK.md
 - Agent workflow rules: AGENTS.md
 
 ## Scope
 
-- Define rebuild detection using persisted metadata or checksums.
-- Add CI steps to test agent-base combinations without pushing images.
-- Document the CI mechanism for developers in DEVELOPMENT.md if needed.
+- Discover custom base definitions and validate base.yml.
+- Build local base images with the defined naming rules.
+- Update checks based on root_image and agent version.
+- Integrate custom bases into selection flow with extensions.
 
 ## Out of scope
 
-- Runtime build/update logic in the CLI.
-- End-user documentation.
+- CI strategy for non-redistributable agents.
 
 ## Expected outputs
 
-- CI validation for non-redistributable agents without image publishing.
-- Clear, documented rebuild trigger rules.
+- Custom base images build and update locally.
+- Selection flow includes custom bases without breaking existing behavior.
 
 ## Sequencing
 
-Run alongside Subtasks 02 to 04, but complete before merging local build logic.
+Run after Subtask 07.
 
 ## Notes
 

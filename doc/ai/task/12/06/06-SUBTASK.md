@@ -1,40 +1,38 @@
-# Subtask 06: Extensions for final images
+# Subtask 06: Custom local agents
 
 ## Goal
 
-Implement extension discovery, selection, and build/update logic for extended final images, and add
-end-user documentation for extension authoring.
+Allow users to define local agents under ~/.aicage/custom/agent/ and integrate them into discovery,
+selection, version checks, and local builds.
 
 ## Rationale
 
-Extensions add a new selection and build layer that should not destabilize the base local build and
-update logic. Deferring them ensures the extension flow can reuse stable local build primitives and
-keeps earlier subtasks focused.
+Custom agents should reuse the same local build pipeline as non-redistributable agents with minimal
+delta, so this work is best built on the core pipeline.
 
 ## Dependencies
 
 - Architecture decisions from Subtask 01.
-- Runtime discovery/version checks from Subtask 03.
-- Local build pipeline from Subtask 04.
+- Runtime discovery/version checks from Subtask 04.
+- Local build pipeline from Subtask 05.
 - Task 12 overview: doc/ai/task/12/12-TASK.md
 - Agent workflow rules: AGENTS.md
 
 ## Scope
 
-- Discover extensions under ~/.aicage/custom/extension/.
-- Implement extension selection and extended image naming rules.
-- Build/update extended images based on upstream final image updates.
-- Add end-user documentation for extension.yml, Dockerfile, and scripts.
+- Discover custom agents from ~/.aicage/custom/agent/.
+- Validate their agent.yml with existing schema.
+- Include them in selection lists and local build logic.
 
 ## Out of scope
 
-- Custom base images.
-- CI strategy for non-redistributable agents.
+- Extensions and custom base images.
+- End-user documentation for extensions.
 
 ## Expected outputs
 
-- Extended images build and update correctly with clear logging.
-- Documentation provides a complete, usable extension authoring guide.
+- Local custom agents behave like non-redistributable agents at runtime.
+- Tests cover discovery and build behavior for custom agents.
 
 ## Sequencing
 

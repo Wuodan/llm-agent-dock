@@ -13,7 +13,7 @@ The goal is to make local builds reproducible and independent of host tooling.
 
 ### Split images
 
-Two images: one for building, one for version checks. This is the current preferred direction.
+Two images: one for building, one for version checks. This is the decided direction.
 
 Pros:
 
@@ -27,7 +27,7 @@ Cons:
 
 ### No builder image
 
-Rely on host tooling for `docker build` and agent version checks.
+Rely on host tooling for `docker build` and agent version checks. Not chosen.
 
 Pros:
 
@@ -57,7 +57,7 @@ Other options:
 
 - Base image: `ubuntu:latest`.
 - Single current image (no per-distro variants).
-- Preferred runtime order:
+- Runtime order is fixed:
   - Try version check inside the image first.
   - If that fails, fall back to running the same command on the host.
 

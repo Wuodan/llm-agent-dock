@@ -1,14 +1,13 @@
-# Subtask 03: Runtime discovery and version checks
+# Subtask 03: CI and test strategy for non-redistributable agents
 
 ## Goal
 
-Implement unified agent discovery and version checking for normal agents, non-redistributable agents,
-and local custom agents.
+Define and implement CI/test strategy for non-redistributable agents without publishing images.
 
 ## Rationale
 
-Local builds and update checks require a consistent view of all agent types and a predictable version
-check flow. This subtask provides the core runtime capability.
+The current CI rebuild detection relies on published images. A replacement mechanism is required to
+validate non-redistributable agent/base combinations.
 
 ## Dependencies
 
@@ -19,24 +18,23 @@ check flow. This subtask provides the core runtime capability.
 
 ## Scope
 
-- Discover agents from release metadata and ~/.aicage/custom/agent/.
-- Add version check flow using aicage-builder first, with host fallback.
-- Define and persist version check results in local metadata storage.
+- Define rebuild detection using persisted metadata or checksums.
+- Add CI steps to test agent-base combinations without pushing images.
+- Document the CI mechanism for developers in DEVELOPMENT.md if needed.
 
 ## Out of scope
 
-- Building or updating local images.
-- Extensions and custom base images.
+- Runtime build/update logic in the CLI.
+- End-user documentation.
 
 ## Expected outputs
 
-- Runtime discovery list includes all agent sources.
-- Version checks use defined fallback and error behavior.
-- Tests cover new discovery and version logic.
+- CI validation for non-redistributable agents without image publishing.
+- Clear, documented rebuild trigger rules.
 
 ## Sequencing
 
-Run after Subtask 02. Required before local build logic.
+Run after Subtask 02. Complete before Subtask 05.
 
 ## Notes
 

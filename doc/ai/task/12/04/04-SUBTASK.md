@@ -1,42 +1,42 @@
-# Subtask 04: Local build pipeline for non-redistributable agents
+# Subtask 04: Runtime discovery and version checks
 
 ## Goal
 
-Add local image build and update logic for non-redistributable agents, including metadata tracking
-and logging.
+Implement unified agent discovery and version checking for normal agents, non-redistributable agents,
+and local custom agents.
 
 ## Rationale
 
-This is the core feature that enables non-redistributable agents to run on user machines without
-shipping images.
+Local builds and update checks require a consistent view of all agent types and a predictable version
+check flow. This subtask provides the core runtime capability.
 
 ## Dependencies
 
 - Architecture decisions from Subtask 01.
-- Runtime discovery/version checks from Subtask 03.
+- Metadata packaging from Subtask 02.
 - Task 12 overview: doc/ai/task/12/12-TASK.md
 - Agent workflow rules: AGENTS.md
 
 ## Scope
 
-- Decide when to build or rebuild local agent-base images.
-- Implement local image naming and tagging rules.
-- Store build metadata and logs under ~/.aicage/.
-- Integrate build behavior into the existing aicage run flow.
+- Discover agents from release metadata and ~/.aicage/custom/agent/.
+- Add version check flow using aicage-builder first, with host fallback.
+- Define and persist version check results in local metadata storage.
 
 ## Out of scope
 
-- Extension images and custom base images.
-- User-facing extension documentation.
+- Building or updating local images.
+- Extensions and custom base images.
 
 ## Expected outputs
 
-- Local builds for non-redistributable agents work end-to-end.
-- Clear, testable build/update decision logic.
+- Runtime discovery list includes all agent sources.
+- Version checks use defined fallback and error behavior.
+- Tests cover new discovery and version logic.
 
 ## Sequencing
 
-Run after Subtask 03. Forms the baseline for local custom agents and extensions.
+Run after Subtask 02. Prefer after Subtask 03 to keep NR-agent testing aligned.
 
 ## Notes
 
