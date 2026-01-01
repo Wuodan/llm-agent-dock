@@ -28,7 +28,7 @@ build pipeline and extensions are stable.
 
 ## Out of scope
 
-- CI strategy for non-redistributable agents.
+- New feature requests outside Task 12.
 
 ## Expected outputs
 
