@@ -274,10 +274,11 @@ So this shall be split into several subtasks from early on with these steps and 
   subtasks.
 - Each subtask results in well-structured code following existing coding and testing guidelines. All tests must succeed,
   test coverage must be good and I want to review and fine-tune the changes for each subtask.
-- At the end of a subtask, a subtask summary document must be created in the subtask folder. This must be part of the
-  focus for following subtasks (subtask document shall contain instructions to read these from other subtasks).
-  Lessons learned is always nice to have in such a document, especially when you encounter a tense discussion or
-  misunderstandings between me and you.
+- At the end of a subtask, a subtask summary document must be created in the subtask folder. Use the template in
+  doc/ai/task/12/SUBTASK-SUMMARY-TEMPLATE.md and adapt as needed. This must be part of the focus for following
+  subtasks (subtask document shall contain instructions to read these from other subtasks). Lessons learned is
+  always nice to have in such a document, especially when you encounter a tense discussion or misunderstandings
+  between me and you.
 
 ## Task/SubTask Workflow
 
