@@ -61,6 +61,7 @@ class RemoteQueryTests(TestCase):
                         "agent_path": "~/.codex",
                         "agent_full_name": "Codex CLI",
                         "agent_homepage": "https://example.com",
+                        "redistributable": True,
                         "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     }
                 },

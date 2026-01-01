@@ -27,6 +27,7 @@ class AgentMetadata:
     agent_path: str
     agent_full_name: str
     agent_homepage: str
+    redistributable: bool
     valid_bases: dict[str, str]
     base_exclude: list[str] | None = None
     base_distro_exclude: list[str] | None = None
@@ -118,7 +119,13 @@ def _parse_agents(value: Any) -> dict[str, AgentMetadata]:
         agent_mapping = _expect_mapping(agent_value, f"agent.{name}")
         _expect_keys(
             agent_mapping,
-            required={"agent_path", "agent_full_name", "agent_homepage", "valid_bases"},
+            required={
+                "agent_path",
+                "agent_full_name",
+                "agent_homepage",
+                "redistributable",
+                "valid_bases",
+            },
             optional={"base_exclude", "base_distro_exclude"},
             context=f"agent.{name}",
         )
@@ -129,6 +136,9 @@ def _parse_agents(value: Any) -> dict[str, AgentMetadata]:
             ),
             agent_homepage=_expect_string(
                 agent_mapping.get("agent_homepage"), f"agent.{name}.agent_homepage"
+            ),
+            redistributable=_expect_bool(
+                agent_mapping.get("redistributable"), f"agent.{name}.redistributable"
             ),
             valid_bases=_expect_str_mapping(
                 agent_mapping.get("valid_bases"), f"agent.{name}.valid_bases"
@@ -152,6 +162,12 @@ def _expect_mapping(value: Any, context: str) -> dict[str, Any]:
 def _expect_string(value: Any, context: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise CliError(f"{context} must be a non-empty string.")
+    return value
+
+
+def _expect_bool(value: Any, context: str) -> bool:
+    if not isinstance(value, bool):
+        raise CliError(f"{context} must be a boolean.")
     return value
 
 

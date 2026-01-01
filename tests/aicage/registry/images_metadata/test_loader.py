@@ -50,6 +50,7 @@ agent:
     agent_path: ~/.codex
     agent_full_name: Codex CLI
     agent_homepage: https://example.com
+    redistributable: true
     valid_bases:
       ubuntu: ghcr.io/aicage/aicage:codex-ubuntu
 """

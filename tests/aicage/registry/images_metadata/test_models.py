@@ -23,6 +23,7 @@ agent:
     agent_path: ~/.codex
     agent_full_name: Codex CLI
     agent_homepage: https://example.com
+    redistributable: true
     valid_bases:
       ubuntu: ghcr.io/aicage/aicage:codex-ubuntu
         """
@@ -57,6 +58,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
+                    "redistributable": True,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     "extra": "nope",
                 }
@@ -68,3 +70,20 @@ agent:
     def test_from_mapping_rejects_missing_required_keys(self) -> None:
         with self.assertRaises(CliError):
             ImagesMetadata.from_mapping({})
+
+    def test_from_mapping_rejects_missing_agent_required_keys(self) -> None:
+        data = {
+            "aicage-image": {"version": "0.3.3"},
+            "aicage-image-base": {"version": "0.3.3"},
+            "bases": {},
+            "agent": {
+                "codex": {
+                    "agent_path": "~/.codex",
+                    "agent_full_name": "Codex CLI",
+                    "agent_homepage": "https://example.com",
+                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                }
+            },
+        }
+        with self.assertRaises(CliError):
+            ImagesMetadata.from_mapping(data)
