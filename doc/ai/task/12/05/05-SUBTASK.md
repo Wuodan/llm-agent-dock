@@ -32,7 +32,7 @@ shipping images.
 ## Expected outputs
 
 - Local builds for non-redistributable agents work end-to-end.
-- Clear, testable build/update decision logic.
+- Build/update decision logic is covered by CI pipelines that build and test images.
 
 ## Sequencing
 
