@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.12] - 2026-01-02
+
+### Fixed
+
+- Agent version checks now run with `/bin/bash` on host and in the util image.
+- Entrypoint mount tests now reflect the bash-based entrypoint script.
+
 ## [0.5.11] - 2026-01-02
 
 ### Fixed
