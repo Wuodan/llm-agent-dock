@@ -40,7 +40,7 @@ class EnsureLocalImageTests(TestCase):
                     str(log_dir),
                 ),
                 mock.patch(
-                    "aicage.registry.local_build.ensure_local_image.local_image_exists",
+                    "aicage.registry.local_build._plan.local_image_exists",
                     return_value=False,
                 ),
                 mock.patch(
@@ -94,7 +94,7 @@ class EnsureLocalImageTests(TestCase):
                     str(log_dir),
                 ),
                 mock.patch(
-                    "aicage.registry.local_build.ensure_local_image.local_image_exists",
+                    "aicage.registry.local_build._plan.local_image_exists",
                     return_value=True,
                 ),
                 mock.patch(
