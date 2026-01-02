@@ -8,6 +8,10 @@ follow [DEVELOPMENT.md](DEVELOPMENT.md) for workflows.
 - Markdown: wrap near ~120 chars.
 - Keep [README.md](README.md) user-only.
 - Put build/process notes in [DEVELOPMENT.md](DEVELOPMENT.md).
+- KISS: default to minimal changes; avoid optional parameters/configs or extra result objects unless explicitly requested.
+- Avoid defensive checks for impossible states unless explicitly requested.
+- Visibility first: new modules default to private (`_`); keep constants private unless used outside the module.
+- Do not invent new public APIs or config fields unless explicitly requested.
 - For all Python commands, use a virtualenv:  
   `python -m venv .venv && source .venv/bin/activate && pip install -r requirements-dev.txt`.
 - Keep code and docs free of conversational feedback to humans; only ship product-ready content.
