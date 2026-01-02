@@ -79,7 +79,7 @@ def _run_builder(image_ref: str, definition_dir: Path) -> _CommandResult:
         "-w",
         "/agent",
         image_ref,
-        "/bin/sh",
+        "/bin/bash",
         "/agent/version.sh",
     ]
     return _run_command(command, "builder image")
@@ -88,10 +88,10 @@ def _run_builder(image_ref: str, definition_dir: Path) -> _CommandResult:
 def _run_host(script_path: Path) -> _CommandResult:
     if not os.access(script_path, os.X_OK):
         get_logger().warning(
-            "version.sh at %s is not executable; running with /bin/sh.",
+            "version.sh at %s is not executable; running with /bin/bash.",
             script_path,
         )
-    return _run_command(["/bin/sh", str(script_path)], "host")
+    return _run_command(["/bin/bash", str(script_path)], "host")
 
 
 def _run_command(command: list[str], context: str) -> _CommandResult:

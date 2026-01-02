@@ -23,7 +23,7 @@ class EntrypointMountTests(TestCase):
                 _validate_entrypoint_path(missing)
 
             entrypoint = Path(tmp_dir) / "entrypoint.sh"
-            entrypoint.write_text("#!/bin/sh\necho ok\n", encoding="utf-8")
+            entrypoint.write_text("#!/usr/bin/env bash\necho ok\n", encoding="utf-8")
             with mock.patch("os.access", return_value=False):
                 with self.assertRaises(CliError):
                     _validate_entrypoint_path(entrypoint)
@@ -43,8 +43,8 @@ class EntrypointMountTests(TestCase):
         self.assertTrue(mounts[0].read_only)
 
     def test_resolve_entrypoint_mount_uses_persisted_entrypoint(self) -> None:
-        agent_cfg = AgentConfig(entrypoint="/bin/sh")
-        entrypoint_path = Path("/bin/sh")
+        agent_cfg = AgentConfig(entrypoint="/bin/bash")
+        entrypoint_path = Path("/bin/bash")
         with (
             mock.patch("aicage.runtime.mounts._entrypoint._resolve_entrypoint_path", return_value=entrypoint_path),
             mock.patch("aicage.runtime.mounts._entrypoint._validate_entrypoint_path"),

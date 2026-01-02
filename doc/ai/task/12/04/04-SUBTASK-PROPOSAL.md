@@ -49,10 +49,10 @@ deferring actual integration until later subtasks.
 Expose a shared function that returns a version string or raises on failure:
 
 1. Try running `version.sh` inside the version-check builder image:
-   - `docker run --rm -v <agent_dir>:/agent:ro <image> /agent/version.sh`
+   - `docker run --rm -v <agent_dir>:/agent:ro <image> /bin/bash /agent/version.sh`
    - If the helper image does not exist or docker fails, record the error.
 2. Fall back to host execution:
-   - `subprocess.run(["/bin/sh", "<agent_dir>/version.sh"], ...)`.
+   - `subprocess.run(["/bin/bash", "<agent_dir>/version.sh"], ...)`.
 3. If both fail, raise `CliError` with combined diagnostics.
 
 ### Persistence of version check results
@@ -111,8 +111,8 @@ Subtask 05 can then decide where to persist this structure (file, db, etc.).
 1. Persist version check results under `~/.aicage/state/version-check/` (exact file layout decided
    in Subtask 05).
 2. Custom agents override packaged agent names.
-3. Execute `version.sh` with `/bin/sh` (or `/bin/bash` if required) to tolerate missing `chmod +x`,
-   and log a warning about non-executable `version.sh`.
+3. Execute `version.sh` with `/bin/bash` to tolerate missing `chmod +x`, and log a warning about
+   non-executable `version.sh`.
 
 ## Open questions
 

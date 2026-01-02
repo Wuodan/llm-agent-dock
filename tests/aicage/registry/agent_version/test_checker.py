@@ -58,7 +58,7 @@ class AgentVersionCheckTests(TestCase):
             )
 
             def _run_side_effect(args: list[str], **kwargs: object) -> CompletedProcess[str]:
-                if args[0] == "/bin/sh":
+                if args[0] == "/bin/bash":
                     return CompletedProcess(args, 1, stdout="", stderr="host failed")
                 return CompletedProcess(args, 0, stdout="1.2.3\n", stderr="")
 
@@ -93,7 +93,7 @@ class AgentVersionCheckTests(TestCase):
             )
 
             def _run_side_effect(args: list[str], **kwargs: object) -> CompletedProcess[str]:
-                if args[0] == "/bin/sh":
+                if args[0] == "/bin/bash":
                     return CompletedProcess(args, 1, stdout="", stderr="host failed")
                 return CompletedProcess(args, 1, stdout="", stderr="builder failed")
 
