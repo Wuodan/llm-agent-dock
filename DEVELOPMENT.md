@@ -17,3 +17,7 @@ advanced/power users who want to tweak or extend things.
 - [aicage-image-base/](https://github.com/aicage/aicage-image-base): builds base OS layers.
 - [aicage-image/](https://github.com/aicage/aicage-image): builds agents on those bases.
 - [aicage-image-util/](https://github.com/aicage/aicage-image-util): builds utility images for aicage runtime tasks.
+
+## Local checks
+
+Run `scripts/lint.sh` from an active virtualenv with `requirements-dev.txt` installed.
