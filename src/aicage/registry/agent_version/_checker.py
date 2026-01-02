@@ -3,25 +3,20 @@ from __future__ import annotations
 import os
 import subprocess
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
-
-import yaml
 
 from aicage._logging import get_logger
 from aicage.config.global_config import GlobalConfig
 from aicage.errors import CliError
 from aicage.registry.images_metadata.models import AgentMetadata
 
-__all__ = ["AgentVersionChecker"]
-
-_DEFAULT_STATE_DIR = "~/.aicage/state/version-check"
+from ._store import VersionCheckStore
 
 
 class AgentVersionChecker:
-    def __init__(self, global_cfg: GlobalConfig, store: _VersionCheckStore | None = None) -> None:
+    def __init__(self, global_cfg: GlobalConfig, store: VersionCheckStore | None = None) -> None:
         self._global_cfg = global_cfg
-        self._store = store or _VersionCheckStore()
+        self._store = store or VersionCheckStore()
 
     def get_version(
         self,
@@ -66,23 +61,6 @@ class AgentVersionChecker:
         raise CliError("; ".join(errors))
 
 
-class _VersionCheckStore:
-    def __init__(self, base_dir: Path | None = None) -> None:
-        self._base_dir = base_dir or Path(os.path.expanduser(_DEFAULT_STATE_DIR))
-
-    def save(self, agent: str, version: str) -> Path:
-        self._base_dir.mkdir(parents=True, exist_ok=True)
-        path = self._base_dir / f"{_sanitize_agent_name(agent)}.yaml"
-        with path.open("w", encoding="utf-8") as handle:
-            payload = {
-                "agent": agent,
-                "version": version,
-                "checked_at": _now_iso(),
-            }
-            yaml.safe_dump(payload, handle, sort_keys=True)
-        return path
-
-
 @dataclass(frozen=True)
 class _CommandResult:
     success: bool
@@ -124,11 +102,3 @@ def _run_command(command: list[str], context: str) -> _CommandResult:
     stderr = process.stderr.strip() if process.stderr else ""
     error = stderr or output or f"Version check failed in {context}."
     return _CommandResult(success=False, output=output, error=error)
-
-
-def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def _sanitize_agent_name(agent_name: str) -> str:
-    return agent_name.replace("/", "_")

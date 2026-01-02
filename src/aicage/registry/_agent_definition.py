@@ -5,7 +5,7 @@ from pathlib import Path
 
 from aicage.config.resources import find_packaged_path
 from aicage.errors import CliError
-from aicage.registry._custom_agent_loader import DEFAULT_CUSTOM_AGENTS_DIR
+from aicage.registry.custom_agent import DEFAULT_CUSTOM_AGENTS_DIR
 from aicage.registry.images_metadata.models import AgentMetadata
 
 __all__ = ["get_agent_definition_dir", "get_agent_build_root"]

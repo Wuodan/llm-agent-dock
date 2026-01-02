@@ -11,7 +11,7 @@ from aicage.config.global_config import GlobalConfig
 from aicage.config.project_config import AgentConfig
 from aicage.errors import CliError
 from aicage.registry._agent_definition import get_agent_definition_dir
-from aicage.registry._agent_version_check import AgentVersionChecker
+from aicage.registry.agent_version import AgentVersionChecker
 from aicage.registry.image_selection import select_agent_image
 from aicage.registry.images_metadata.loader import load_images_metadata
 from aicage.registry.images_metadata.models import ImagesMetadata

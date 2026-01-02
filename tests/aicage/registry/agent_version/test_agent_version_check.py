@@ -8,7 +8,7 @@ import yaml
 
 from aicage.config.global_config import GlobalConfig
 from aicage.errors import CliError
-from aicage.registry._agent_version_check import AgentVersionChecker, _VersionCheckStore
+from aicage.registry.agent_version import AgentVersionChecker, VersionCheckStore
 from aicage.registry.images_metadata.models import AgentMetadata
 
 
@@ -21,7 +21,7 @@ class AgentVersionCheckTests(TestCase):
             store_dir = Path(tmp_dir) / "state"
             checker = AgentVersionChecker(
                 global_cfg=self._global_config(),
-                store=_VersionCheckStore(store_dir),
+                store=VersionCheckStore(store_dir),
             )
 
             def _run_side_effect(args: list[str], **kwargs: object) -> CompletedProcess[str]:
@@ -31,7 +31,7 @@ class AgentVersionCheckTests(TestCase):
 
             with (
                 mock.patch(
-                    "aicage.registry._agent_version_check.subprocess.run",
+                    "aicage.registry.agent_version._checker.subprocess.run",
                     side_effect=_run_side_effect,
                 ),
                 mock.patch("sys.stderr", new_callable=io.StringIO),
@@ -55,7 +55,7 @@ class AgentVersionCheckTests(TestCase):
             store_dir = Path(tmp_dir) / "state"
             checker = AgentVersionChecker(
                 global_cfg=self._global_config(),
-                store=_VersionCheckStore(store_dir),
+                store=VersionCheckStore(store_dir),
             )
             with self.assertRaises(CliError):
                 checker.get_version(

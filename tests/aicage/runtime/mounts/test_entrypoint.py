@@ -5,9 +5,9 @@ from unittest import TestCase, mock
 from aicage.config.project_config import AgentConfig
 from aicage.errors import CliError
 from aicage.runtime.mounts._entrypoint import (
-    resolve_entrypoint_mount,
     _resolve_entrypoint_path,
     _validate_entrypoint_path,
+    resolve_entrypoint_mount,
 )
 
 
