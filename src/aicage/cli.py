@@ -9,8 +9,8 @@ from aicage.cli_parse import parse_cli
 from aicage.cli_types import ParsedArgs
 from aicage.config import ConfigError, RunConfig, SettingsStore, load_run_config
 from aicage.errors import CliError
-from aicage.registry import pull_image
-from aicage.registry.local_build import ensure_local_image
+from aicage.registry.image_pull import pull_image
+from aicage.registry.local_build.ensure_local_image import ensure_local_image
 from aicage.runtime.run_args import DockerRunArgs, assemble_docker_run
 from aicage.runtime.run_plan import build_run_args
 
