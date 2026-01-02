@@ -32,6 +32,9 @@ def select_agent_image(agent: str, context: ConfigContext) -> str:
     else:
         _validate_base(agent, base, agent_metadata)
 
+    if not agent_metadata.redistributable and not agent_metadata.is_custom:
+        return _local_image_ref(agent, base)
+
     return agent_metadata.valid_bases[base]
 
 
@@ -58,3 +61,8 @@ def _validate_base(
 ) -> None:
     if base not in agent_metadata.valid_bases:
         raise CliError(f"Base '{base}' is not valid for agent '{agent}'.")
+
+
+def _local_image_ref(agent: str, base: str) -> str:
+    tag = f"{agent}-{base}".lower().replace("/", "-")
+    return f"aicage:{tag}"

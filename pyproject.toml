@@ -21,16 +21,27 @@ aicage = "aicage.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/aicage"]
-shared-data = { "config/config.yaml" = "config/config.yaml", "config/images-metadata.yaml" = "config/images-metadata.yaml" }
+shared-data = {
+  "config/config.yaml" = "config/config.yaml",
+  "config/images-metadata.yaml" = "config/images-metadata.yaml",
+  "config/agent-build/Dockerfile" = "config/agent-build/Dockerfile",
+  "config/agent-build/agents/claude/agent.yaml" = "config/agent-build/agents/claude/agent.yaml",
+  "config/agent-build/agents/claude/install.sh" = "config/agent-build/agents/claude/install.sh",
+  "config/agent-build/agents/claude/version.sh" = "config/agent-build/agents/claude/version.sh",
+  "config/agent-build/agents/droid/agent.yaml" = "config/agent-build/agents/droid/agent.yaml",
+  "config/agent-build/agents/droid/install.sh" = "config/agent-build/agents/droid/install.sh",
+  "config/agent-build/agents/droid/version.sh" = "config/agent-build/agents/droid/version.sh",
+}
 
 [tool.hatch.build]
-include = ["config/config.yaml", "config/images-metadata.yaml"]
+include = ["config/config.yaml", "config/images-metadata.yaml", "config/agent-build/**"]
 
 [tool.hatch.build.targets.sdist]
 include = [
   "src/aicage/**",
   "config/config.yaml",
   "config/images-metadata.yaml",
+  "config/agent-build/**",
   "LICENSE",
   "README.md",
   "pyproject.toml",

@@ -7,6 +7,7 @@
     "image_registry_api_url",
     "image_registry_api_token_url",
     "image_repository",
+    "image_base_repository",
     "default_image_base",
     "version_check_image"
   ],
@@ -21,6 +22,9 @@
       "type": "string"
     },
     "image_repository": {
+      "type": "string"
+    },
+    "image_base_repository": {
       "type": "string"
     },
     "default_image_base": {

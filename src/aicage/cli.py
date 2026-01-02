@@ -10,6 +10,7 @@ from aicage.cli_types import ParsedArgs
 from aicage.config import ConfigError, RunConfig, SettingsStore, load_run_config
 from aicage.errors import CliError
 from aicage.registry import pull_image
+from aicage.registry._local_build import ensure_local_image
 from aicage.runtime.run_args import DockerRunArgs, assemble_docker_run
 from aicage.runtime.run_plan import build_run_args
 
@@ -46,7 +47,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
         run_config: RunConfig = load_run_config(parsed.agent, parsed)
         logger.info("Resolved run config for agent %s", run_config.agent)
-        pull_image(run_config)
+        agent_metadata = run_config.images_metadata.agents[run_config.agent]
+        if not agent_metadata.redistributable and not agent_metadata.is_custom:
+            ensure_local_image(run_config)
+        else:
+            pull_image(run_config)
         run_args: DockerRunArgs = build_run_args(config=run_config, parsed=parsed)
 
         run_cmd: list[str] = assemble_docker_run(run_args)

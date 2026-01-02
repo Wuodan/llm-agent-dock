@@ -15,7 +15,9 @@ class RunPlanTests(TestCase):
         config = RunConfig(
             project_path=project_path,
             agent="codex",
+            base="ubuntu",
             image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+            agent_version=None,
             global_cfg=self._get_global_config(),
             images_metadata=self._get_images_metadata(),
             project_docker_args="--project",
@@ -36,7 +38,9 @@ class RunPlanTests(TestCase):
         config = RunConfig(
             project_path=project_path,
             agent="codex",
+            base="ubuntu",
             image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+            agent_version=None,
             global_cfg=self._get_global_config(),
             images_metadata=self._get_images_metadata(),
             project_docker_args="",
@@ -57,6 +61,7 @@ class RunPlanTests(TestCase):
             image_registry_api_url="https://ghcr.io/v2",
             image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
             image_repository="aicage/aicage",
+            image_base_repository="aicage/aicage-image-base",
             default_image_base="ubuntu",
             version_check_image="ghcr.io/aicage/aicage-image-util:latest",
             agents={},

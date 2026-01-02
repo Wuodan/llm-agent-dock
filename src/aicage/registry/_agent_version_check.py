@@ -11,7 +11,6 @@ import yaml
 from aicage._logging import get_logger
 from aicage.config.global_config import GlobalConfig
 from aicage.errors import CliError
-from aicage.registry._custom_agent_loader import DEFAULT_CUSTOM_AGENTS_DIR
 from aicage.registry.images_metadata.models import AgentMetadata
 
 __all__ = ["AgentVersionChecker"]
@@ -24,9 +23,13 @@ class AgentVersionChecker:
         self._global_cfg = global_cfg
         self._store = store or _VersionCheckStore()
 
-    def get_version(self, agent_name: str, agent_metadata: AgentMetadata) -> str:
+    def get_version(
+        self,
+        agent_name: str,
+        _agent_metadata: AgentMetadata,
+        definition_dir: Path,
+    ) -> str:
         logger = get_logger()
-        definition_dir = Path(os.path.expanduser(DEFAULT_CUSTOM_AGENTS_DIR)) / agent_name
         script_path = definition_dir / "version.sh"
         if not script_path.is_file():
             raise CliError(f"Agent '{agent_name}' is missing version.sh at {script_path}.")

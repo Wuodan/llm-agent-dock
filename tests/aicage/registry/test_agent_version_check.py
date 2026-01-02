@@ -36,11 +36,11 @@ class AgentVersionCheckTests(TestCase):
                 ),
                 mock.patch("sys.stderr", new_callable=io.StringIO),
             ):
-                with mock.patch(
-                    "aicage.registry._agent_version_check.DEFAULT_CUSTOM_AGENTS_DIR",
-                    str(Path(tmp_dir)),
-                ):
-                    result = checker.get_version("custom", self._agent_metadata("custom"))
+                result = checker.get_version(
+                    "custom",
+                    self._agent_metadata("custom"),
+                    definition_dir=agent_dir,
+                )
 
             self.assertEqual("1.2.3", result)
             stored = store_dir / "custom.yaml"
@@ -58,11 +58,11 @@ class AgentVersionCheckTests(TestCase):
                 store=_VersionCheckStore(store_dir),
             )
             with self.assertRaises(CliError):
-                with mock.patch(
-                    "aicage.registry._agent_version_check.DEFAULT_CUSTOM_AGENTS_DIR",
-                    str(Path(tmp_dir)),
-                ):
-                    checker.get_version("custom", self._agent_metadata("custom"))
+                checker.get_version(
+                    "custom",
+                    self._agent_metadata("custom"),
+                    definition_dir=agent_dir,
+                )
             self.assertFalse((store_dir / "custom.yaml").exists())
 
     @staticmethod
@@ -72,6 +72,7 @@ class AgentVersionCheckTests(TestCase):
             image_registry_api_url="https://ghcr.io/v2",
             image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
             image_repository="aicage/aicage",
+            image_base_repository="aicage/aicage-image-base",
             default_image_base="ubuntu",
             version_check_image="ghcr.io/aicage/aicage-image-util:latest",
             agents={},

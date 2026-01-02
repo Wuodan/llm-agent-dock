@@ -8,9 +8,13 @@ from aicage.docker_client import get_docker_client
 
 def get_local_repo_digest(run_config: RunConfig) -> str | None:
     repository = f"{run_config.global_cfg.image_registry}/{run_config.global_cfg.image_repository}"
+    return get_local_repo_digest_for_repo(run_config.image_ref, repository)
+
+
+def get_local_repo_digest_for_repo(image_ref: str, repository: str) -> str | None:
     try:
         client = get_docker_client()
-        image = client.images.get(run_config.image_ref)
+        image = client.images.get(image_ref)
     except (ImageNotFound, DockerException):
         return None
 

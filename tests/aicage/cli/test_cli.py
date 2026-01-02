@@ -29,12 +29,15 @@ def _build_run_config(project_path: Path, image_ref: str) -> RunConfig:
     return RunConfig(
         project_path=project_path,
         agent="codex",
+        base="ubuntu",
         image_ref=image_ref,
+        agent_version=None,
         global_cfg=GlobalConfig(
             image_registry="ghcr.io",
             image_registry_api_url="https://ghcr.io/v2",
             image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
             image_repository="aicage/aicage",
+            image_base_repository="aicage/aicage-image-base",
             default_image_base="ubuntu",
             version_check_image="ghcr.io/aicage/aicage-image-util:latest",
             agents={},

@@ -24,7 +24,9 @@ __all__ = ["RunConfig", "load_run_config"]
 class RunConfig:
     project_path: Path
     agent: str
+    base: str
     image_ref: str
+    agent_version: str | None
     global_cfg: GlobalConfig
     images_metadata: ImagesMetadata
     project_docker_args: str
@@ -47,7 +49,7 @@ def load_run_config(agent: str, parsed: ParsedArgs | None = None) -> RunConfig:
             images_metadata=images_metadata,
         )
         image_ref = select_agent_image(agent, context)
-        _check_agent_version(agent, global_cfg, images_metadata)
+        agent_version = _check_agent_version(agent, global_cfg, images_metadata)
         agent_cfg = project_cfg.agents.setdefault(agent, AgentConfig())
 
         existing_project_docker_args: str = agent_cfg.docker_args
@@ -60,7 +62,9 @@ def load_run_config(agent: str, parsed: ParsedArgs | None = None) -> RunConfig:
         return RunConfig(
             project_path=project_path,
             agent=agent,
+            base=agent_cfg.base,
             image_ref=image_ref,
+            agent_version=agent_version,
             global_cfg=global_cfg,
             images_metadata=images_metadata,
             project_docker_args=existing_project_docker_args,
@@ -91,9 +95,12 @@ def _check_agent_version(
     agent: str,
     global_cfg: GlobalConfig,
     images_metadata: ImagesMetadata,
-) -> None:
+) -> str | None:
     agent_metadata = images_metadata.agents[agent]
-    if not agent_metadata.is_custom:
-        return
+    if agent_metadata.redistributable and not agent_metadata.is_custom:
+        return None
+    from aicage.registry._agent_definition import get_agent_definition_dir
+
+    definition_dir = get_agent_definition_dir(agent, agent_metadata)
     checker = AgentVersionChecker(global_cfg)
-    checker.get_version(agent, agent_metadata)
+    return checker.get_version(agent, agent_metadata, definition_dir)

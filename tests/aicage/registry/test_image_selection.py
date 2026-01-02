@@ -65,18 +65,42 @@ class ImageSelectionTests(TestCase):
         with self.assertRaises(CliError):
             image_selection.select_agent_image("codex", context)
 
+    def test_resolve_non_redistributable_uses_local_tag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project_path = Path(tmp_dir) / "project"
+            project_path.mkdir()
+            store = mock.Mock()
+            context = self._build_context(
+                store,
+                project_path,
+                bases=["ubuntu"],
+                agent_name="claude",
+                redistributable=False,
+            )
+            context.project_cfg.agents["claude"] = AgentConfig(base="ubuntu")
+            selection = image_selection.select_agent_image("claude", context)
+
+            self.assertEqual("aicage:claude-ubuntu", selection)
+            store.save_project.assert_not_called()
+
     @staticmethod
     def _build_context(
         store: mock.Mock,
         project_path: Path,
         bases: list[str],
         agents: dict[str, AgentConfig] | None = None,
+        agent_name: str = "codex",
+        redistributable: bool = True,
     ) -> ConfigContext:
         return ConfigContext(
             store=store,
             project_cfg=ProjectConfig(path=str(project_path), agents=agents or {}),
             global_cfg=ImageSelectionTests._global_config(),
-            images_metadata=ImageSelectionTests._metadata_with_bases(bases),
+            images_metadata=ImageSelectionTests._metadata_with_bases(
+                bases,
+                agent_name=agent_name,
+                redistributable=redistributable,
+            ),
         )
 
     @staticmethod
@@ -86,13 +110,18 @@ class ImageSelectionTests(TestCase):
             image_registry_api_url="https://ghcr.io/v2",
             image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
             image_repository="aicage/aicage",
+            image_base_repository="aicage/aicage-image-base",
             default_image_base="ubuntu",
             version_check_image="ghcr.io/aicage/aicage-image-util:latest",
             agents={},
         )
 
     @staticmethod
-    def _metadata_with_bases(bases: list[str]) -> ImagesMetadata:
+    def _metadata_with_bases(
+        bases: list[str],
+        agent_name: str = "codex",
+        redistributable: bool = True,
+    ) -> ImagesMetadata:
         return ImagesMetadata.from_mapping(
             {
                 "aicage-image": {"version": "0.3.3"},
@@ -108,13 +137,13 @@ class ImageSelectionTests(TestCase):
                     for name in bases
                 },
                 "agent": {
-                    "codex": {
+                    agent_name: {
                         "agent_path": "~/.codex",
                         "agent_full_name": "Codex CLI",
                         "agent_homepage": "https://example.com",
-                        "redistributable": True,
+                        "redistributable": redistributable,
                         "valid_bases": {
-                            name: f"ghcr.io/aicage/aicage:codex-{name}"
+                            name: f"ghcr.io/aicage/aicage:{agent_name}-{name}"
                             for name in bases
                         },
                     }

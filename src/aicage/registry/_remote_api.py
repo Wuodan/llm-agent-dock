@@ -14,12 +14,16 @@ class RegistryDiscoveryError(Exception):
 
 
 def fetch_pull_token(global_cfg: GlobalConfig) -> str:
-    url = f"{global_cfg.image_registry_api_token_url}:{global_cfg.image_repository}:pull"
+    return fetch_pull_token_for_repository(global_cfg, global_cfg.image_repository)
+
+
+def fetch_pull_token_for_repository(global_cfg: GlobalConfig, repository: str) -> str:
+    url = f"{global_cfg.image_registry_api_token_url}:{repository}:pull"
     data, _ = _fetch_json(url, None)
     token = data.get("token")
     if not token:
         raise RegistryDiscoveryError(
-            f"Missing token while querying registry for {global_cfg.image_repository}."
+            f"Missing token while querying registry for {repository}."
         )
     return token
 

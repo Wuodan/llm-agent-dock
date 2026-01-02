@@ -12,6 +12,7 @@ class GlobalConfig:
     image_registry_api_url: str
     image_registry_api_token_url: str
     image_repository: str
+    image_base_repository: str
     default_image_base: str
     version_check_image: str
     agents: dict[str, dict[str, Any]] = field(default_factory=dict)
@@ -23,6 +24,7 @@ class GlobalConfig:
             "image_registry_api_url",
             "image_registry_api_token_url",
             "image_repository",
+            "image_base_repository",
             "default_image_base",
             "version_check_image",
         )
@@ -34,6 +36,7 @@ class GlobalConfig:
             image_registry_api_url=data["image_registry_api_url"],
             image_registry_api_token_url=data["image_registry_api_token_url"],
             image_repository=data["image_repository"],
+            image_base_repository=data["image_base_repository"],
             default_image_base=data["default_image_base"],
             version_check_image=data["version_check_image"],
             agents=data.get("agents", {}) or {},
@@ -45,6 +48,7 @@ class GlobalConfig:
             "image_registry_api_url": self.image_registry_api_url,
             "image_registry_api_token_url": self.image_registry_api_token_url,
             "image_repository": self.image_repository,
+            "image_base_repository": self.image_base_repository,
             "default_image_base": self.default_image_base,
             "version_check_image": self.version_check_image,
             "agents": self.agents,
