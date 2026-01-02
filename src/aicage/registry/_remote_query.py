@@ -3,47 +3,21 @@ from __future__ import annotations
 import urllib.error
 import urllib.request
 from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
-from aicage.config.runtime_config import RunConfig
 from aicage.registry._remote_api import (
     RegistryDiscoveryError,
-    fetch_pull_token,
     fetch_pull_token_for_repository,
 )
 
-
-def get_remote_repo_digest(run_config: RunConfig) -> str | None:
-    reference = _parse_reference(run_config.image_ref)
-    try:
-        token = fetch_pull_token(run_config.global_cfg)
-    except RegistryDiscoveryError:
-        return None
-    url = (
-        f"{run_config.global_cfg.image_registry_api_url}"
-        f"/{run_config.global_cfg.image_repository}"
-        f"/manifests/{reference}"
-    )
-    headers: dict[str, str] = {
-        "Accept": ",".join(
-            [
-                "application/vnd.oci.image.index.v1+json",
-                "application/vnd.docker.distribution.manifest.list.v2+json",
-                "application/vnd.oci.image.manifest.v1+json",
-                "application/vnd.docker.distribution.manifest.v2+json",
-            ]
-        ),
-        "Authorization": f"Bearer {token}",
-    }
-    response_headers = _head_request(url, headers)
-    if response_headers is None:
-        return None
-    return response_headers.get("Docker-Content-Digest")
+if TYPE_CHECKING:
+    from aicage.config.global_config import GlobalConfig
 
 
 def get_remote_repo_digest_for_repo(
     image_ref: str,
     repository: str,
-    global_cfg: "GlobalConfig",
+    global_cfg: GlobalConfig,
 ) -> str | None:
     reference = _parse_reference(image_ref)
     try:

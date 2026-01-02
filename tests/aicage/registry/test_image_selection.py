@@ -70,12 +70,15 @@ class ImageSelectionTests(TestCase):
             project_path = Path(tmp_dir) / "project"
             project_path.mkdir()
             store = mock.Mock()
-            context = self._build_context(
-                store,
-                project_path,
-                bases=["ubuntu"],
-                agent_name="claude",
-                redistributable=False,
+            context = ConfigContext(
+                store=store,
+                project_cfg=ProjectConfig(path=str(project_path), agents={}),
+                global_cfg=self._global_config(),
+                images_metadata=self._metadata_with_bases(
+                    ["ubuntu"],
+                    agent_name="claude",
+                    redistributable=False,
+                ),
             )
             context.project_cfg.agents["claude"] = AgentConfig(base="ubuntu")
             selection = image_selection.select_agent_image("claude", context)
@@ -89,18 +92,12 @@ class ImageSelectionTests(TestCase):
         project_path: Path,
         bases: list[str],
         agents: dict[str, AgentConfig] | None = None,
-        agent_name: str = "codex",
-        redistributable: bool = True,
     ) -> ConfigContext:
         return ConfigContext(
             store=store,
             project_cfg=ProjectConfig(path=str(project_path), agents=agents or {}),
             global_cfg=ImageSelectionTests._global_config(),
-            images_metadata=ImageSelectionTests._metadata_with_bases(
-                bases,
-                agent_name=agent_name,
-                redistributable=redistributable,
-            ),
+            images_metadata=ImageSelectionTests._metadata_with_bases(bases),
         )
 
     @staticmethod

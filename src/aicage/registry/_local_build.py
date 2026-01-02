@@ -5,6 +5,7 @@ import subprocess
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 
@@ -18,6 +19,9 @@ __all__ = ["ensure_local_image"]
 
 _DEFAULT_STATE_DIR = "~/.aicage/state/local-build"
 _DEFAULT_LOG_DIR = "~/.aicage/logs/build"
+
+if TYPE_CHECKING:
+    from aicage.config.global_config import GlobalConfig
 
 
 @dataclass(frozen=True)
@@ -176,7 +180,7 @@ def _build_log_path(agent: str, base: str) -> Path:
 def _refresh_base_digest(
     base_image_ref: str,
     base_repository: str,
-    global_cfg: "GlobalConfig",
+    global_cfg: GlobalConfig,
 ) -> str | None:
     logger = get_logger()
     local_digest = _local_query.get_local_repo_digest_for_repo(base_image_ref, base_repository)

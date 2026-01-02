@@ -9,6 +9,7 @@ from aicage.config.config_store import SettingsStore
 from aicage.config.context import ConfigContext
 from aicage.config.global_config import GlobalConfig
 from aicage.config.project_config import AgentConfig
+from aicage.registry._agent_definition import get_agent_definition_dir
 from aicage.registry._agent_version_check import AgentVersionChecker
 from aicage.registry.image_selection import select_agent_image
 from aicage.registry.images_metadata.loader import load_images_metadata
@@ -99,8 +100,6 @@ def _check_agent_version(
     agent_metadata = images_metadata.agents[agent]
     if agent_metadata.redistributable and not agent_metadata.is_custom:
         return None
-    from aicage.registry._agent_definition import get_agent_definition_dir
-
     definition_dir = get_agent_definition_dir(agent, agent_metadata)
     checker = AgentVersionChecker(global_cfg)
     return checker.get_version(agent, agent_metadata, definition_dir)

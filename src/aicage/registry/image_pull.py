@@ -32,7 +32,11 @@ def _decide_pull(run_config: RunConfig) -> _PullDecision:
     if local_digest is None:
         return _PullDecision(should_pull=True)
 
-    remote_digest = _remote_query.get_remote_repo_digest(run_config)
+    remote_digest = _remote_query.get_remote_repo_digest_for_repo(
+        run_config.image_ref,
+        run_config.global_cfg.image_repository,
+        run_config.global_cfg,
+    )
     if remote_digest is None:
         return _PullDecision(should_pull=False)
 

@@ -83,7 +83,9 @@ class DockerInvocationTests(TestCase):
         )
         with (
             mock.patch("aicage.registry.image_pull._local_query.get_local_repo_digest", return_value=None),
-            mock.patch("aicage.registry.image_pull._remote_query.get_remote_repo_digest") as remote_mock,
+            mock.patch(
+                "aicage.registry.image_pull._remote_query.get_remote_repo_digest_for_repo"
+            ) as remote_mock,
             mock.patch("aicage.registry.image_pull.subprocess.Popen", return_value=pull_ok) as popen_mock,
             mock.patch("aicage.registry.image_pull.subprocess.run") as run_mock,
             mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
@@ -105,7 +107,9 @@ class DockerInvocationTests(TestCase):
         )
         with (
             mock.patch("aicage.registry.image_pull._local_query.get_local_repo_digest", return_value=None),
-            mock.patch("aicage.registry.image_pull._remote_query.get_remote_repo_digest") as remote_mock,
+            mock.patch(
+                "aicage.registry.image_pull._remote_query.get_remote_repo_digest_for_repo"
+            ) as remote_mock,
             mock.patch("aicage.registry.image_pull.subprocess.Popen", return_value=pull_download) as popen_mock,
             mock.patch("aicage.registry.image_pull.subprocess.run") as run_mock,
             mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
@@ -122,7 +126,9 @@ class DockerInvocationTests(TestCase):
         inspect_ok = FakeCompleted(returncode=0)
         with (
             mock.patch("aicage.registry.image_pull._local_query.get_local_repo_digest", return_value=None),
-            mock.patch("aicage.registry.image_pull._remote_query.get_remote_repo_digest") as remote_mock,
+            mock.patch(
+                "aicage.registry.image_pull._remote_query.get_remote_repo_digest_for_repo"
+            ) as remote_mock,
             mock.patch("aicage.registry.image_pull.subprocess.Popen", return_value=pull_fail),
             mock.patch("aicage.registry.image_pull.subprocess.run", return_value=inspect_ok),
             mock.patch("sys.stderr", new_callable=io.StringIO) as stderr,
@@ -138,7 +144,9 @@ class DockerInvocationTests(TestCase):
         inspect_fail = FakeCompleted(returncode=1, stderr="missing", stdout="")
         with (
             mock.patch("aicage.registry.image_pull._local_query.get_local_repo_digest", return_value=None),
-            mock.patch("aicage.registry.image_pull._remote_query.get_remote_repo_digest") as remote_mock,
+            mock.patch(
+                "aicage.registry.image_pull._remote_query.get_remote_repo_digest_for_repo"
+            ) as remote_mock,
             mock.patch("aicage.registry.image_pull.subprocess.Popen", return_value=pull_fail),
             mock.patch("aicage.registry.image_pull.subprocess.run", return_value=inspect_fail),
             mock.patch("sys.stdout", new_callable=io.StringIO),
@@ -151,7 +159,10 @@ class DockerInvocationTests(TestCase):
         run_config = self._build_run_config("repo:tag")
         with (
             mock.patch("aicage.registry.image_pull._local_query.get_local_repo_digest", return_value="same"),
-            mock.patch("aicage.registry.image_pull._remote_query.get_remote_repo_digest", return_value="same"),
+            mock.patch(
+                "aicage.registry.image_pull._remote_query.get_remote_repo_digest_for_repo",
+                return_value="same",
+            ),
             mock.patch("aicage.registry.image_pull.subprocess.Popen") as popen_mock,
             mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
         ):
@@ -163,7 +174,10 @@ class DockerInvocationTests(TestCase):
         run_config = self._build_run_config("repo:tag")
         with (
             mock.patch("aicage.registry.image_pull._local_query.get_local_repo_digest", return_value="local"),
-            mock.patch("aicage.registry.image_pull._remote_query.get_remote_repo_digest", return_value=None),
+            mock.patch(
+                "aicage.registry.image_pull._remote_query.get_remote_repo_digest_for_repo",
+                return_value=None,
+            ),
             mock.patch("aicage.registry.image_pull.subprocess.Popen") as popen_mock,
             mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
         ):
