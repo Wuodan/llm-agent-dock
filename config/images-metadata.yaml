@@ -1,12 +1,12 @@
 aicage-image:
-  version: 0.4.7
+  version: 0.5.10
 aicage-image-base:
-  version: 0.4.7
+  version: 0.5.7
 bases:
   act:
     root_image: ghcr.io/catthehacker/ubuntu:act-latest
     base_image_distro: Ubuntu
-    base_image_description: Default runner image from act (act runs GitHub Actions locally)
+    base_image_description: (Ubuntu) Runner image from act (act runs GitHub Actions locally)
     os_installer: distro/debian/install.sh
     test_suite: default
   alpine:
@@ -30,13 +30,13 @@ bases:
   minimal:
     root_image: node:alpine
     base_image_distro: Alpine
-    base_image_description: Minimal Alpine base image
+    base_image_description: (Alpine) For quick CI/CD tests; reduced packages
     os_installer: distro/alpine-minimal/install.sh
     test_suite: minimal
   node:
     root_image: node:lts-slim
     base_image_distro: Ubuntu
-    base_image_description: Official Node image (all base images have Node)
+    base_image_description: (Ubuntu) Official Node image (all base images have Node)
     os_installer: distro/debian/install.sh
     test_suite: default
   ubuntu:
@@ -46,6 +46,19 @@ bases:
     os_installer: distro/debian/install.sh
     test_suite: default
 agent:
+  claude:
+    agent_path: ~/.claude
+    agent_full_name: Claude Code
+    agent_homepage: https://claude.com/product/claude-code
+    redistributable: false
+    valid_bases:
+      act: ghcr.io/aicage/aicage:claude-act
+      alpine: ghcr.io/aicage/aicage:claude-alpine
+      debian: ghcr.io/aicage/aicage:claude-debian
+      fedora: ghcr.io/aicage/aicage:claude-fedora
+      minimal: ghcr.io/aicage/aicage:claude-minimal
+      node: ghcr.io/aicage/aicage:claude-node
+      ubuntu: ghcr.io/aicage/aicage:claude-ubuntu
   codex:
     agent_path: ~/.codex
     agent_full_name: Codex CLI
@@ -88,6 +101,19 @@ agent:
       minimal: ghcr.io/aicage/aicage:crush-minimal
       node: ghcr.io/aicage/aicage:crush-node
       ubuntu: ghcr.io/aicage/aicage:crush-ubuntu
+  droid:
+    agent_path: ~/.factory
+    agent_full_name: Factory CLI
+    agent_homepage: https://factory.ai/product/cli
+    redistributable: false
+    valid_bases:
+      act: ghcr.io/aicage/aicage:droid-act
+      alpine: ghcr.io/aicage/aicage:droid-alpine
+      debian: ghcr.io/aicage/aicage:droid-debian
+      fedora: ghcr.io/aicage/aicage:droid-fedora
+      minimal: ghcr.io/aicage/aicage:droid-minimal
+      node: ghcr.io/aicage/aicage:droid-node
+      ubuntu: ghcr.io/aicage/aicage:droid-ubuntu
   gemini:
     agent_path: ~/.gemini
     agent_full_name: Gemini CLI
@@ -127,29 +153,3 @@ agent:
       minimal: ghcr.io/aicage/aicage:qwen-minimal
       node: ghcr.io/aicage/aicage:qwen-node
       ubuntu: ghcr.io/aicage/aicage:qwen-ubuntu
-  claude:
-    agent_path: ~/.claude
-    agent_full_name: Claude Code
-    agent_homepage: https://claude.com/product/claude-code
-    redistributable: false
-    valid_bases:
-      act: ghcr.io/aicage/aicage:claude-act
-      alpine: ghcr.io/aicage/aicage:claude-alpine
-      debian: ghcr.io/aicage/aicage:claude-debian
-      fedora: ghcr.io/aicage/aicage:claude-fedora
-      minimal: ghcr.io/aicage/aicage:claude-minimal
-      node: ghcr.io/aicage/aicage:claude-node
-      ubuntu: ghcr.io/aicage/aicage:claude-ubuntu
-  droid:
-    agent_path: ~/.factory
-    agent_full_name: Factory CLI
-    agent_homepage: https://factory.ai/product/cli
-    redistributable: false
-    valid_bases:
-      act: ghcr.io/aicage/aicage:droid-act
-      alpine: ghcr.io/aicage/aicage:droid-alpine
-      debian: ghcr.io/aicage/aicage:droid-debian
-      fedora: ghcr.io/aicage/aicage:droid-fedora
-      minimal: ghcr.io/aicage/aicage:droid-minimal
-      node: ghcr.io/aicage/aicage:droid-node
-      ubuntu: ghcr.io/aicage/aicage:droid-ubuntu
