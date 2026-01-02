@@ -23,3 +23,8 @@ The images produced by `aicage-image` and `aicage-image-base` are signed and hav
 We should add logic to verify we are using signed/provenanced images in:
 - `aicage-image`: When we use the base-images in CI pipelines from `aicage-image-base`
 - `aicage`: when we pull/use final-images produced by `aicage-image`
+
+## Support symlinks in project-folder
+
+If the project-folder contains symlinks to outside it's structure, then those fail in containers.  
+To fix this we could collect such symlinks and propose to mount the targets to the containers.
