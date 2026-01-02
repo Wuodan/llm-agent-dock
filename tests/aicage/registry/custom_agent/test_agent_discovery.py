@@ -12,7 +12,7 @@ class AgentDiscoveryTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             missing = Path(tmp_dir) / "missing-custom-agents"
             with mock.patch(
-                "aicage.registry.custom_agent._loader.DEFAULT_CUSTOM_AGENTS_DIR",
+                "aicage.registry.custom_agent.loader.DEFAULT_CUSTOM_AGENTS_DIR",
                 str(missing),
             ):
                 discovered = discover_agents(metadata)
@@ -36,7 +36,7 @@ class AgentDiscoveryTests(TestCase):
                 encoding="utf-8",
             )
             with mock.patch(
-                "aicage.registry.custom_agent._loader.DEFAULT_CUSTOM_AGENTS_DIR",
+                "aicage.registry.custom_agent.loader.DEFAULT_CUSTOM_AGENTS_DIR",
                 str(custom_dir),
             ):
                 discovered = discover_agents(metadata)
@@ -67,7 +67,7 @@ class AgentDiscoveryTests(TestCase):
                 encoding="utf-8",
             )
             with mock.patch(
-                "aicage.registry.custom_agent._loader.DEFAULT_CUSTOM_AGENTS_DIR",
+                "aicage.registry.custom_agent.loader.DEFAULT_CUSTOM_AGENTS_DIR",
                 str(custom_dir),
             ):
                 discovered = discover_agents(metadata)

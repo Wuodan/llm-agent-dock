@@ -31,7 +31,7 @@ class AgentVersionCheckTests(TestCase):
 
             with (
                 mock.patch(
-                    "aicage.registry.agent_version._checker.subprocess.run",
+                    "aicage.registry.agent_version.checker.subprocess.run",
                     side_effect=_run_side_effect,
                 ),
                 mock.patch("sys.stderr", new_callable=io.StringIO),
