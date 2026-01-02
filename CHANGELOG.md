@@ -7,7 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.5.8] - 2025-01-02
+## [0.5.9] - 2026-01-02
+
+### Added
+
+- Shared pull log location for all image pulls.
+- Local `scripts/lint.sh` helper for linting and `__all__` checks.
+- Coverage for runtime config persistence/version checks and a dynamic `__all__` test.
+
+### Changed
+
+- Docker pull output is now written to logs; CLI prints a single-line pull message with log path.
+- CLI internals moved into `aicage/cli/` for clearer separation.
+
+### Refactored
+
+- Split local build logic into smaller modules (plan, digest, runner).
+- Split image pull logic into decision and runner helpers.
+
+## [0.5.8] - 2026-01-02
 
 ### Added
 
