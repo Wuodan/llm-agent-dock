@@ -13,7 +13,7 @@ from aicage.registry.images_metadata.models import AgentMetadata
 
 
 class AgentVersionCheckTests(TestCase):
-    def test_check_uses_host_fallback_and_persists(self) -> None:
+    def test_check_uses_builder_fallback_and_persists(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             agent_dir = Path(tmp_dir) / "custom"
             agent_dir.mkdir()
@@ -25,8 +25,8 @@ class AgentVersionCheckTests(TestCase):
             )
 
             def _run_side_effect(args: list[str], **kwargs: object) -> CompletedProcess[str]:
-                if args[0] == "docker":
-                    return CompletedProcess(args, 1, stdout="", stderr="builder failed")
+                if args[0] == "/bin/sh":
+                    return CompletedProcess(args, 1, stdout="", stderr="host failed")
                 return CompletedProcess(args, 0, stdout="1.2.3\n", stderr="")
 
             with (

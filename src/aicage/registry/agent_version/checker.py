@@ -30,6 +30,19 @@ class AgentVersionChecker:
             raise CliError(f"Agent '{agent_name}' is missing version.sh at {script_path}.")
 
         errors: list[str] = []
+        host_result = _run_host(script_path)
+        if host_result.success:
+            logger.info("Version check succeeded on host for %s", agent_name)
+            self._store.save(agent_name, host_result.output)
+            return host_result.output
+
+        logger.warning(
+            "Version check failed on host for %s: %s",
+            agent_name,
+            host_result.error,
+        )
+        errors.append(host_result.error)
+
         builder_result = _run_builder(
             image_ref=self._global_cfg.version_check_image,
             definition_dir=definition_dir,
@@ -45,18 +58,6 @@ class AgentVersionChecker:
             builder_result.error,
         )
         errors.append(builder_result.error)
-        host_result = _run_host(script_path)
-        if host_result.success:
-            logger.info("Version check succeeded on host for %s", agent_name)
-            self._store.save(agent_name, host_result.output)
-            return host_result.output
-
-        logger.warning(
-            "Version check failed on host for %s: %s",
-            agent_name,
-            host_result.error,
-        )
-        errors.append(host_result.error)
         logger.error("Version check failed for %s: %s", agent_name, "; ".join(errors))
         raise CliError("; ".join(errors))
 
