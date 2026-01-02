@@ -87,10 +87,12 @@ def ensure_local_image(run_config: RunConfig) -> None:
 
     base_image_ref = _base_image_ref(run_config)
     base_repo = _base_repository(run_config)
+    pull_log_path = _pull_log_path(run_config.agent, run_config.base)
     base_digest = _refresh_base_digest(
         base_image_ref=base_image_ref,
         base_repository=base_repo,
         global_cfg=run_config.global_cfg,
+        pull_log_path=pull_log_path,
     )
 
     store = _BuildStore()
@@ -143,7 +145,11 @@ def _should_build(
     return False
 
 
-def _run_build(run_config: RunConfig, base_image_ref: str, log_path: Path) -> None:
+def _run_build(
+    run_config: RunConfig,
+    base_image_ref: str,
+    log_path: Path,
+) -> None:
     logger = get_logger()
     log_path.parent.mkdir(parents=True, exist_ok=True)
     print(f"[aicage] Building local image {run_config.image_ref} (logs: {log_path})...")
@@ -153,6 +159,7 @@ def _run_build(run_config: RunConfig, base_image_ref: str, log_path: Path) -> No
     command = [
         "docker",
         "build",
+        "--no-cache",
         "--build-arg",
         f"BASE_IMAGE={base_image_ref}",
         "--build-arg",
@@ -174,13 +181,19 @@ def _run_build(run_config: RunConfig, base_image_ref: str, log_path: Path) -> No
 
 def _build_log_path(agent: str, base: str) -> Path:
     log_dir = Path(os.path.expanduser(_DEFAULT_LOG_DIR))
-    return log_dir / f"{_sanitize(agent)}-{base}.log"
+    return log_dir / f"{_sanitize(agent)}-{base}-{_timestamp()}.log"
+
+
+def _pull_log_path(agent: str, base: str) -> Path:
+    log_dir = Path(os.path.expanduser(_DEFAULT_LOG_DIR))
+    return log_dir / f"{_sanitize(agent)}-{base}-pull-{_timestamp()}.log"
 
 
 def _refresh_base_digest(
     base_image_ref: str,
     base_repository: str,
     global_cfg: GlobalConfig,
+    pull_log_path: Path,
 ) -> str | None:
     logger = get_logger()
     local_digest = _local_query.get_local_repo_digest_for_repo(base_image_ref, base_repository)
@@ -192,15 +205,21 @@ def _refresh_base_digest(
     if remote_digest is None or remote_digest == local_digest:
         return local_digest
 
-    logger.info("Pulling base image %s", base_image_ref)
-    pull = subprocess.run(
-        ["docker", "pull", base_image_ref],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
+    pull_log_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"[aicage] Pulling base image {base_image_ref} (logs: {pull_log_path})...")
+    logger.info("Pulling base image %s (logs: %s)", base_image_ref, pull_log_path)
+    with pull_log_path.open("w", encoding="utf-8") as log_handle:
+        pull = subprocess.run(
+            ["docker", "pull", base_image_ref],
+            check=False,
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
     if pull.returncode != 0:
-        message = pull.stderr.strip() or pull.stdout.strip() or "docker pull failed"
+        message = "docker pull failed"
+        if pull_log_path.is_file():
+            message = f"{message}; see {pull_log_path}"
         if local_digest:
             logger.warning("Base image pull failed; using local base image: %s", message)
             return local_digest
@@ -230,6 +249,10 @@ def _base_image_ref(run_config: RunConfig) -> str:
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _timestamp() -> str:
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
 def _sanitize(value: str) -> str:
