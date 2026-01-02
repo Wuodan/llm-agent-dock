@@ -23,6 +23,7 @@ class ConfigStoreTests(TestCase):
                         "image_registry_api_token_url": "https://ghcr.io/token",
                         "image_repository": "aicage/aicage",
                         "default_image_base": "ubuntu",
+                        "version_check_image": "ghcr.io/aicage/aicage-image-util:latest",
                     },
                     sort_keys=False,
                 ),

@@ -1,6 +1,7 @@
 import sys
 from dataclasses import dataclass
 
+from aicage._logging import get_logger
 from aicage.config.context import ConfigContext
 from aicage.errors import CliError
 from aicage.registry.images_metadata.models import AgentMetadata
@@ -24,12 +25,16 @@ def prompt_yes_no(question: str, default: bool = False) -> bool:
     suffix = "[Y/n]" if default else "[y/N]"
     response = input(f"{question} {suffix} ").strip().lower()
     if not response:
-        return default
-    return response in {"y", "yes"}
+        choice = default
+    else:
+        choice = response in {"y", "yes"}
+    get_logger().info("Prompt yes/no '%s' -> %s", question, choice)
+    return choice
 
 
 def prompt_for_base(request: BaseSelectionRequest) -> str:
     ensure_tty_for_prompt()
+    logger = get_logger()
     title = f"Select base image for '{request.agent}' (runtime to use inside the container):"
     bases = _base_options(request.context, request.agent_metadata)
 
@@ -56,6 +61,7 @@ def prompt_for_base(request: BaseSelectionRequest) -> str:
     if bases and choice not in _available_bases(bases):
         options = ", ".join(_available_bases(bases))
         raise CliError(f"Invalid base '{choice}'. Valid options: {options}")
+    logger.info("Selected base '%s' for agent '%s'", choice, request.agent)
     return choice
 
 

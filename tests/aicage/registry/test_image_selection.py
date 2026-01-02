@@ -87,6 +87,7 @@ class ImageSelectionTests(TestCase):
             image_registry_api_token_url="https://ghcr.io/token?service=ghcr.io&scope=repository",
             image_repository="aicage/aicage",
             default_image_base="ubuntu",
+            version_check_image="ghcr.io/aicage/aicage-image-util:latest",
             agents={},
         )
 

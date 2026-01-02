@@ -4,6 +4,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 
+from aicage._logging import get_logger
 from aicage.config.runtime_config import RunConfig
 from aicage.errors import CliError
 from aicage.registry import _local_query, _remote_query
@@ -17,8 +18,10 @@ class _PullDecision:
 
 
 def pull_image(run_config: RunConfig) -> None:
+    logger = get_logger()
     decision = _decide_pull(run_config)
     if not decision.should_pull:
+        logger.info("Image pull not required for %s", run_config.image_ref)
         return
 
     _run_pull(run_config.image_ref)
@@ -37,7 +40,9 @@ def _decide_pull(run_config: RunConfig) -> _PullDecision:
 
 
 def _run_pull(image_ref: str) -> None:
+    logger = get_logger()
     print(f"[aicage] Pulling image {image_ref}...")
+    logger.info("Pulling image %s", image_ref)
 
     last_nonempty_line = ""
     pull_process = subprocess.Popen(
@@ -58,6 +63,7 @@ def _run_pull(image_ref: str) -> None:
     pull_process.wait()
 
     if pull_process.returncode == 0:
+        logger.info("Image pull succeeded for %s", image_ref)
         return
 
     inspect = subprocess.run(
@@ -69,7 +75,9 @@ def _run_pull(image_ref: str) -> None:
     if inspect.returncode == 0:
         msg = last_nonempty_line or f"docker pull failed for {image_ref}"
         print(f"[aicage] Warning: {msg}. Using local image.", file=sys.stderr)
+        logger.warning("Pull failed for %s, using local image: %s", image_ref, msg)
         return
 
     detail = last_nonempty_line or f"docker pull failed for {image_ref}"
+    logger.error("Pull failed for %s: %s", image_ref, detail)
     raise CliError(detail)

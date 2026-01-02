@@ -7,7 +7,8 @@
     "image_registry_api_url",
     "image_registry_api_token_url",
     "image_repository",
-    "default_image_base"
+    "default_image_base",
+    "version_check_image"
   ],
   "properties": {
     "image_registry": {
@@ -23,6 +24,9 @@
       "type": "string"
     },
     "default_image_base": {
+      "type": "string"
+    },
+    "version_check_image": {
       "type": "string"
     },
     "agents": {

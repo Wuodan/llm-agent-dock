@@ -4,6 +4,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from aicage._logging import get_logger
 from aicage.cli_parse import parse_cli
 from aicage.cli_types import ParsedArgs
 from aicage.config import ConfigError, RunConfig, SettingsStore, load_run_config
@@ -16,9 +17,11 @@ __all__ = ["ParsedArgs", "parse_cli", "main"]
 
 
 def _print_project_config() -> None:
+    logger = get_logger()
     store = SettingsStore()
     project_path = Path.cwd().resolve()
     config_path = store.project_config_path(project_path)
+    logger.info("Printing project config at %s", config_path)
     print("Project config path:")
     print(config_path)
     print()
@@ -35,12 +38,14 @@ def _print_project_config() -> None:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parsed_argv: Sequence[str] = argv if argv is not None else sys.argv[1:]
+    logger = get_logger()
     try:
         parsed: ParsedArgs = parse_cli(parsed_argv)
         if parsed.config_action == "print":
             _print_project_config()
             return 0
         run_config: RunConfig = load_run_config(parsed.agent, parsed)
+        logger.info("Resolved run config for agent %s", run_config.agent)
         pull_image(run_config)
         run_args: DockerRunArgs = build_run_args(config=run_config, parsed=parsed)
 
@@ -48,15 +53,18 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         if parsed.dry_run:
             print(shlex.join(run_cmd))
+            logger.info("Dry-run docker command printed.")
             return 0
 
         subprocess.run(run_cmd, check=True)
         return 0
     except KeyboardInterrupt:
         print()
+        logger.warning("Interrupted by user.")
         return 130
     except (CliError, ConfigError) as exc:
         print(f"[aicage] {exc}", file=sys.stderr)
+        logger.error("CLI error: %s", exc)
         return 1
 
 

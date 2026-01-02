@@ -31,6 +31,7 @@ class AgentMetadata:
     valid_bases: dict[str, str]
     base_exclude: list[str] | None = None
     base_distro_exclude: list[str] | None = None
+    is_custom: bool = False
 
 
 @dataclass(frozen=True)

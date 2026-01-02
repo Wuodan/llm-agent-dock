@@ -9,6 +9,7 @@ from aicage.config.config_store import SettingsStore
 from aicage.config.context import ConfigContext
 from aicage.config.global_config import GlobalConfig
 from aicage.config.project_config import AgentConfig
+from aicage.registry._agent_version_check import AgentVersionChecker
 from aicage.registry.image_selection import select_agent_image
 from aicage.registry.images_metadata.loader import load_images_metadata
 from aicage.registry.images_metadata.models import ImagesMetadata
@@ -46,6 +47,7 @@ def load_run_config(agent: str, parsed: ParsedArgs | None = None) -> RunConfig:
             images_metadata=images_metadata,
         )
         image_ref = select_agent_image(agent, context)
+        _check_agent_version(agent, global_cfg, images_metadata)
         agent_cfg = project_cfg.agents.setdefault(agent, AgentConfig())
 
         existing_project_docker_args: str = agent_cfg.docker_args
@@ -83,3 +85,15 @@ def _persist_docker_args(agent_cfg: AgentConfig, parsed: ParsedArgs | None) -> N
 
     if prompt_yes_no(question, default=True):
         agent_cfg.docker_args = parsed.docker_args
+
+
+def _check_agent_version(
+    agent: str,
+    global_cfg: GlobalConfig,
+    images_metadata: ImagesMetadata,
+) -> None:
+    agent_metadata = images_metadata.agents[agent]
+    if not agent_metadata.is_custom:
+        return
+    checker = AgentVersionChecker(global_cfg)
+    checker.get_version(agent, agent_metadata)

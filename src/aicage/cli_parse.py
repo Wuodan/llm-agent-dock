@@ -2,6 +2,7 @@ import argparse
 import sys
 from collections.abc import Sequence
 
+from aicage._logging import get_logger
 from aicage.cli_types import ParsedArgs
 from aicage.errors import CliError
 
@@ -40,6 +41,7 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "<agent-args> are passed verbatim to the agent.\n"
         )
         print(usage)
+        get_logger().info("Displayed CLI usage help.")
         sys.exit(0)
 
     if opts.config:
