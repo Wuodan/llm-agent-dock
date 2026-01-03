@@ -7,7 +7,7 @@
 
 ## Changes
 
-- Key decisions (why): Required agent.yml flag `redistributable`; no local state files for build/update decisions;
+- Key decisions (why): Required agent.yml flag `build_local`; no local state files for build/update decisions;
   deterministic tags + real image inspection; no logs or cache under ~/.aicage/; build logs in /tmp; aicage-builder
   split images with fixed version-check order.
 - User-visible behavior changes: None.

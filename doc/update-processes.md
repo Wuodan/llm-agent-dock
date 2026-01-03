@@ -8,8 +8,8 @@ includes current and planned behavior.
 | Item                           | Source of change                                | Update trigger                                     | Where it runs |
 |--------------------------------|-------------------------------------------------|----------------------------------------------------|---------------|
 | Base image (aicage-image-base) | Base config or upstream root image changes      | Scheduled weekly build + manual release            | CI            |
-| Final image (redistributable)  | Agent version or base image changes             | CI build on change + publish, runtime pull on use  | CI + client   |
-| Final image (non-redistribut.) | Agent version or base image changes             | Local rebuild on run when changes are detected     | Client        |
+| Final image (prebuilt)         | Agent version or base image changes             | CI build on change + publish, runtime pull on use  | CI + client   |
+| Final image (build_local=true) | Agent version or base image changes             | Local rebuild on run when changes are detected     | Client        |
 | Local custom agent             | Agent version or base image changes             | Local rebuild on run when changes are detected     | Client        |
 | Local extension (planned)      | Extension scripts or base/final image changes   | Local rebuild on run when changes are detected     | Client        |
 | Local custom base (planned)    | Custom base definition or root image changes    | Local rebuild on run when changes are detected     | Client        |
@@ -19,8 +19,8 @@ includes current and planned behavior.
 | Artifact                                | Built from                                 | Stored/published                    | Update signal (current/planned)              |
 |-----------------------------------------|--------------------------------------------|-------------------------------------|----------------------------------------------|
 | Base image                              | aicage-image-base bases/<BASE>              | Registry (ghcr.io)                  | Scheduled weekly + manual                    |
-| Final image (redistributable)           | base image + agents/<AGENT>                 | Registry (ghcr.io)                  | Agent version + base image updates           |
-| Local final image (non-redistributable) | base image + packaged agent-build/<AGENT>   | Local Docker engine                 | Agent version + base image digest change     |
+| Final image (prebuilt)                  | base image + agents/<AGENT>                 | Registry (ghcr.io)                  | Agent version + base image updates           |
+| Local final image (build_local=true)    | base image + packaged agent-build/<AGENT>   | Local Docker engine                 | Agent version + base image digest change     |
 | Local final image (custom agent)        | base image + ~/.aicage/custom/agent/<AGENT> | Local Docker engine                 | Agent version + base image digest change     |
 | Local extended image (planned)          | final image + extensions                    | Local Docker engine                 | Extension changes + base/final image updates |
 | Local custom base image (planned)       | custom base definition                       | Local Docker engine                 | Definition changes + root image updates      |

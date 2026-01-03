@@ -30,11 +30,12 @@ class AgentDiscoveryTests(TestCase):
                         "agent_path: ~/.custom-codex",
                         "agent_full_name: Custom Codex",
                         "agent_homepage: https://example.com",
-                        "redistributable: false",
                     ]
                 ),
                 encoding="utf-8",
             )
+            (agent_dir / "install.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            (agent_dir / "version.sh").write_text("echo 1.0.0\n", encoding="utf-8")
             with mock.patch(
                 "aicage.registry.custom_agent.loader.DEFAULT_CUSTOM_AGENTS_DIR",
                 str(custom_dir),
@@ -42,7 +43,7 @@ class AgentDiscoveryTests(TestCase):
                 discovered = discover_agents(metadata, "aicage")
 
         agent = discovered.agents["codex"]
-        self.assertTrue(agent.is_custom)
+        self.assertEqual(custom_dir / "codex", agent.local_definition_dir)
         self.assertEqual({"ubuntu": "aicage:codex-ubuntu"}, agent.valid_bases)
 
     def test_discover_agents_filters_bases(self) -> None:
@@ -57,7 +58,6 @@ class AgentDiscoveryTests(TestCase):
                         "agent_path: ~/.custom",
                         "agent_full_name: Custom",
                         "agent_homepage: https://example.com",
-                        "redistributable: false",
                         "base_exclude:",
                         "  - alpine",
                         "base_distro_exclude:",
@@ -66,6 +66,8 @@ class AgentDiscoveryTests(TestCase):
                 ),
                 encoding="utf-8",
             )
+            (agent_dir / "install.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            (agent_dir / "version.sh").write_text("echo 1.0.0\n", encoding="utf-8")
             with mock.patch(
                 "aicage.registry.custom_agent.loader.DEFAULT_CUSTOM_AGENTS_DIR",
                 str(custom_dir),
@@ -73,7 +75,7 @@ class AgentDiscoveryTests(TestCase):
                 discovered = discover_agents(metadata, "aicage")
 
         agent = discovered.agents["custom"]
-        self.assertTrue(agent.is_custom)
+        self.assertEqual(custom_dir / "custom", agent.local_definition_dir)
         self.assertEqual({"ubuntu": "aicage:custom-ubuntu"}, agent.valid_bases)
 
     @staticmethod
@@ -97,7 +99,7 @@ class AgentDiscoveryTests(TestCase):
                         "agent_path": "~/.codex",
                         "agent_full_name": "Codex CLI",
                         "agent_homepage": "https://example.com",
-                        "redistributable": True,
+                        "build_local": False,
                         "valid_bases": {
                             name: f"ghcr.io/aicage/aicage:codex-{name}" for name in bases
                         },

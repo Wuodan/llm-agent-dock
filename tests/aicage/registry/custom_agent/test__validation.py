@@ -11,17 +11,22 @@ class CustomAgentValidationTests(TestCase):
 
     def test_expect_bool_rejects_non_bool(self) -> None:
         with self.assertRaises(CliError):
-            _validation.expect_bool("true", "redistributable")
+            _validation.expect_bool("true", "build_local")
 
     def test_maybe_str_list_rejects_non_string_items(self) -> None:
         with self.assertRaises(CliError):
             _validation.maybe_str_list(["ok", ""], "base_exclude")
 
-    def test_expect_keys_rejects_missing_required(self) -> None:
+    def test_validate_agent_mapping_rejects_missing_required(self) -> None:
         with self.assertRaises(CliError):
-            _validation.expect_keys(
-                {"agent_path": "~/.custom"},
-                required={"agent_path", "agent_full_name"},
-                optional=set(),
-                context="custom agent",
-            )
+            _validation.validate_agent_mapping({"agent_path": "~/.custom"})
+
+    def test_validate_agent_mapping_defaults_build_local(self) -> None:
+        payload = _validation.validate_agent_mapping(
+            {
+                "agent_path": "~/.custom",
+                "agent_full_name": "Custom",
+                "agent_homepage": "https://example.com",
+            }
+        )
+        self.assertTrue(payload["build_local"])

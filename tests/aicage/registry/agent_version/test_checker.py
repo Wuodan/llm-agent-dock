@@ -36,7 +36,7 @@ class AgentVersionCheckTests(TestCase):
             ):
                 result = checker.get_version(
                     "custom",
-                    self._agent_metadata(True),
+                    self._agent_metadata(),
                     definition_dir=agent_dir,
                 )
 
@@ -71,7 +71,7 @@ class AgentVersionCheckTests(TestCase):
             ):
                 result = checker.get_version(
                     "custom",
-                    self._agent_metadata(True),
+                    self._agent_metadata(),
                     definition_dir=agent_dir,
                 )
 
@@ -107,7 +107,7 @@ class AgentVersionCheckTests(TestCase):
                 with self.assertRaises(CliError) as raised:
                     checker.get_version(
                         "custom",
-                        self._agent_metadata(True),
+                        self._agent_metadata(),
                         definition_dir=agent_dir,
                     )
             self.assertIn("builder failed", str(raised.exception))
@@ -124,7 +124,7 @@ class AgentVersionCheckTests(TestCase):
             with self.assertRaises(CliError):
                 checker.get_version(
                     "custom",
-                    self._agent_metadata(True),
+                    self._agent_metadata(),
                     definition_dir=agent_dir,
                 )
             self.assertFalse((store_dir / "custom.yaml").exists())
@@ -144,12 +144,11 @@ class AgentVersionCheckTests(TestCase):
         )
 
     @staticmethod
-    def _agent_metadata(is_custom: bool) -> AgentMetadata:
+    def _agent_metadata() -> AgentMetadata:
         return AgentMetadata(
             agent_path="~/.custom",
             agent_full_name="Custom",
             agent_homepage="https://example.com",
-            redistributable=False,
             valid_bases={},
-            is_custom=is_custom,
+            local_definition_dir=Path("/tmp/definition"),
         )

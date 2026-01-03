@@ -7,7 +7,7 @@ from aicage.registry.images_metadata.models import ImagesMetadata
 
 def build_run_config(
     agent_version: str | None = "1.2.3",
-    redistributable: bool = False,
+    build_local: bool = True,
 ) -> RunConfig:
     return RunConfig(
         project_path=Path("/tmp/project"),
@@ -26,13 +26,13 @@ def build_run_config(
             local_image_repository="aicage",
             agents={},
         ),
-        images_metadata=build_images_metadata(redistributable=redistributable),
+        images_metadata=build_images_metadata(build_local=build_local),
         project_docker_args="",
         mounts=[],
     )
 
 
-def build_images_metadata(redistributable: bool = False) -> ImagesMetadata:
+def build_images_metadata(build_local: bool = True) -> ImagesMetadata:
     return ImagesMetadata.from_mapping(
         {
             "aicage-image": {"version": "0.3.3"},
@@ -51,7 +51,7 @@ def build_images_metadata(redistributable: bool = False) -> ImagesMetadata:
                     "agent_path": "~/.claude",
                     "agent_full_name": "Claude Code",
                     "agent_homepage": "https://example.com",
-                    "redistributable": redistributable,
+                    "build_local": build_local,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:claude-ubuntu"},
                 }
             },

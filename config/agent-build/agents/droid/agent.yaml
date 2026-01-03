@@ -1,4 +1,4 @@
 agent_path: ~/.factory
 agent_full_name: Factory CLI
 agent_homepage: https://factory.ai/product/cli
-redistributable: false
+build_local: true

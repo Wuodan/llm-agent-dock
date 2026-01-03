@@ -116,7 +116,7 @@ class RuntimeConfigTests(TestCase):
                 with self.assertRaises(CliError):
                     load_run_config("codex")
 
-    def test_check_agent_version_uses_definition_dir_for_non_redistributable(self) -> None:
+    def test_check_agent_version_uses_definition_dir_for_build_local(self) -> None:
         global_cfg = GlobalConfig(
             image_registry="ghcr.io",
             image_registry_api_url="https://ghcr.io/v2",
@@ -146,30 +146,23 @@ class RuntimeConfigTests(TestCase):
                         "agent_path": "~/.codex",
                         "agent_full_name": "Codex CLI",
                         "agent_homepage": "https://example.com",
-                        "redistributable": False,
+                        "build_local": True,
                         "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     }
                 },
             }
         )
-        with (
-            mock.patch(
-                "aicage.config.runtime_config.get_agent_definition_dir",
-                return_value=Path("/tmp/definition"),
-            ) as definition_mock,
-            mock.patch("aicage.config.runtime_config.AgentVersionChecker") as checker_cls,
-        ):
+        with mock.patch("aicage.config.runtime_config.AgentVersionChecker") as checker_cls:
             checker = checker_cls.return_value
             checker.get_version.return_value = "1.2.3"
             version = runtime_config._check_agent_version("codex", global_cfg, images_metadata)
 
         self.assertEqual("1.2.3", version)
-        definition_mock.assert_called_once_with("codex", images_metadata.agents["codex"])
         checker_cls.assert_called_once_with(global_cfg)
         checker.get_version.assert_called_once_with(
             "codex",
             images_metadata.agents["codex"],
-            Path("/tmp/definition"),
+            images_metadata.agents["codex"].local_definition_dir,
         )
 
     @staticmethod
@@ -192,7 +185,7 @@ class RuntimeConfigTests(TestCase):
                         "agent_path": "~/.codex",
                         "agent_full_name": "Codex CLI",
                         "agent_homepage": "https://example.com",
-                        "redistributable": True,
+                        "build_local": False,
                         "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     }
                 },

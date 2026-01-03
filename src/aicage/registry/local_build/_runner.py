@@ -4,9 +4,9 @@ import subprocess
 from pathlib import Path
 
 from aicage._logging import get_logger
+from aicage.config.resources import find_packaged_path
 from aicage.config.runtime_config import RunConfig
 from aicage.errors import CliError
-from aicage.registry._agent_definition import get_agent_build_root
 
 
 def run_build(
@@ -19,7 +19,7 @@ def run_build(
     print(f"[aicage] Building local image {run_config.image_ref} (logs: {log_path})...")
     logger.info("Building local image %s (logs: %s)", run_config.image_ref, log_path)
 
-    build_root = get_agent_build_root()
+    build_root = find_packaged_path("agent-build/Dockerfile").parent
     command = [
         "docker",
         "build",

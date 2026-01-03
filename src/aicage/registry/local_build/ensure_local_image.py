@@ -13,8 +13,8 @@ from ._store import BuildRecord, BuildStore
 
 def ensure_local_image(run_config: RunConfig) -> None:
     agent_metadata = run_config.images_metadata.agents[run_config.agent]
-    if agent_metadata.redistributable:
-        return
+    if agent_metadata.local_definition_dir is None:
+        raise CliError(f"Missing local definition for '{run_config.agent}'.")
 
     if run_config.agent_version is None:
         raise CliError(f"Missing agent version for '{run_config.agent}'.")

@@ -15,8 +15,8 @@ class LocalBuildRunnerTests(TestCase):
             log_path = Path(tmp_dir) / "logs" / "build.log"
             with (
                 mock.patch(
-                    "aicage.registry.local_build._runner.get_agent_build_root",
-                    return_value=Path("/tmp/build"),
+                    "aicage.registry.local_build._runner.find_packaged_path",
+                    return_value=Path("/tmp/build/Dockerfile"),
                 ),
                 mock.patch(
                     "aicage.registry.local_build._runner.subprocess.run",
@@ -53,8 +53,8 @@ class LocalBuildRunnerTests(TestCase):
             log_path = Path(tmp_dir) / "logs" / "build.log"
             with (
                 mock.patch(
-                    "aicage.registry.local_build._runner.get_agent_build_root",
-                    return_value=Path("/tmp/build"),
+                    "aicage.registry.local_build._runner.find_packaged_path",
+                    return_value=Path("/tmp/build/Dockerfile"),
                 ),
                 mock.patch(
                     "aicage.registry.local_build._runner.subprocess.run",

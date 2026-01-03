@@ -65,7 +65,7 @@ class ImageSelectionTests(TestCase):
         with self.assertRaises(CliError):
             image_selection.select_agent_image("codex", context)
 
-    def test_resolve_non_redistributable_uses_local_tag(self) -> None:
+    def test_resolve_build_local_uses_local_tag(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             project_path = Path(tmp_dir) / "project"
             project_path.mkdir()
@@ -77,7 +77,7 @@ class ImageSelectionTests(TestCase):
                 images_metadata=self._metadata_with_bases(
                     ["ubuntu"],
                     agent_name="claude",
-                    redistributable=False,
+                    build_local=True,
                 ),
             )
             context.project_cfg.agents["claude"] = AgentConfig(base="ubuntu")
@@ -118,7 +118,7 @@ class ImageSelectionTests(TestCase):
     def _metadata_with_bases(
         bases: list[str],
         agent_name: str = "codex",
-        redistributable: bool = True,
+        build_local: bool = False,
     ) -> ImagesMetadata:
         return ImagesMetadata.from_mapping(
             {
@@ -139,7 +139,7 @@ class ImageSelectionTests(TestCase):
                         "agent_path": "~/.codex",
                         "agent_full_name": "Codex CLI",
                         "agent_homepage": "https://example.com",
-                        "redistributable": redistributable,
+                        "build_local": build_local,
                         "valid_bases": {
                             name: f"ghcr.io/aicage/aicage:{agent_name}-{name}"
                             for name in bases

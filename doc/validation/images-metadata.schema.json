@@ -72,7 +72,7 @@
           "agent_path",
           "agent_full_name",
           "agent_homepage",
-          "redistributable",
+          "build_local",
           "valid_bases"
         ],
         "properties": {
@@ -85,7 +85,7 @@
           "agent_homepage": {
             "type": "string"
           },
-          "redistributable": {
+          "build_local": {
             "type": "boolean"
           },
           "base_exclude": {

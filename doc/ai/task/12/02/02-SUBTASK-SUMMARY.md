@@ -7,10 +7,10 @@
 
 ## Changes
 
-- Key decisions (why): Added required `redistributable` to agent metadata to avoid optional handling; added
+- Key decisions (why): Added required `build_local` to agent metadata to avoid optional handling; added
   non-redistributable agents in the existing agents structure to keep packaging KISS.
 - User-visible behavior changes: None (metadata and packaging only).
-- Internal behavior changes: Images metadata now requires `redistributable` for agents and includes NR agents; aicage
+- Internal behavior changes: Images metadata now requires `build_local` for agents and includes NR agents; aicage
   metadata parsing and tests were updated to accept the new required field and NR entries; aicage-image CI now skips
   NR agents in refresh, fails fast in build when mis-invoked, and refresh is triggered via workflow_run after release.
 - Files and modules with major changes:

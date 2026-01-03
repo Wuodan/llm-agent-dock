@@ -23,7 +23,7 @@ agent:
     agent_path: ~/.codex
     agent_full_name: Codex CLI
     agent_homepage: https://example.com
-    redistributable: true
+    build_local: false
     valid_bases:
       ubuntu: ghcr.io/aicage/aicage:codex-ubuntu
         """
@@ -66,7 +66,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     "extra": "nope",
                 }
@@ -124,7 +124,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
@@ -142,7 +142,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {1: "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
@@ -160,7 +160,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {"ubuntu": ""},
                 }
             },
@@ -178,7 +178,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": "yes",
+                    "build_local": "yes",
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
@@ -196,7 +196,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     "base_exclude": [1],
                 }
@@ -215,7 +215,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     "base_exclude": "ubuntu",
                 }
@@ -234,7 +234,7 @@ agent:
                     "agent_path": " ",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
@@ -252,7 +252,7 @@ agent:
                     "agent_path": "~/.codex",
                     "agent_full_name": "Codex CLI",
                     "agent_homepage": "https://example.com",
-                    "redistributable": True,
+                    "build_local": False,
                     "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     "base_exclude": ["ubuntu"],
                 }

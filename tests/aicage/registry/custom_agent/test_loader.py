@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, mock
 
+from aicage.errors import CliError
 from aicage.registry.custom_agent.loader import load_custom_agents
 from aicage.registry.images_metadata.models import ImagesMetadata
 
@@ -30,7 +31,6 @@ class CustomAgentLoaderTests(TestCase):
                         "agent_path: ~/.custom",
                         "agent_full_name: Custom",
                         "agent_homepage: https://example.com",
-                        "redistributable: false",
                         "base_exclude:",
                         "  - alpine",
                         "base_distro_exclude:",
@@ -39,6 +39,8 @@ class CustomAgentLoaderTests(TestCase):
                 ),
                 encoding="utf-8",
             )
+            (agent_dir / "install.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            (agent_dir / "version.sh").write_text("echo 1.0.0\n", encoding="utf-8")
             with mock.patch(
                 "aicage.registry.custom_agent.loader.DEFAULT_CUSTOM_AGENTS_DIR",
                 str(custom_dir),
@@ -46,8 +48,31 @@ class CustomAgentLoaderTests(TestCase):
                 custom_agents = load_custom_agents(metadata, "aicage")
 
         agent = custom_agents["custom"]
-        self.assertTrue(agent.is_custom)
+        self.assertEqual(custom_dir / "custom", agent.local_definition_dir)
         self.assertEqual({"ubuntu": "aicage:custom-ubuntu"}, agent.valid_bases)
+
+    def test_load_custom_agents_requires_install_and_version(self) -> None:
+        metadata = self._metadata_with_bases(["ubuntu"])
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            custom_dir = Path(tmp_dir)
+            agent_dir = custom_dir / "custom"
+            agent_dir.mkdir()
+            (agent_dir / "agent.yml").write_text(
+                "\n".join(
+                    [
+                        "agent_path: ~/.custom",
+                        "agent_full_name: Custom",
+                        "agent_homepage: https://example.com",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            with mock.patch(
+                "aicage.registry.custom_agent.loader.DEFAULT_CUSTOM_AGENTS_DIR",
+                str(custom_dir),
+            ):
+                with self.assertRaises(CliError):
+                    load_custom_agents(metadata, "aicage")
 
     @staticmethod
     def _metadata_with_bases(bases: list[str]) -> ImagesMetadata:
@@ -70,7 +95,7 @@ class CustomAgentLoaderTests(TestCase):
                         "agent_path": "~/.codex",
                         "agent_full_name": "Codex CLI",
                         "agent_homepage": "https://example.com",
-                        "redistributable": True,
+                        "build_local": False,
                         "valid_bases": {
                             name: f"ghcr.io/aicage/aicage:codex-{name}" for name in bases
                         },

@@ -50,7 +50,7 @@ agent:
     agent_path: ~/.claude
     agent_full_name: Claude Code
     agent_homepage: https://claude.com/product/claude-code
-    redistributable: false
+    build_local: true
     valid_bases:
       act: aicage:claude-act
       alpine: aicage:claude-alpine
@@ -63,7 +63,7 @@ agent:
     agent_path: ~/.codex
     agent_full_name: Codex CLI
     agent_homepage: https://developers.openai.com/codex/cli
-    redistributable: true
+    build_local: false
     valid_bases:
       act: ghcr.io/aicage/aicage:codex-act
       alpine: ghcr.io/aicage/aicage:codex-alpine
@@ -76,7 +76,7 @@ agent:
     agent_path: ~/.copilot
     agent_full_name: GitHub Copilot CLI
     agent_homepage: https://github.com/features/copilot/cli
-    redistributable: true
+    build_local: false
     base_exclude:
       - alpine
       - minimal
@@ -92,7 +92,7 @@ agent:
     agent_path: ~/.local/share/crush
     agent_full_name: Crush
     agent_homepage: https://github.com/charmbracelet/crush
-    redistributable: true
+    build_local: false
     valid_bases:
       act: ghcr.io/aicage/aicage:crush-act
       alpine: ghcr.io/aicage/aicage:crush-alpine
@@ -105,7 +105,7 @@ agent:
     agent_path: ~/.factory
     agent_full_name: Factory CLI
     agent_homepage: https://factory.ai/product/cli
-    redistributable: false
+    build_local: true
     valid_bases:
       act: aicage:droid-act
       alpine: aicage:droid-alpine
@@ -118,7 +118,7 @@ agent:
     agent_path: ~/.gemini
     agent_full_name: Gemini CLI
     agent_homepage: https://geminicli.com
-    redistributable: true
+    build_local: false
     valid_bases:
       act: ghcr.io/aicage/aicage:gemini-act
       alpine: ghcr.io/aicage/aicage:gemini-alpine
@@ -131,7 +131,7 @@ agent:
     agent_path: ~/.config/goose
     agent_full_name: Goose CLI
     agent_homepage: https://block.github.io/goose
-    redistributable: true
+    build_local: false
     valid_bases:
       act: ghcr.io/aicage/aicage:goose-act
       alpine: ghcr.io/aicage/aicage:goose-alpine
@@ -144,7 +144,7 @@ agent:
     agent_path: ~/.qwen
     agent_full_name: Qwen Code
     agent_homepage: https://github.com/QwenLM/qwen-code
-    redistributable: true
+    build_local: false
     valid_bases:
       act: ghcr.io/aicage/aicage:qwen-act
       alpine: ghcr.io/aicage/aicage:qwen-alpine

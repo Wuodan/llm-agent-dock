@@ -26,10 +26,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         run_config: RunConfig = load_run_config(parsed.agent, parsed)
         logger.info("Resolved run config for agent %s", run_config.agent)
         agent_metadata = run_config.images_metadata.agents[run_config.agent]
-        if not agent_metadata.redistributable and not agent_metadata.is_custom:
-            ensure_local_image(run_config)
-        else:
+        if agent_metadata.local_definition_dir is None:
             pull_image(run_config)
+        else:
+            ensure_local_image(run_config)
         run_args: DockerRunArgs = build_run_args(config=run_config, parsed=parsed)
 
         run_cmd: list[str] = assemble_docker_run(run_args)

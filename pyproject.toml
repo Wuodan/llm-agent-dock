@@ -26,12 +26,14 @@ packages = ["src/aicage"]
 "config/config.yaml" = "config/config.yaml"
 "config/images-metadata.yaml" = "config/images-metadata.yaml"
 "config/agent-build" = "config/agent-build"
+"config/validation/agent.schema.json" = "config/validation/agent.schema.json"
 
 [tool.hatch.build]
 include = [
   "config/config.yaml",
   "config/images-metadata.yaml",
   "config/agent-build/**",
+  "config/validation/agent.schema.json",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -40,6 +42,7 @@ include = [
   "config/config.yaml",
   "config/images-metadata.yaml",
   "config/agent-build/**",
+  "config/validation/agent.schema.json",
   "LICENSE",
   "README.md",
   "pyproject.toml",

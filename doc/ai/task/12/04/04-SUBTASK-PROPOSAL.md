@@ -9,7 +9,7 @@ deferring actual integration until later subtasks.
 ## Goals
 
 - Unified discovery list for:
-  - Release agents from `images-metadata.yaml` (redistributable + non-redistributable).
+- Release agents from `images-metadata.yaml` (build_local true/false).
   - Local custom agents at `~/.aicage/custom/agent/<AGENT>/` (stub until Subtask 06).
 - Version check flow:
   - Try aicage-builder version-check image first (stub until helper image exists).
@@ -30,7 +30,7 @@ deferring actual integration until later subtasks.
 - Keep `ImagesMetadata` as the central runtime source of truth.
 - Add a lightweight `AgentSource` concept in runtime (not in metadata YAML):
   - `source_kind`: `"release"` or `"custom"`.
-  - `is_redistributable`: from agent metadata.
+  - `build_local`: from agent metadata.
 - Use `source_kind` only to decide downstream behavior (e.g., local build vs pull).
 
 ### Agent discovery flow (stubbed)

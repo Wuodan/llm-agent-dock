@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AICAGE agent definition",
+  "type": "object",
+  "required": [
+    "agent_path",
+    "agent_full_name",
+    "agent_homepage"
+  ],
+  "properties": {
+    "agent_path": {
+      "type": "string"
+    },
+    "agent_full_name": {
+      "type": "string"
+    },
+    "agent_homepage": {
+      "type": "string"
+    },
+    "build_local": {
+      "type": "boolean",
+      "default": true
+    },
+    "base_exclude": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "base_distro_exclude": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

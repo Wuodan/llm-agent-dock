@@ -1,4 +1,4 @@
 agent_path: ~/.claude
 agent_full_name: Claude Code
 agent_homepage: https://claude.com/product/claude-code
-redistributable: false
+build_local: true

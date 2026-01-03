@@ -33,7 +33,7 @@ metadata. Getting these aligned first avoids rework and conflicting assumptions.
 ## Expected outputs
 
 - Approved architecture decisions documented in this subtask folder.
-- Non-redistributable agents represented via a required agent.yml flag.
+- Non-redistributable agents represented via a required `build_local` flag.
 - No local state files for build/update decisions; deterministic tags and real image inspection only.
 - No logs or cache under ~/.aicage/; build logs go to /tmp.
 - Clear constraints and assumptions for all later subtasks.
