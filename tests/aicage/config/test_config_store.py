@@ -5,6 +5,16 @@ from unittest import TestCase, mock
 import yaml
 
 from aicage.config import ConfigError, ProjectConfig, SettingsStore
+from aicage.config.global_config import (
+    _DEFAULT_IMAGE_BASE_KEY,
+    _IMAGE_BASE_REPOSITORY_KEY,
+    _IMAGE_REGISTRY_API_TOKEN_URL_KEY,
+    _IMAGE_REGISTRY_API_URL_KEY,
+    _IMAGE_REGISTRY_KEY,
+    _IMAGE_REPOSITORY_KEY,
+    _LOCAL_IMAGE_REPOSITORY_KEY,
+    _VERSION_CHECK_IMAGE_KEY,
+)
 from aicage.config.project_config import AgentConfig, AgentMounts
 
 
@@ -18,14 +28,14 @@ class ConfigStoreTests(TestCase):
             packaged_config.write_text(
                 yaml.safe_dump(
                     {
-                        "image_registry": "ghcr.io",
-                        "image_registry_api_url": "https://ghcr.io/v2",
-                        "image_registry_api_token_url": "https://ghcr.io/token",
-                        "image_repository": "aicage/aicage",
-                        "image_base_repository": "aicage/aicage-image-base",
-                        "default_image_base": "ubuntu",
-                        "version_check_image": "ghcr.io/aicage/aicage-image-util:agent-version",
-                        "local_image_repository": "aicage",
+                        _IMAGE_REGISTRY_KEY: "ghcr.io",
+                        _IMAGE_REGISTRY_API_URL_KEY: "https://ghcr.io/v2",
+                        _IMAGE_REGISTRY_API_TOKEN_URL_KEY: "https://ghcr.io/token",
+                        _IMAGE_REPOSITORY_KEY: "aicage/aicage",
+                        _IMAGE_BASE_REPOSITORY_KEY: "aicage/aicage-image-base",
+                        _DEFAULT_IMAGE_BASE_KEY: "ubuntu",
+                        _VERSION_CHECK_IMAGE_KEY: "ghcr.io/aicage/aicage-image-util:agent-version",
+                        _LOCAL_IMAGE_REPOSITORY_KEY: "aicage",
                     },
                     sort_keys=False,
                 ),
@@ -40,7 +50,7 @@ class ConfigStoreTests(TestCase):
                 global_path = store._global_config()
                 self.assertTrue(global_path.exists())
                 global_data = yaml.safe_load(global_path.read_text())
-                self.assertEqual("aicage/aicage", global_data["image_repository"])
+                self.assertEqual("aicage/aicage", global_data[_IMAGE_REPOSITORY_KEY])
 
                 global_cfg = store.load_global()
                 self.assertEqual("aicage/aicage", global_cfg.image_repository)

@@ -9,6 +9,27 @@ import yaml
 from aicage.config.resources import find_packaged_path
 from aicage.errors import CliError
 
+_AICAGE_IMAGE_KEY: str = "aicage-image"
+_AICAGE_IMAGE_BASE_KEY: str = "aicage-image-base"
+_BASES_KEY: str = "bases"
+_AGENT_KEY: str = "agent"
+
+_VERSION_KEY: str = "version"
+
+_ROOT_IMAGE_KEY: str = "root_image"
+_BASE_IMAGE_DISTRO_KEY: str = "base_image_distro"
+_BASE_IMAGE_DESCRIPTION_KEY: str = "base_image_description"
+_OS_INSTALLER_KEY: str = "os_installer"
+_TEST_SUITE_KEY: str = "test_suite"
+
+AGENT_PATH_KEY: str = "agent_path"
+AGENT_FULL_NAME_KEY: str = "agent_full_name"
+AGENT_HOMEPAGE_KEY: str = "agent_homepage"
+BUILD_LOCAL_KEY: str = "build_local"
+_VALID_BASES_KEY: str = "valid_bases"
+BASE_EXCLUDE_KEY: str = "base_exclude"
+BASE_DISTRO_EXCLUDE_KEY: str = "base_distro_exclude"
+
 
 @dataclass(frozen=True)
 class ImageReleaseInfo:
@@ -56,14 +77,14 @@ class ImagesMetadata:
     def from_mapping(cls, data: dict[str, Any]) -> ImagesMetadata:
         _expect_keys(
             data,
-            required={"aicage-image", "aicage-image-base", "bases", "agent"},
+            required={_AICAGE_IMAGE_KEY, _AICAGE_IMAGE_BASE_KEY, _BASES_KEY, _AGENT_KEY},
             optional=set(),
             context="images metadata",
         )
-        aicage_image = _parse_release_info(data["aicage-image"], "aicage-image")
-        aicage_image_base = _parse_release_info(data["aicage-image-base"], "aicage-image-base")
-        bases = _parse_bases(data["bases"])
-        agents = _parse_agents(data["agent"])
+        aicage_image = _parse_release_info(data[_AICAGE_IMAGE_KEY], _AICAGE_IMAGE_KEY)
+        aicage_image_base = _parse_release_info(data[_AICAGE_IMAGE_BASE_KEY], _AICAGE_IMAGE_BASE_KEY)
+        bases = _parse_bases(data[_BASES_KEY])
+        agents = _parse_agents(data[_AGENT_KEY])
         return cls(
             aicage_image=aicage_image,
             aicage_image_base=aicage_image_base,
@@ -74,83 +95,100 @@ class ImagesMetadata:
 
 def _parse_release_info(value: Any, context: str) -> ImageReleaseInfo:
     mapping = _expect_mapping(value, context)
-    _expect_keys(mapping, required={"version"}, optional=set(), context=context)
-    return ImageReleaseInfo(version=_expect_string(mapping.get("version"), f"{context}.version"))
+    _expect_keys(mapping, required={_VERSION_KEY}, optional=set(), context=context)
+    return ImageReleaseInfo(version=_expect_string(mapping.get(_VERSION_KEY), f"{context}.{_VERSION_KEY}"))
 
 
 def _parse_bases(value: Any) -> dict[str, BaseMetadata]:
-    mapping = _expect_mapping(value, "bases")
+    mapping = _expect_mapping(value, _BASES_KEY)
     bases: dict[str, BaseMetadata] = {}
     for name, base_value in mapping.items():
         if not isinstance(name, str):
             raise CliError("Images metadata base keys must be strings.")
-        base_mapping = _expect_mapping(base_value, f"bases.{name}")
+        base_mapping = _expect_mapping(base_value, f"{_BASES_KEY}.{name}")
         _expect_keys(
             base_mapping,
             required={
-                "root_image",
-                "base_image_distro",
-                "base_image_description",
-                "os_installer",
-                "test_suite",
+                _ROOT_IMAGE_KEY,
+                _BASE_IMAGE_DISTRO_KEY,
+                _BASE_IMAGE_DESCRIPTION_KEY,
+                _OS_INSTALLER_KEY,
+                _TEST_SUITE_KEY,
             },
             optional=set(),
-            context=f"bases.{name}",
+            context=f"{_BASES_KEY}.{name}",
         )
         bases[name] = BaseMetadata(
-            root_image=_expect_string(base_mapping.get("root_image"), f"bases.{name}.root_image"),
+            root_image=_expect_string(
+                base_mapping.get(_ROOT_IMAGE_KEY),
+                f"{_BASES_KEY}.{name}.{_ROOT_IMAGE_KEY}",
+            ),
             base_image_distro=_expect_string(
-                base_mapping.get("base_image_distro"), f"bases.{name}.base_image_distro"
+                base_mapping.get(_BASE_IMAGE_DISTRO_KEY),
+                f"{_BASES_KEY}.{name}.{_BASE_IMAGE_DISTRO_KEY}",
             ),
             base_image_description=_expect_string(
-                base_mapping.get("base_image_description"),
-                f"bases.{name}.base_image_description",
+                base_mapping.get(_BASE_IMAGE_DESCRIPTION_KEY),
+                f"{_BASES_KEY}.{name}.{_BASE_IMAGE_DESCRIPTION_KEY}",
             ),
-            os_installer=_expect_string(base_mapping.get("os_installer"), f"bases.{name}.os_installer"),
-            test_suite=_expect_string(base_mapping.get("test_suite"), f"bases.{name}.test_suite"),
+            os_installer=_expect_string(
+                base_mapping.get(_OS_INSTALLER_KEY),
+                f"{_BASES_KEY}.{name}.{_OS_INSTALLER_KEY}",
+            ),
+            test_suite=_expect_string(
+                base_mapping.get(_TEST_SUITE_KEY),
+                f"{_BASES_KEY}.{name}.{_TEST_SUITE_KEY}",
+            ),
         )
     return bases
 
 
 def _parse_agents(value: Any) -> dict[str, AgentMetadata]:
-    mapping = _expect_mapping(value, "agent")
+    mapping = _expect_mapping(value, _AGENT_KEY)
     agents: dict[str, AgentMetadata] = {}
     for name, agent_value in mapping.items():
         if not isinstance(name, str):
             raise CliError("Images metadata agent keys must be strings.")
-        agent_mapping = _expect_mapping(agent_value, f"agent.{name}")
+        agent_mapping = _expect_mapping(agent_value, f"{_AGENT_KEY}.{name}")
         _expect_keys(
             agent_mapping,
             required={
-                "agent_path",
-                "agent_full_name",
-                "agent_homepage",
-                "build_local",
-                "valid_bases",
+                AGENT_PATH_KEY,
+                AGENT_FULL_NAME_KEY,
+                AGENT_HOMEPAGE_KEY,
+                BUILD_LOCAL_KEY,
+                _VALID_BASES_KEY,
             },
-            optional={"base_exclude", "base_distro_exclude"},
-            context=f"agent.{name}",
+            optional={BASE_EXCLUDE_KEY, BASE_DISTRO_EXCLUDE_KEY},
+            context=f"{_AGENT_KEY}.{name}",
         )
         agents[name] = AgentMetadata(
-            agent_path=_expect_string(agent_mapping.get("agent_path"), f"agent.{name}.agent_path"),
+            agent_path=_expect_string(
+                agent_mapping.get(AGENT_PATH_KEY), f"{_AGENT_KEY}.{name}.{AGENT_PATH_KEY}"
+            ),
             agent_full_name=_expect_string(
-                agent_mapping.get("agent_full_name"), f"agent.{name}.agent_full_name"
+                agent_mapping.get(AGENT_FULL_NAME_KEY),
+                f"{_AGENT_KEY}.{name}.{AGENT_FULL_NAME_KEY}",
             ),
             agent_homepage=_expect_string(
-                agent_mapping.get("agent_homepage"), f"agent.{name}.agent_homepage"
+                agent_mapping.get(AGENT_HOMEPAGE_KEY),
+                f"{_AGENT_KEY}.{name}.{AGENT_HOMEPAGE_KEY}",
             ),
             local_definition_dir=_local_definition_dir(
                 name,
-                _expect_bool(agent_mapping.get("build_local"), f"agent.{name}.build_local"),
+                _expect_bool(
+                    agent_mapping.get(BUILD_LOCAL_KEY), f"{_AGENT_KEY}.{name}.{BUILD_LOCAL_KEY}"
+                ),
             ),
             valid_bases=_expect_str_mapping(
-                agent_mapping.get("valid_bases"), f"agent.{name}.valid_bases"
+                agent_mapping.get(_VALID_BASES_KEY), f"{_AGENT_KEY}.{name}.{_VALID_BASES_KEY}"
             ),
             base_exclude=_maybe_str_list(
-                agent_mapping.get("base_exclude"), f"agent.{name}.base_exclude"
+                agent_mapping.get(BASE_EXCLUDE_KEY), f"{_AGENT_KEY}.{name}.{BASE_EXCLUDE_KEY}"
             ),
             base_distro_exclude=_maybe_str_list(
-                agent_mapping.get("base_distro_exclude"), f"agent.{name}.base_distro_exclude"
+                agent_mapping.get(BASE_DISTRO_EXCLUDE_KEY),
+                f"{_AGENT_KEY}.{name}.{BASE_DISTRO_EXCLUDE_KEY}",
             ),
         )
     return agents

@@ -7,6 +7,9 @@ from pathlib import Path
 import yaml
 
 _DEFAULT_STATE_DIR = "~/.aicage/state/version-check"
+_AGENT_KEY: str = "agent"
+_VERSION_KEY: str = "version"
+_CHECKED_AT_KEY: str = "checked_at"
 
 
 class VersionCheckStore:
@@ -18,9 +21,9 @@ class VersionCheckStore:
         path = self._base_dir / f"{_sanitize_agent_name(agent)}.yaml"
         with path.open("w", encoding="utf-8") as handle:
             payload = {
-                "agent": agent,
-                "version": version,
-                "checked_at": _now_iso(),
+                _AGENT_KEY: agent,
+                _VERSION_KEY: version,
+                _CHECKED_AT_KEY: _now_iso(),
             }
             yaml.safe_dump(payload, handle, sort_keys=True)
         return path

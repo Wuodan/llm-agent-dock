@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from aicage.config.context import ConfigContext
-from aicage.config.project_config import AgentConfig
+from aicage.config.project_config import AGENT_BASE_KEY, AgentConfig
 from aicage.errors import CliError
 from aicage.registry.images_metadata.models import AgentMetadata, ImagesMetadata
 from aicage.runtime.prompts import BaseSelectionRequest, prompt_for_base
@@ -14,7 +14,7 @@ from ._image_refs import local_image_ref
 def select_agent_image(agent: str, context: ConfigContext) -> str:
     agent_cfg = context.project_cfg.agents.setdefault(agent, AgentConfig())
     agent_metadata = _require_agent_metadata(agent, context.images_metadata)
-    base = agent_cfg.base or context.global_cfg.agents.get(agent, {}).get("base")
+    base = agent_cfg.base or context.global_cfg.agents.get(agent, {}).get(AGENT_BASE_KEY)
 
     if not base:
         available_bases = _available_bases(agent, agent_metadata)

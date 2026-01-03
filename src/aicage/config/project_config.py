@@ -2,6 +2,19 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+_PROJECT_PATH_KEY: str = "path"
+_PROJECT_AGENTS_KEY: str = "agents"
+_DOCKER_ARGS_KEY: str = "docker_args"
+
+AGENT_BASE_KEY: str = "base"
+_AGENT_ENTRYPOINT_KEY: str = "entrypoint"
+_AGENT_MOUNTS_KEY: str = "mounts"
+
+_MOUNT_GITCONFIG_KEY: str = "gitconfig"
+_MOUNT_GNUPG_KEY: str = "gnupg"
+_MOUNT_SSH_KEY: str = "ssh"
+_MOUNT_DOCKER_KEY: str = "docker"
+
 
 @dataclass
 class AgentMounts:
@@ -13,22 +26,22 @@ class AgentMounts:
     @classmethod
     def from_mapping(cls, data: dict[str, Any]) -> "AgentMounts":
         return cls(
-            gitconfig=data.get("gitconfig"),
-            gnupg=data.get("gnupg"),
-            ssh=data.get("ssh"),
-            docker=data.get("docker"),
+            gitconfig=data.get(_MOUNT_GITCONFIG_KEY),
+            gnupg=data.get(_MOUNT_GNUPG_KEY),
+            ssh=data.get(_MOUNT_SSH_KEY),
+            docker=data.get(_MOUNT_DOCKER_KEY),
         )
 
     def to_mapping(self) -> dict[str, bool]:
         payload: dict[str, bool] = {}
         if self.gitconfig is not None:
-            payload["gitconfig"] = self.gitconfig
+            payload[_MOUNT_GITCONFIG_KEY] = self.gitconfig
         if self.gnupg is not None:
-            payload["gnupg"] = self.gnupg
+            payload[_MOUNT_GNUPG_KEY] = self.gnupg
         if self.ssh is not None:
-            payload["ssh"] = self.ssh
+            payload[_MOUNT_SSH_KEY] = self.ssh
         if self.docker is not None:
-            payload["docker"] = self.docker
+            payload[_MOUNT_DOCKER_KEY] = self.docker
         return payload
 
 
@@ -41,25 +54,25 @@ class AgentConfig:
 
     @classmethod
     def from_mapping(cls, data: dict[str, Any]) -> "AgentConfig":
-        mounts = AgentMounts.from_mapping(data.get("mounts", {}) or {})
+        mounts = AgentMounts.from_mapping(data.get(_AGENT_MOUNTS_KEY, {}) or {})
         return cls(
-            base=data.get("base"),
-            docker_args=data.get("docker_args", "") or "",
-            entrypoint=data.get("entrypoint"),
+            base=data.get(AGENT_BASE_KEY),
+            docker_args=data.get(_DOCKER_ARGS_KEY, "") or "",
+            entrypoint=data.get(_AGENT_ENTRYPOINT_KEY),
             mounts=mounts,
         )
 
     def to_mapping(self) -> dict[str, Any]:
         payload: dict[str, Any] = {}
         if self.base:
-            payload["base"] = self.base
+            payload[AGENT_BASE_KEY] = self.base
         if self.docker_args:
-            payload["docker_args"] = self.docker_args
+            payload[_DOCKER_ARGS_KEY] = self.docker_args
         if self.entrypoint:
-            payload["entrypoint"] = self.entrypoint
+            payload[_AGENT_ENTRYPOINT_KEY] = self.entrypoint
         mounts = self.mounts.to_mapping()
         if mounts:
-            payload["mounts"] = mounts
+            payload[_AGENT_MOUNTS_KEY] = mounts
         return payload
 
 
@@ -70,18 +83,18 @@ class ProjectConfig:
 
     @classmethod
     def from_mapping(cls, project_path: Path, data: dict[str, Any]) -> "ProjectConfig":
-        raw_agents = data.get("agents", {}) or {}
+        raw_agents = data.get(_PROJECT_AGENTS_KEY, {}) or {}
         agents = {name: AgentConfig.from_mapping(cfg) for name, cfg in raw_agents.items()}
-        legacy_docker_args = data.get("docker_args", "")
+        legacy_docker_args = data.get(_DOCKER_ARGS_KEY, "")
         if legacy_docker_args:
             for agent_cfg in agents.values():
                 if not agent_cfg.docker_args:
                     agent_cfg.docker_args = legacy_docker_args
         return cls(
-            path=data.get("path", str(project_path)),
+            path=data.get(_PROJECT_PATH_KEY, str(project_path)),
             agents=agents,
         )
 
     def to_mapping(self) -> dict[str, Any]:
         agents_payload = {name: cfg.to_mapping() for name, cfg in self.agents.items()}
-        return {"path": self.path, "agents": agents_payload}
+        return {_PROJECT_PATH_KEY: self.path, _PROJECT_AGENTS_KEY: agents_payload}

@@ -9,6 +9,7 @@ import yaml
 from aicage.config.global_config import GlobalConfig
 from aicage.errors import CliError
 from aicage.registry.agent_version import AgentVersionChecker, VersionCheckStore
+from aicage.registry.agent_version._store import _VERSION_KEY
 from aicage.registry.images_metadata.models import AgentMetadata
 
 
@@ -44,7 +45,7 @@ class AgentVersionCheckTests(TestCase):
             stored = store_dir / "custom.yaml"
             self.assertTrue(stored.is_file())
             data = yaml.safe_load(stored.read_text(encoding="utf-8"))
-            self.assertEqual("1.2.3", data["version"])
+            self.assertEqual("1.2.3", data[_VERSION_KEY])
 
     def test_check_uses_builder_fallback_and_persists(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -79,7 +80,7 @@ class AgentVersionCheckTests(TestCase):
             stored = store_dir / "custom.yaml"
             self.assertTrue(stored.is_file())
             data = yaml.safe_load(stored.read_text(encoding="utf-8"))
-            self.assertEqual("1.2.3", data["version"])
+            self.assertEqual("1.2.3", data[_VERSION_KEY])
 
     def test_check_raises_when_builder_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

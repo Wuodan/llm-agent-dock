@@ -4,7 +4,25 @@ from aicage.config.context import ConfigContext
 from aicage.config.global_config import GlobalConfig
 from aicage.config.project_config import ProjectConfig
 from aicage.errors import CliError
-from aicage.registry.images_metadata.models import AgentMetadata, ImagesMetadata
+from aicage.registry.images_metadata.models import (
+    _AGENT_KEY,
+    _AICAGE_IMAGE_BASE_KEY,
+    _AICAGE_IMAGE_KEY,
+    _BASE_IMAGE_DESCRIPTION_KEY,
+    _BASE_IMAGE_DISTRO_KEY,
+    _BASES_KEY,
+    _OS_INSTALLER_KEY,
+    _ROOT_IMAGE_KEY,
+    _TEST_SUITE_KEY,
+    _VALID_BASES_KEY,
+    _VERSION_KEY,
+    AGENT_FULL_NAME_KEY,
+    AGENT_HOMEPAGE_KEY,
+    AGENT_PATH_KEY,
+    BUILD_LOCAL_KEY,
+    AgentMetadata,
+    ImagesMetadata,
+)
 from aicage.runtime.prompts import (
     BaseSelectionRequest,
     ensure_tty_for_prompt,
@@ -111,25 +129,25 @@ class PromptTests(TestCase):
     def _metadata_with_bases(bases: list[str]) -> ImagesMetadata:
         return ImagesMetadata.from_mapping(
             {
-                "aicage-image": {"version": "0.3.3"},
-                "aicage-image-base": {"version": "0.3.3"},
-                "bases": {
+                _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+                _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+                _BASES_KEY: {
                     name: {
-                        "root_image": "ubuntu:latest",
-                        "base_image_distro": "Ubuntu",
-                        "base_image_description": "Default",
-                        "os_installer": "distro/debian/install.sh",
-                        "test_suite": "default",
+                        _ROOT_IMAGE_KEY: "ubuntu:latest",
+                        _BASE_IMAGE_DISTRO_KEY: "Ubuntu",
+                        _BASE_IMAGE_DESCRIPTION_KEY: "Default",
+                        _OS_INSTALLER_KEY: "distro/debian/install.sh",
+                        _TEST_SUITE_KEY: "default",
                     }
                     for name in bases
                 },
-                "agent": {
+                _AGENT_KEY: {
                     "codex": {
-                        "agent_path": "~/.codex",
-                        "agent_full_name": "Codex CLI",
-                        "agent_homepage": "https://example.com",
-                        "build_local": False,
-                        "valid_bases": {name: f"repo:{name}" for name in bases},
+                        AGENT_PATH_KEY: "~/.codex",
+                        AGENT_FULL_NAME_KEY: "Codex CLI",
+                        AGENT_HOMEPAGE_KEY: "https://example.com",
+                        BUILD_LOCAL_KEY: False,
+                        _VALID_BASES_KEY: {name: f"repo:{name}" for name in bases},
                     }
                 },
             }

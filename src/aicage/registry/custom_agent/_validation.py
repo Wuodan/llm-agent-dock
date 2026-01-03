@@ -7,6 +7,7 @@ from typing import Any
 
 from aicage.config.resources import find_packaged_path
 from aicage.errors import CliError
+from aicage.registry.images_metadata.models import BUILD_LOCAL_KEY
 
 _AGENT_SCHEMA_PATH = "validation/agent.schema.json"
 _CUSTOM_AGENT_CONTEXT = "custom agent metadata"
@@ -32,7 +33,7 @@ def validate_agent_mapping(mapping: dict[str, Any]) -> dict[str, Any]:
             raise CliError(f"{context} contains unsupported keys: {', '.join(unknown)}.")
 
     normalized = dict(mapping)
-    normalized.setdefault("build_local", True)
+    normalized.setdefault(BUILD_LOCAL_KEY, True)
 
     for key, value in normalized.items():
         schema_entry = properties.get(key)

@@ -14,6 +14,15 @@ from aicage.registry.images_metadata.models import (
     ImagesMetadata,
 )
 from aicage.registry.local_build import ensure_local_image as ensure_local_image_module
+from aicage.registry.local_build._store import (
+    _AGENT_KEY,
+    _AGENT_VERSION_KEY,
+    _BASE_DIGEST_KEY,
+    _BASE_IMAGE_KEY,
+    _BASE_KEY,
+    _BUILT_AT_KEY,
+    _IMAGE_REF_KEY,
+)
 
 from ._fixtures import build_run_config
 
@@ -90,7 +99,7 @@ class EnsureLocalImageTests(TestCase):
             build_mock.assert_called_once()
             record_path = state_dir / "claude-ubuntu.yaml"
             payload = yaml.safe_load(record_path.read_text(encoding="utf-8"))
-            self.assertEqual("1.2.3", payload["agent_version"])
+            self.assertEqual("1.2.3", payload[_AGENT_VERSION_KEY])
 
     def test_ensure_local_image_skips_when_up_to_date(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -102,13 +111,13 @@ class EnsureLocalImageTests(TestCase):
             record_path.write_text(
                 yaml.safe_dump(
                     {
-                        "agent": "claude",
-                        "base": "ubuntu",
-                        "agent_version": "1.2.3",
-                        "base_image": "ghcr.io/aicage/aicage-image-base:ubuntu",
-                        "base_digest": "sha256:base",
-                        "image_ref": "aicage:claude-ubuntu",
-                        "built_at": "2024-01-01T00:00:00+00:00",
+                        _AGENT_KEY: "claude",
+                        _BASE_KEY: "ubuntu",
+                        _AGENT_VERSION_KEY: "1.2.3",
+                        _BASE_IMAGE_KEY: "ghcr.io/aicage/aicage-image-base:ubuntu",
+                        _BASE_DIGEST_KEY: "sha256:base",
+                        _IMAGE_REF_KEY: "aicage:claude-ubuntu",
+                        _BUILT_AT_KEY: "2024-01-01T00:00:00+00:00",
                     }
                 ),
                 encoding="utf-8",

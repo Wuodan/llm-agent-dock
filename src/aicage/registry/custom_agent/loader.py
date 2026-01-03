@@ -8,7 +8,15 @@ import yaml
 
 from aicage.errors import CliError
 from aicage.registry._image_refs import local_image_ref
-from aicage.registry.images_metadata.models import AgentMetadata, ImagesMetadata
+from aicage.registry.images_metadata.models import (
+    AGENT_FULL_NAME_KEY,
+    AGENT_HOMEPAGE_KEY,
+    AGENT_PATH_KEY,
+    BASE_DISTRO_EXCLUDE_KEY,
+    BASE_EXCLUDE_KEY,
+    AgentMetadata,
+    ImagesMetadata,
+)
 
 from ._validation import ensure_required_files, expect_string, maybe_str_list, validate_agent_mapping
 
@@ -68,9 +76,9 @@ def _build_custom_agent(
     local_image_repository: str,
 ) -> AgentMetadata:
     normalized_mapping = validate_agent_mapping(agent_mapping)
-    base_exclude = maybe_str_list(normalized_mapping.get("base_exclude"), "base_exclude")
+    base_exclude = maybe_str_list(normalized_mapping.get(BASE_EXCLUDE_KEY), BASE_EXCLUDE_KEY)
     base_distro_exclude = maybe_str_list(
-        normalized_mapping.get("base_distro_exclude"), "base_distro_exclude"
+        normalized_mapping.get(BASE_DISTRO_EXCLUDE_KEY), BASE_DISTRO_EXCLUDE_KEY
     )
     valid_bases = _build_valid_bases(
         agent_name=agent_name,
@@ -80,9 +88,9 @@ def _build_custom_agent(
         local_image_repository=local_image_repository,
     )
     return AgentMetadata(
-        agent_path=expect_string(normalized_mapping.get("agent_path"), "agent_path"),
-        agent_full_name=expect_string(normalized_mapping.get("agent_full_name"), "agent_full_name"),
-        agent_homepage=expect_string(normalized_mapping.get("agent_homepage"), "agent_homepage"),
+        agent_path=expect_string(normalized_mapping.get(AGENT_PATH_KEY), AGENT_PATH_KEY),
+        agent_full_name=expect_string(normalized_mapping.get(AGENT_FULL_NAME_KEY), AGENT_FULL_NAME_KEY),
+        agent_homepage=expect_string(normalized_mapping.get(AGENT_HOMEPAGE_KEY), AGENT_HOMEPAGE_KEY),
         valid_bases=valid_bases,
         base_exclude=base_exclude,
         base_distro_exclude=base_distro_exclude,

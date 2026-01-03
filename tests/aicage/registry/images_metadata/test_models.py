@@ -1,30 +1,48 @@
 from unittest import TestCase
 
 from aicage.errors import CliError
-from aicage.registry.images_metadata.models import ImagesMetadata
+from aicage.registry.images_metadata.models import (
+    _AGENT_KEY,
+    _AICAGE_IMAGE_BASE_KEY,
+    _AICAGE_IMAGE_KEY,
+    _BASE_IMAGE_DESCRIPTION_KEY,
+    _BASE_IMAGE_DISTRO_KEY,
+    _BASES_KEY,
+    _OS_INSTALLER_KEY,
+    _ROOT_IMAGE_KEY,
+    _TEST_SUITE_KEY,
+    _VALID_BASES_KEY,
+    _VERSION_KEY,
+    AGENT_FULL_NAME_KEY,
+    AGENT_HOMEPAGE_KEY,
+    AGENT_PATH_KEY,
+    BASE_EXCLUDE_KEY,
+    BUILD_LOCAL_KEY,
+    ImagesMetadata,
+)
 
 
 class ImagesMetadataModelTests(TestCase):
     def test_from_yaml_parses_valid_payload(self) -> None:
-        payload = """
-aicage-image:
-  version: 0.3.3
-aicage-image-base:
-  version: 0.3.3
-bases:
+        payload = f"""
+{_AICAGE_IMAGE_KEY}:
+  {_VERSION_KEY}: 0.3.3
+{_AICAGE_IMAGE_BASE_KEY}:
+  {_VERSION_KEY}: 0.3.3
+{_BASES_KEY}:
   ubuntu:
-    root_image: ubuntu:latest
-    base_image_distro: Ubuntu
-    base_image_description: Good default
-    os_installer: distro/debian/install.sh
-    test_suite: default
-agent:
+    {_ROOT_IMAGE_KEY}: ubuntu:latest
+    {_BASE_IMAGE_DISTRO_KEY}: Ubuntu
+    {_BASE_IMAGE_DESCRIPTION_KEY}: Good default
+    {_OS_INSTALLER_KEY}: distro/debian/install.sh
+    {_TEST_SUITE_KEY}: default
+{_AGENT_KEY}:
   codex:
-    agent_path: ~/.codex
-    agent_full_name: Codex CLI
-    agent_homepage: https://example.com
-    build_local: false
-    valid_bases:
+    {AGENT_PATH_KEY}: ~/.codex
+    {AGENT_FULL_NAME_KEY}: Codex CLI
+    {AGENT_HOMEPAGE_KEY}: https://example.com
+    {BUILD_LOCAL_KEY}: false
+    {_VALID_BASES_KEY}:
       ubuntu: ghcr.io/aicage/aicage:codex-ubuntu
         """
         metadata = ImagesMetadata.from_yaml(payload)
@@ -39,7 +57,7 @@ agent:
 
     def test_from_yaml_rejects_invalid_payload(self) -> None:
         with self.assertRaises(CliError):
-            ImagesMetadata.from_yaml("aicage-image: [")
+            ImagesMetadata.from_yaml(f"{_AICAGE_IMAGE_KEY}: [")
 
     def test_from_yaml_requires_mapping(self) -> None:
         with self.assertRaises(CliError):
@@ -47,10 +65,10 @@ agent:
 
     def test_from_mapping_rejects_unknown_top_level_keys(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {},
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {},
             "extra": {},
         }
         with self.assertRaises(CliError):
@@ -58,16 +76,16 @@ agent:
 
     def test_from_mapping_rejects_unknown_agent_keys(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                     "extra": "nope",
                 }
             },
@@ -81,15 +99,15 @@ agent:
 
     def test_from_mapping_rejects_missing_agent_required_keys(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
         }
@@ -98,34 +116,34 @@ agent:
 
     def test_from_mapping_rejects_non_string_base_key(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {
                 1: {
-                    "root_image": "ubuntu:latest",
-                    "base_image_distro": "Ubuntu",
-                    "base_image_description": "Default",
-                    "os_installer": "distro/debian/install.sh",
-                    "test_suite": "default",
+                    _ROOT_IMAGE_KEY: "ubuntu:latest",
+                    _BASE_IMAGE_DISTRO_KEY: "Ubuntu",
+                    _BASE_IMAGE_DESCRIPTION_KEY: "Default",
+                    _OS_INSTALLER_KEY: "distro/debian/install.sh",
+                    _TEST_SUITE_KEY: "default",
                 }
             },
-            "agent": {},
+            _AGENT_KEY: {},
         }
         with self.assertRaises(CliError):
             ImagesMetadata.from_mapping(data)
 
     def test_from_mapping_rejects_non_string_agent_key(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 1: {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
         }
@@ -134,16 +152,16 @@ agent:
 
     def test_from_mapping_rejects_invalid_valid_bases_keys(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {1: "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {1: "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
         }
@@ -152,16 +170,16 @@ agent:
 
     def test_from_mapping_rejects_invalid_valid_bases_values(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {"ubuntu": ""},
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {"ubuntu": ""},
                 }
             },
         }
@@ -170,16 +188,16 @@ agent:
 
     def test_from_mapping_rejects_invalid_agent_bool(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": "yes",
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: "yes",
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
         }
@@ -188,17 +206,17 @@ agent:
 
     def test_from_mapping_rejects_invalid_agent_list(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
-                    "base_exclude": [1],
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    BASE_EXCLUDE_KEY: [1],
                 }
             },
         }
@@ -207,17 +225,17 @@ agent:
 
     def test_from_mapping_rejects_invalid_agent_list_type(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
-                    "base_exclude": "ubuntu",
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    BASE_EXCLUDE_KEY: "ubuntu",
                 }
             },
         }
@@ -226,16 +244,16 @@ agent:
 
     def test_from_mapping_rejects_empty_agent_fields(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": " ",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    AGENT_PATH_KEY: " ",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
                 }
             },
         }
@@ -244,17 +262,17 @@ agent:
 
     def test_from_mapping_accepts_valid_exclude_list(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": {},
-            "agent": {
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: {},
+            _AGENT_KEY: {
                 "codex": {
-                    "agent_path": "~/.codex",
-                    "agent_full_name": "Codex CLI",
-                    "agent_homepage": "https://example.com",
-                    "build_local": False,
-                    "valid_bases": {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
-                    "base_exclude": ["ubuntu"],
+                    AGENT_PATH_KEY: "~/.codex",
+                    AGENT_FULL_NAME_KEY: "Codex CLI",
+                    AGENT_HOMEPAGE_KEY: "https://example.com",
+                    BUILD_LOCAL_KEY: False,
+                    _VALID_BASES_KEY: {"ubuntu": "ghcr.io/aicage/aicage:codex-ubuntu"},
+                    BASE_EXCLUDE_KEY: ["ubuntu"],
                 }
             },
         }
@@ -263,10 +281,10 @@ agent:
 
     def test_from_mapping_rejects_invalid_bases_mapping(self) -> None:
         data = {
-            "aicage-image": {"version": "0.3.3"},
-            "aicage-image-base": {"version": "0.3.3"},
-            "bases": [],
-            "agent": {},
+            _AICAGE_IMAGE_KEY: {_VERSION_KEY: "0.3.3"},
+            _AICAGE_IMAGE_BASE_KEY: {_VERSION_KEY: "0.3.3"},
+            _BASES_KEY: [],
+            _AGENT_KEY: {},
         }
         with self.assertRaises(CliError):
             ImagesMetadata.from_mapping(data)
