@@ -20,7 +20,7 @@ from aicage.registry.images_metadata.models import (
 
 from ._validation import ensure_required_files, expect_string, maybe_str_list, validate_agent_mapping
 
-DEFAULT_CUSTOM_AGENTS_DIR = "~/.aicage/custom/agent"
+DEFAULT_CUSTOM_AGENTS_DIR = "~/.aicage/custom/agents"
 _AGENT_DEFINITION_FILES = ("agent.yml", "agent.yaml")
 
 

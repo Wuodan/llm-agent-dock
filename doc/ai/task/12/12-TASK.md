@@ -114,7 +114,7 @@ developers and not for users.
 
 ### Custom local agents
 
-Users shall be able to define their own local agents in `~/.aicage/custom/agent/<AGENT>/`.
+Users shall be able to define their own local agents in `~/.aicage/custom/agents/<AGENT>/`.
 This is intended for private or experimental agents that are not part of `aicage-image`.
 
 Structure should match `agents/<AGENT>/` from `aicage-image` as closely as possible:

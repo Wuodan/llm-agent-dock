@@ -10,7 +10,7 @@ deferring actual integration until later subtasks.
 
 - Unified discovery list for:
 - Release agents from `images-metadata.yaml` (build_local true/false).
-  - Local custom agents at `~/.aicage/custom/agent/<AGENT>/` (stub until Subtask 06).
+  - Local custom agents at `~/.aicage/custom/agents/<AGENT>/` (stub until Subtask 06).
 - Version check flow:
   - Try aicage-builder version-check image first (stub until helper image exists).
   - Fall back to host execution of `version.sh`.
@@ -36,7 +36,7 @@ deferring actual integration until later subtasks.
 ### Agent discovery flow (stubbed)
 
 1. Load packaged `images-metadata.yaml` as today.
-2. Merge additional agents from `~/.aicage/custom/agent/<AGENT>/`:
+2. Merge additional agents from `~/.aicage/custom/agents/<AGENT>/`:
    - Parse `agent.yml` using the same schema.
    - Compute `valid_bases` by filtering bases from packaged metadata using
      `base_exclude` and `base_distro_exclude`.
@@ -102,7 +102,7 @@ Subtask 05 can then decide where to persist this structure (file, db, etc.).
 
 ## Workflow impacts
 
-- Discovery will look for `~/.aicage/custom/agent/` on startup.
+- Discovery will look for `~/.aicage/custom/agents/` on startup.
 - Version checks attempt the builder image first, then host.
 - Persistence of version check results is not implemented in this subtask.
 

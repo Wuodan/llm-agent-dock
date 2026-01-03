@@ -10,7 +10,11 @@ from ._fixtures import build_run_config
 
 class LocalBuildRunnerTests(TestCase):
     def test_run_build_invokes_docker(self) -> None:
-        run_config = build_run_config()
+        with mock.patch(
+            "aicage.registry.images_metadata.models.find_packaged_path",
+            return_value=Path("/tmp/build/Dockerfile"),
+        ):
+            run_config = build_run_config()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "logs" / "build.log"
             with (
@@ -36,6 +40,8 @@ class LocalBuildRunnerTests(TestCase):
                 "docker",
                 "build",
                 "--no-cache",
+                "--file",
+                "/tmp/build/Dockerfile",
                 "--build-arg",
                 "BASE_IMAGE=ghcr.io/aicage/aicage-image-base:ubuntu",
                 "--build-arg",
@@ -48,7 +54,11 @@ class LocalBuildRunnerTests(TestCase):
         )
 
     def test_run_build_raises_on_failure(self) -> None:
-        run_config = build_run_config()
+        with mock.patch(
+            "aicage.registry.images_metadata.models.find_packaged_path",
+            return_value=Path("/tmp/build/Dockerfile"),
+        ):
+            run_config = build_run_config()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "logs" / "build.log"
             with (

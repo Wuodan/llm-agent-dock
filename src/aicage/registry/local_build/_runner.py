@@ -19,11 +19,14 @@ def run_build(
     print(f"[aicage] Building local image {run_config.image_ref} (logs: {log_path})...")
     logger.info("Building local image %s (logs: %s)", run_config.image_ref, log_path)
 
-    build_root = find_packaged_path("agent-build/Dockerfile").parent
+    dockerfile_path = find_packaged_path("agent-build/Dockerfile")
+    build_root = _build_context_dir(run_config, dockerfile_path)
     command = [
         "docker",
         "build",
         "--no-cache",
+        "--file",
+        str(dockerfile_path),
         "--build-arg",
         f"BASE_IMAGE={base_image_ref}",
         "--build-arg",
@@ -51,3 +54,13 @@ def local_image_exists(image_ref: str) -> bool:
         text=True,
     )
     return result.returncode == 0
+
+
+def _build_context_dir(run_config: RunConfig, dockerfile_path: Path) -> Path:
+    agent_metadata = run_config.images_metadata.agents[run_config.agent]
+    local_definition_dir = agent_metadata.local_definition_dir
+    if local_definition_dir is None:
+        return dockerfile_path.parent
+    if local_definition_dir.is_relative_to(dockerfile_path.parent):
+        return dockerfile_path.parent
+    return local_definition_dir.parent.parent

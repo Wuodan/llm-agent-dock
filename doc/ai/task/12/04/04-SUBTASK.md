@@ -19,7 +19,7 @@ check flow. This subtask provides the core runtime capability.
 
 ## Scope
 
-- Discover agents from release metadata and ~/.aicage/custom/agent/.
+- Discover agents from release metadata and ~/.aicage/custom/agents/.
 - Add version check flow using aicage-builder first, with host fallback.
 - Define and persist version check results in local metadata storage.
 

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Allow users to define local agents under ~/.aicage/custom/agent/ and integrate them into discovery,
+Allow users to define local agents under ~/.aicage/custom/agents/ and integrate them into discovery,
 selection, version checks, and local builds.
 
 ## Rationale
@@ -20,7 +20,7 @@ delta, so this work is best built on the core pipeline.
 
 ## Scope
 
-- Discover custom agents from ~/.aicage/custom/agent/.
+- Discover custom agents from ~/.aicage/custom/agents/.
 - Validate their agent.yml with existing schema.
 - Include them in selection lists and local build logic.
 

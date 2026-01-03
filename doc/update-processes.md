@@ -21,7 +21,7 @@ includes current and planned behavior.
 | Base image                           | aicage-image-base bases/<BASE>              | Registry (ghcr.io)  | Scheduled weekly + manual                    |
 | Final image (prebuilt)               | base image + agents/<AGENT>                 | Registry (ghcr.io)  | Agent version + base image updates           |
 | Local final image (build_local=true) | base image + packaged agent-build/<AGENT>   | Local Docker engine | Agent version + base image digest change     |
-| Local final image (custom agent)     | base image + ~/.aicage/custom/agent/<AGENT> | Local Docker engine | Agent version + base image digest change     |
+| Local final image (custom agent)     | base image + ~/.aicage/custom/agents/<AGENT> | Local Docker engine | Agent version + base image digest change     |
 | Local extended image (planned)       | final image + extensions                    | Local Docker engine | Extension changes + base/final image updates |
 | Local custom base image (planned)    | custom base definition                      | Local Docker engine | Definition changes + root image updates      |
 
