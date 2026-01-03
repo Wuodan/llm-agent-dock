@@ -60,3 +60,8 @@ Examples:
 
 This overrides the same parameter to docker run. And with `docker run --entrypoint` user can do the same. We have it
 only for debugging anyway.
+
+## Fix silent pull of util-image
+
+When aicage uses the util-image, it does a docker-run which pulls the image. But the user is kept waiting wondering
+what's going on. On my Raspberry Pi 4 this takes a while.
