@@ -21,3 +21,11 @@ advanced/power users who want to tweak or extend things.
 ## Local checks
 
 Run `scripts/lint.sh` from an active virtualenv with `requirements-dev.txt` installed.
+
+## Integration tests
+
+Integration tests are opt-in because they require Docker and network access. Run them with:
+
+```bash
+AICAGE_RUN_INTEGRATION=1 pytest -m integration
+```
