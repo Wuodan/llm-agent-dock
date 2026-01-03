@@ -41,3 +41,22 @@ Right now docker is used in several places. Centralize that into one clean packa
 ## Centralize string constants for yaml values
 
 Those strings should be cleanly centralized in one place.
+
+## Integration tests with scenarios simulating user environment and actions
+
+To largely automate my manual tests
+
+Examples:
+- docker not installed
+- npm not installed but used in a version.sh (local agents or local custom agents)
+- happy case process for actions user can do:
+  - local agents
+  - local custom agents
+  - extensions
+  - custom bases
+  - combinations of those with or without npm installed, util-image used or not, etc
+
+## Replace remove `aicage --entrypoint`
+
+This overrides the same parameter to docker run. And with `docker run --entrypoint` user can do the same. We have it
+only for debugging anyway.
