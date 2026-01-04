@@ -45,7 +45,8 @@ jobs:
               ["pytest", "--collect-only", "-q", "-m", "integration"],
               text=True,
           ).splitlines()
-          matrix = {"include": [{"test": test} for test in tests if test.strip()]}
+          node_ids = [line for line in tests if "::" in line]
+          matrix = {"include": [{"test": test} for test in node_ids]}
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
               handle.write(f"matrix={json.dumps(matrix)}\n")
           PY
