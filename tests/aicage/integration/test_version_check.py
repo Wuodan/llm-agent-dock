@@ -37,8 +37,12 @@ def _write_npm_shim(bin_dir: Path) -> None:
 
 def test_version_check_falls_back_to_builder(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     _require_integration()
+    home_dir = tmp_path / "home"
+    home_dir.mkdir()
+    monkeypatch.setenv("HOME", str(home_dir))
     with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp_dir:
         temp_path = Path(temp_dir)
         bin_dir = temp_path / "bin"
