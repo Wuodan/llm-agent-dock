@@ -24,6 +24,7 @@ from aicage.docker.query import (
     local_image_exists,
 )
 from aicage.docker.refs import repository_from_image_ref
+from aicage.docker.runtime import get_container_runtime
 from aicage.registry.agent_build._store import BuildRecord, BuildStore
 from aicage.registry.digest.remote_digest import get_remote_digest
 
@@ -252,7 +253,7 @@ def force_record_agent_version(
 def replace_with_dummy_image(image_ref: str) -> str:
     subprocess.run(
         [
-            "docker",
+            get_container_runtime(),
             "import",
             "-",
             image_ref,
@@ -267,7 +268,7 @@ def replace_with_dummy_image(image_ref: str) -> str:
         return f"{repository}@{digest}"
 
     inspect = subprocess.run(
-        ["docker", "image", "inspect", image_ref, "--format", "{{.Id}}"],
+        [get_container_runtime(), "image", "inspect", image_ref, "--format", "{{.Id}}"],
         check=True,
         capture_output=True,
         text=True,
@@ -281,7 +282,7 @@ def replace_with_dummy_image(image_ref: str) -> str:
 def assert_old_image_replaced(old_image_ref: str, image_ref: str) -> None:
     if old_image_ref.startswith("sha256:"):
         inspect = subprocess.run(
-            ["docker", "image", "inspect", image_ref, "--format", "{{.Id}}"],
+            [get_container_runtime(), "image", "inspect", image_ref, "--format", "{{.Id}}"],
             check=True,
             capture_output=True,
             text=True,
@@ -317,7 +318,7 @@ def assert_rootfs_layer_present(layer: str, image_ref: str) -> None:
 def keep_pulled_image_last_rootfs_layer(image_ref: str) -> Iterator[str]:
     assert "@sha256:" in image_ref
     subprocess.run(
-        ["docker", "pull", image_ref],
+        [get_container_runtime(), "pull", image_ref],
         check=True,
         capture_output=True,
     )
@@ -325,10 +326,18 @@ def keep_pulled_image_last_rootfs_layer(image_ref: str) -> Iterator[str]:
         yield get_last_rootfs_layer(image_ref)
     finally:
         subprocess.run(
-            ["docker", "image", "rm", image_ref],
+            [get_container_runtime(), "image", "rm", image_ref],
             check=False,
             capture_output=True,
         )
+
+
+def remove_image(image_ref: str, *, force: bool = False) -> None:
+    command = [get_container_runtime(), "image", "rm"]
+    if force:
+        command.append("-f")
+    command.append(image_ref)
+    subprocess.run(command, check=False, capture_output=True)
 
 
 def build_cli_env(home_dir: Path) -> dict[str, str]:

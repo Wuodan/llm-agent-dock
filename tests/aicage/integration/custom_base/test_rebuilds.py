@@ -86,7 +86,7 @@ def test_custom_base_rebuilds_on_digest_change_ghcr(
     assert_rootfs_layer_present(expected_base_image_layer, final_image_record.image_ref)
 
 
-def test_custom_base_rebuilds_on_digest_change_docker(
+def test_custom_base_rebuilds_on_digest_change_registry_image(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     require_integration()

@@ -1,4 +1,3 @@
-import subprocess
 from pathlib import Path
 
 import pytest
@@ -10,6 +9,7 @@ from aicage.docker.query import get_local_repo_digest_for_repo, local_image_exis
 
 from .._helpers import (
     assert_old_image_replaced,
+    remove_image,
     replace_with_dummy_image,
     require_integration,
     run_agent_version,
@@ -18,7 +18,10 @@ from .._helpers import (
 
 pytestmark = pytest.mark.integration
 
-def test_builtin_agent_pulls_newer_digest(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_builtin_agent_pulls_newer_digest(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     require_integration()
     workspace, env = setup_workspace(monkeypatch, tmp_path, "copilot")
     bases = load_bases()
@@ -34,4 +37,4 @@ def test_builtin_agent_pulls_newer_digest(monkeypatch: pytest.MonkeyPatch, tmp_p
         assert local_digest_after is not None
         assert_old_image_replaced(old_image_ref, image_ref)
     finally:
-        subprocess.run(["docker", "image", "rm", "-f", image_ref], check=False, capture_output=True)
+        remove_image(image_ref, force=True)
