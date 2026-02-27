@@ -6,6 +6,7 @@ without relying on chat history.
 ## Original task
 
 Primary task description:
+
 - [`34-TASK-add-podman-support.md`](./34-TASK-add-podman-support.md)
 
 Required workflow from the task:
@@ -47,17 +48,18 @@ Planned split:
 3. integration test parameterization and documentation
 4. review/stabilization
 
-## Important open decisions still needing user approval
+## Approved design decisions from Session 1
 
-These decisions were identified but not resolved yet:
+The user approved:
 
 1. Runtime selection policy
-   - `docker` first and `podman` fallback
-   - or explicit configuration/selection
+   - prefer `docker`
+   - fall back to `podman`
 
 2. Meaning of `--docker` when running with Podman
-   - keep literal Docker socket semantics only
-   - or treat it as "mount container runtime socket" and map to Podman behavior when using Podman
+   - keep the flag name for backward compatibility
+   - treat it as "enable container runtime access inside the container"
+   - map behavior to the selected runtime where supported
 
 3. Supported platform scope for initial delivery
    - Linux fully tested
@@ -66,8 +68,8 @@ These decisions were identified but not resolved yet:
 ## Recommended execution order
 
 Use the session documents in:
+
 - [`session-1-analysis-design`](./session-1-analysis-design/)
 - [`session-2-core-refactor`](./session-2-core-refactor/)
 - [`session-3-integration-tests`](./session-3-integration-tests/)
 - [`session-4-review-stabilization`](./session-4-review-stabilization/)
-
