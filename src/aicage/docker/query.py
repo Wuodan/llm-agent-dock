@@ -1,21 +1,15 @@
+import json
 import subprocess
-
-from docker.errors import DockerException, ImageNotFound
 
 from aicage._logging import get_logger
 
-from ._client import get_docker_client
-from .cli import run_docker_command
+from .cli import run_docker_command, run_docker_command_capture
+from .runtime import get_container_runtime
 from .types import ImageRefRepository
 
 
 def local_image_exists(image_ref: str) -> bool:
-    client = get_docker_client()
-    try:
-        client.images.get(image_ref)
-    except ImageNotFound:
-        return False
-    return True
+    return _inspect_local_image(image_ref) is not None
 
 
 def get_local_repo_digest(image: ImageRefRepository) -> str | None:
@@ -23,13 +17,11 @@ def get_local_repo_digest(image: ImageRefRepository) -> str | None:
 
 
 def get_local_repo_digest_for_repo(image_ref: str, repository: str) -> str | None:
-    try:
-        client = get_docker_client()
-        image = client.images.get(image_ref)
-    except (ImageNotFound, DockerException):
+    image = _inspect_local_image(image_ref)
+    if image is None:
         return None
 
-    repo_digests = image.attrs.get("RepoDigests")
+    repo_digests = image.get("RepoDigests")
     if not isinstance(repo_digests, list):
         return None
 
@@ -44,13 +36,11 @@ def get_local_repo_digest_for_repo(image_ref: str, repository: str) -> str | Non
 
 
 def get_local_rootfs_layers(image_ref: str) -> list[str] | None:
-    try:
-        client = get_docker_client()
-        image = client.images.get(image_ref)
-    except (ImageNotFound, DockerException):
+    image = _inspect_local_image(image_ref)
+    if image is None:
         return None
 
-    rootfs = image.attrs.get("RootFS")
+    rootfs = image.get("RootFS")
     if not isinstance(rootfs, dict):
         return None
     layers = rootfs.get("Layers")
@@ -64,8 +54,9 @@ def get_local_rootfs_layers(image_ref: str) -> list[str] | None:
 
 def _remove_image_ref(image_ref: str, target_label: str) -> None:
     logger = get_logger()
+    runtime = get_container_runtime()
     result = run_docker_command(
-        ["docker", "image", "rm", image_ref],
+        [runtime, "image", "rm", image_ref],
         check=False,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
@@ -90,3 +81,24 @@ def cleanup_old_digest(
     updated_digest = get_local_repo_digest_for_repo(image_ref, repository)
     if updated_digest and updated_digest != local_digest:
         _remove_old_image_digest(repository, local_digest)
+
+
+def _inspect_local_image(image_ref: str) -> dict[str, object] | None:
+    runtime = get_container_runtime()
+    result = run_docker_command_capture(
+        [runtime, "image", "inspect", image_ref],
+        check=False,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(payload, list) or not payload:
+        return None
+    image = payload[0]
+    if not isinstance(image, dict):
+        return None
+    return image

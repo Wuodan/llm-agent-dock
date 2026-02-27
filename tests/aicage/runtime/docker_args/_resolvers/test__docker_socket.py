@@ -16,13 +16,18 @@ class DockerSocketMountTests(TestCase):
         parsed = _build_parsed(docker_socket=True)
         with (
             mock.patch(f"{_MODULE}.os.name", "posix"),
+            mock.patch(f"{_MODULE}.get_container_runtime", return_value="podman"),
+            mock.patch(
+                f"{_MODULE}.get_container_runtime_socket_path",
+                return_value=mock.Mock(as_posix=mock.Mock(return_value="/run/user/1000/podman/podman.sock")),
+            ),
             mock.patch(f"{_MODULE}.prompt_persist_docker_socket", return_value=True),
         ):
             resolved = resolve(context, "codex", parsed)
 
         self.assertTrue(agent_cfg.mounts.docker)
         self.assertEqual(1, len(resolved.mounts))
-        self.assertEqual("/run/docker.sock", resolved.mounts[0].host_path.as_posix())
+        self.assertEqual("/run/user/1000/podman/podman.sock", resolved.mounts[0].host_path.as_posix())
         self.assertEqual([], resolved.env)
 
     def test_resolve_docker_socket_mount_uses_persisted_socket(self) -> None:
@@ -30,6 +35,11 @@ class DockerSocketMountTests(TestCase):
         context = _build_context(agent_cfg)
         with (
             mock.patch(f"{_MODULE}.os.name", "posix"),
+            mock.patch(f"{_MODULE}.get_container_runtime", return_value="docker"),
+            mock.patch(
+                f"{_MODULE}.get_container_runtime_socket_path",
+                return_value=mock.Mock(as_posix=mock.Mock(return_value="/run/docker.sock")),
+            ),
             mock.patch(f"{_MODULE}.prompt_persist_docker_socket") as prompt_mock,
         ):
             resolved = resolve(context, "codex", _build_parsed())
@@ -49,7 +59,10 @@ class DockerSocketMountTests(TestCase):
     def test_resolve_docker_socket_mount_windows_env(self) -> None:
         agent_cfg = AgentConfig(mounts=_AgentMounts(docker=True))
         context = _build_context(agent_cfg)
-        with mock.patch(f"{_MODULE}.os.name", "nt"):
+        with (
+            mock.patch(f"{_MODULE}.os.name", "nt"),
+            mock.patch(f"{_MODULE}.get_container_runtime", return_value="docker"),
+        ):
             resolved = resolve(context, "codex", _build_parsed())
 
         self.assertEqual([], resolved.mounts)
@@ -57,6 +70,18 @@ class DockerSocketMountTests(TestCase):
             [(DOCKER_HOST, WINDOWS_DOCKER_HOST)],
             [(item.name, item.value) for item in resolved.env],
         )
+
+    def test_resolve_docker_socket_mount_windows_podman_has_no_mapping(self) -> None:
+        agent_cfg = AgentConfig(mounts=_AgentMounts(docker=True))
+        context = _build_context(agent_cfg)
+        with (
+            mock.patch(f"{_MODULE}.os.name", "nt"),
+            mock.patch(f"{_MODULE}.get_container_runtime", return_value="podman"),
+        ):
+            resolved = resolve(context, "codex", _build_parsed())
+
+        self.assertEqual([], resolved.mounts)
+        self.assertEqual([], resolved.env)
 
 
 def _build_context(agent_cfg: AgentConfig) -> ConfigContext:

@@ -27,9 +27,9 @@ def prompt_persist_docker_socket() -> bool:
     if os.name == "nt":
         print(
             "Info: You must enable 'Expose daemon on tcp://localhost:2375 without TLS' "
-            "in Docker Desktop settings to use --docker on Windows."
+            "in Docker Desktop settings to use --docker with Docker on Windows."
         )
-    return _prompt_yes_no("Persist mounting the Docker socket for this project?", default=True)
+    return _prompt_yes_no("Persist mounting the container runtime socket for this project?", default=True)
 
 
 def prompt_mount_git_support(items: list[tuple[str, str, Path]]) -> list[str]:

@@ -1,6 +1,6 @@
+import json
+import subprocess
 from unittest import TestCase, mock
-
-from docker.errors import ImageNotFound
 
 from aicage.docker.query import (
     _remove_image_ref,
@@ -14,29 +14,23 @@ from aicage.docker.query import (
 from aicage.docker.types import ImageRefRepository
 
 
-class FakeImage:
-    def __init__(self, repo_digests: object, rootfs: object | None = None):
-        self.attrs = {"RepoDigests": repo_digests}
-        if rootfs is not None:
-            self.attrs["RootFS"] = rootfs
-
-
-class FakeImages:
-    def __init__(self, image: FakeImage | None):
-        self._image = image
-
-    def get(self, image_ref: str) -> FakeImage:
-        if self._image is None:
-            raise ImageNotFound(image_ref)
-        return self._image
-
-
-class FakeClient:
-    def __init__(self, image: FakeImage | None):
-        self.images = FakeImages(image)
+def _inspect_result(image: dict[str, object] | None) -> subprocess.CompletedProcess[str]:
+    if image is None:
+        return subprocess.CompletedProcess(["docker", "image", "inspect"], 1, stdout="", stderr="missing")
+    return subprocess.CompletedProcess(
+        ["docker", "image", "inspect"],
+        0,
+        stdout=json.dumps([image]),
+        stderr="",
+    )
 
 
 class LocalQueryTests(TestCase):
+    def setUp(self) -> None:
+        runtime_patcher = mock.patch("aicage.docker.query.get_container_runtime", return_value="podman")
+        self._runtime_mock = runtime_patcher.start()
+        self.addCleanup(runtime_patcher.stop)
+
     @staticmethod
     def test_remove_image_ref_removes_image() -> None:
         with (
@@ -48,7 +42,7 @@ class LocalQueryTests(TestCase):
         ):
             _remove_image_ref("ghcr.io/aicage/aicage@sha256:old", "old image digest")
         run_mock.assert_called_once_with(
-            ["docker", "image", "rm", "ghcr.io/aicage/aicage@sha256:old"],
+            ["podman", "image", "rm", "ghcr.io/aicage/aicage@sha256:old"],
             check=False,
             stdout=mock.ANY,
             stderr=mock.ANY,
@@ -70,72 +64,80 @@ class LocalQueryTests(TestCase):
     def test_get_local_repo_digest(self) -> None:
         image = ImageRefRepository(image_ref="repo:tag", repository="ghcr.io/aicage/aicage")
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(None),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result(None),
         ):
             self.assertIsNone(get_local_repo_digest(image))
 
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(FakeImage(repo_digests={"bad": "data"})),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result({"RepoDigests": {"bad": "data"}}),
         ):
             self.assertIsNone(get_local_repo_digest(image))
 
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(FakeImage(repo_digests=["bad"])),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result({"RepoDigests": ["bad"]}),
         ):
             self.assertIsNone(get_local_repo_digest(image))
 
         payload = ["ghcr.io/aicage/aicage@sha256:deadbeef", "other@sha256:skip"]
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(FakeImage(repo_digests=payload)),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result({"RepoDigests": payload}),
         ):
             digest = get_local_repo_digest(image)
         self.assertEqual("sha256:deadbeef", digest)
 
     def test_get_local_repo_digest_for_repo(self) -> None:
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(None),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result(None),
         ):
             self.assertIsNone(get_local_repo_digest_for_repo("repo:tag", "ghcr.io/aicage/aicage"))
 
         payload = ["ghcr.io/aicage/aicage@sha256:deadbeef", "other@sha256:skip"]
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(FakeImage(repo_digests=payload)),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result({"RepoDigests": payload}),
         ):
             digest = get_local_repo_digest_for_repo("repo:tag", "ghcr.io/aicage/aicage")
         self.assertEqual("sha256:deadbeef", digest)
 
     def test_get_local_rootfs_layers(self) -> None:
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(None),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result(None),
         ):
             self.assertIsNone(get_local_rootfs_layers("repo:tag"))
 
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(FakeImage(repo_digests=[], rootfs={"Layers": ["a", "b"]})),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result({"RepoDigests": [], "RootFS": {"Layers": ["a", "b"]}}),
         ):
             layers = get_local_rootfs_layers("repo:tag")
         self.assertEqual(["a", "b"], layers)
 
     def test_local_image_exists_true_on_success(self) -> None:
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(FakeImage(repo_digests=[])),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result({"RepoDigests": []}),
         ):
             exists = local_image_exists("aicage:claude-ubuntu")
         self.assertTrue(exists)
 
     def test_local_image_exists_false_on_failure(self) -> None:
         with mock.patch(
-            "aicage.docker.query.get_docker_client",
-            return_value=FakeClient(None),
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=_inspect_result(None),
+        ):
+            exists = local_image_exists("aicage:claude-ubuntu")
+        self.assertFalse(exists)
+
+    def test_local_image_exists_false_on_invalid_json(self) -> None:
+        with mock.patch(
+            "aicage.docker.query.run_docker_command_capture",
+            return_value=subprocess.CompletedProcess(["docker", "image", "inspect"], 0, stdout="{", stderr=""),
         ):
             exists = local_image_exists("aicage:claude-ubuntu")
         self.assertFalse(exists)

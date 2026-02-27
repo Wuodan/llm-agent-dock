@@ -21,7 +21,17 @@ class DockerCliTests(TestCase):
             try:
                 run_docker_command(["docker", "run"], check=True)
             except DockerError as exc:
-                assert "Docker CLI not found" in str(exc)
+                assert "Docker CLI not found." in str(exc)
+            else:
+                raise AssertionError("Expected DockerError")
+
+    @staticmethod
+    def test_run_docker_command_raises_clean_error_on_missing_podman() -> None:
+        with mock.patch("aicage.docker.cli.subprocess.run", side_effect=FileNotFoundError):
+            try:
+                run_docker_command(["podman", "run"], check=True)
+            except DockerError as exc:
+                assert "Podman CLI not found." in str(exc)
             else:
                 raise AssertionError("Expected DockerError")
 

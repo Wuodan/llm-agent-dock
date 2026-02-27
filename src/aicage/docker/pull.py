@@ -1,8 +1,10 @@
-import json
+import subprocess
 from pathlib import Path
 
 from aicage._logging import get_logger
-from aicage.docker._client import get_docker_pull_client
+from aicage.docker.cli import run_docker_command
+from aicage.docker.errors import DockerError
+from aicage.docker.runtime import get_container_runtime
 
 
 def run_pull(image_ref: str, log_path: Path) -> None:
@@ -11,20 +13,15 @@ def run_pull(image_ref: str, log_path: Path) -> None:
     print(f"[aicage] Pulling image {image_ref} (logs: {log_path})...")
     logger.info("Pulling image %s (logs: %s)", image_ref, log_path)
 
-    client = get_docker_pull_client()
+    runtime = get_container_runtime()
     with log_path.open("w", encoding="utf-8") as log_handle:
-        for event in client.api.pull(image_ref, stream=True, decode=True):
-            log_handle.write(f"{_format_pull_event(event)}\n")
-            log_handle.flush()
+        result = run_docker_command(
+            [runtime, "pull", image_ref],
+            check=False,
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+        )
+    if result.returncode != 0:
+        raise DockerError(f"Image pull failed for {image_ref}. See log at {log_path}.")
 
     logger.info("Image pull succeeded for %s", image_ref)
-
-
-def _format_pull_event(event: object) -> str:
-    if isinstance(event, bytes):
-        return event.decode("utf-8", errors="replace").rstrip("\n")
-    if isinstance(event, str):
-        return event.rstrip("\n")
-    if isinstance(event, dict):
-        return json.dumps(event, ensure_ascii=True)
-    return str(event).rstrip("\n")

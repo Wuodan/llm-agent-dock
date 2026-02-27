@@ -9,6 +9,7 @@ from aicage.docker._mounts import append_mount
 from aicage.docker.cli import run_docker_command
 from aicage.docker.query import cleanup_old_digest, get_local_repo_digest_for_repo
 from aicage.docker.refs import repository_from_image_ref
+from aicage.docker.runtime import get_container_runtime
 from aicage.runtime.run_args import DockerRunArgs
 
 
@@ -28,6 +29,7 @@ def print_run_command(args: DockerRunArgs) -> None:
 
 
 def run_builder_version_check(image_ref: str, definition_dir: Path) -> subprocess.CompletedProcess[str]:
+    runtime = get_container_runtime()
     command = [
         "/bin/bash",
         "-c",
@@ -37,7 +39,7 @@ def run_builder_version_check(image_ref: str, definition_dir: Path) -> subproces
         "&& /bin/bash /tmp/version.sh",
     ]
     run_command = [
-        "docker",
+        runtime,
         "run",
         "--rm",
         *proxy_run_env_args_from_host(),
@@ -70,7 +72,7 @@ def run_builder_version_check(image_ref: str, definition_dir: Path) -> subproces
 
 
 def _assemble_docker_run(args: DockerRunArgs) -> list[str]:
-    cmd: list[str] = ["docker", "run", "--rm", "-it"]
+    cmd: list[str] = [get_container_runtime(), "run", "--rm", "-it"]
     cmd.extend(resolve_user_ids())
     for env in args.env:
         cmd.extend(["-e", f"{env.name}={env.value}"])

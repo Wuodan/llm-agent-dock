@@ -16,7 +16,7 @@ class RunCommandTests(TestCase):
             agent_args=["--flag"],
         )
         with (
-            mock.patch("aicage.docker.run._assemble_docker_run", return_value=["docker", "run"]),
+            mock.patch("aicage.docker.run._assemble_docker_run", return_value=["podman", "run"]),
             mock.patch("aicage.docker.run.run_docker_command") as run_mock,
             mock.patch(
                 "aicage.docker.run.get_local_repo_digest_for_repo",
@@ -26,7 +26,7 @@ class RunCommandTests(TestCase):
         ):
             run.run_container(args)
 
-        run_mock.assert_called_once_with(["docker", "run"], check=True)
+        run_mock.assert_called_once_with(["podman", "run"], check=True)
         cleanup_mock.assert_called_once_with(
             "ghcr.io/aicage/aicage",
             "sha256:old",
@@ -41,16 +41,17 @@ class RunCommandTests(TestCase):
             agent_args=[],
         )
         with (
-            mock.patch("aicage.docker.run._assemble_docker_run", return_value=["docker", "run", "image"]),
+            mock.patch("aicage.docker.run._assemble_docker_run", return_value=["podman", "run", "image"]),
             mock.patch("builtins.print") as print_mock,
         ):
             run.print_run_command(args)
 
-        print_mock.assert_called_once_with("docker run image")
+        print_mock.assert_called_once_with("podman run image")
 
     def test_run_builder_version_check_returns_output(self) -> None:
         with (
             mock.patch.dict(os.environ, {}, clear=True),
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
             mock.patch(
                 "aicage.docker.run.subprocess.run",
                 return_value=subprocess.CompletedProcess([], 0, stdout="1.2.3\n", stderr=""),
@@ -67,6 +68,7 @@ class RunCommandTests(TestCase):
     def test_run_builder_version_check_handles_command_error(self) -> None:
         with (
             mock.patch.dict(os.environ, {}, clear=True),
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
             mock.patch(
                 "aicage.docker.run.subprocess.run",
                 return_value=subprocess.CompletedProcess([], 2, stdout="partial", stderr="failed"),
@@ -83,9 +85,10 @@ class RunCommandTests(TestCase):
     def test_run_builder_version_check_handles_timeout(self) -> None:
         with (
             mock.patch.dict(os.environ, {}, clear=True),
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
             mock.patch(
                 "aicage.docker.run.subprocess.run",
-                side_effect=subprocess.TimeoutExpired(cmd=["docker"], timeout=1),
+                side_effect=subprocess.TimeoutExpired(cmd=["podman"], timeout=1),
             ),
         ):
             result = run.run_builder_version_check(
@@ -99,6 +102,7 @@ class RunCommandTests(TestCase):
     def test_run_builder_version_check_handles_command_exception(self) -> None:
         with (
             mock.patch.dict(os.environ, {}, clear=True),
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
             mock.patch(
                 "aicage.docker.run.subprocess.run",
                 side_effect=RuntimeError("boom"),
@@ -119,6 +123,7 @@ class RunCommandTests(TestCase):
                 {"HTTPS_PROXY": "http://proxy-https:8080"},
                 clear=True,
             ),
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
             mock.patch(
                 "aicage.docker.run.subprocess.run",
                 return_value=subprocess.CompletedProcess([], 0, stdout="ok", stderr=""),
@@ -134,7 +139,10 @@ class RunCommandTests(TestCase):
         self.assertIn("HTTPS_PROXY=http://proxy-https:8080", command)
 
     def test_assemble_includes_env_and_mounts(self) -> None:
-        with mock.patch("aicage.docker.run.resolve_user_ids", return_value=["-e", "AICAGE_HOST_USER=me"]):
+        with (
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
+            mock.patch("aicage.docker.run.resolve_user_ids", return_value=["-e", "AICAGE_HOST_USER=me"]),
+        ):
             run_args = DockerRunArgs(
                 image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
                 merged_docker_args="--net=host",
@@ -149,6 +157,7 @@ class RunCommandTests(TestCase):
                 ],
             )
             cmd = run._assemble_docker_run(run_args)
+        self.assertEqual("podman", cmd[0])
         self.assertIn("-e", cmd)
         self.assertIn("EXTRA=1", cmd)
         self.assertIn("--mount", cmd)

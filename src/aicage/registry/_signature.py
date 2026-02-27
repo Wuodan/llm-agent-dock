@@ -9,6 +9,7 @@ from aicage.docker.query import (
     get_local_repo_digest_for_repo,
     local_image_exists,
 )
+from aicage.docker.runtime import get_container_runtime
 from aicage.registry._errors import RegistryError
 from aicage.registry._logs import pull_log_path
 from aicage.registry.digest.remote_digest import get_remote_digest
@@ -46,8 +47,9 @@ def _with_digest(image_ref: str, digest: str) -> str:
 
 
 def _run_cosign_verify(image_ref: str) -> subprocess.CompletedProcess[str]:
+    runtime = get_container_runtime()
     command = [
-        "docker",
+        runtime,
         "run",
         "--rm",
         COSIGN_IMAGE_REF,

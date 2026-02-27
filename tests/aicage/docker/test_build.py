@@ -19,6 +19,7 @@ class LocalBuildRunnerTests(TestCase):
             log_path = Path(tmp_dir) / "logs" / "build.log"
             with (
                 mock.patch.dict(os.environ, {}, clear=True),
+                mock.patch("aicage.docker.build.get_container_runtime", return_value="podman"),
                 mock.patch(
                     "aicage.docker.build.find_packaged_path",
                     return_value=Path("/tmp/build/Dockerfile"),
@@ -39,7 +40,7 @@ class LocalBuildRunnerTests(TestCase):
         command = run_mock.call_args.args[0]
         self.assertEqual(
             [
-                "docker",
+                "podman",
                 "build",
                 "--no-cache",
                 "--file",
@@ -60,6 +61,10 @@ class LocalBuildRunnerTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "logs" / "build.log"
             with (
+                mock.patch(
+                    "aicage.docker.build.get_container_runtime",
+                    return_value="podman",
+                ),
                 mock.patch(
                     "aicage.docker.build.find_packaged_path",
                     return_value=Path("/tmp/build/Dockerfile"),
@@ -84,6 +89,7 @@ class LocalBuildRunnerTests(TestCase):
             dockerfile_path.write_text("FROM ubuntu:latest\n", encoding="utf-8")
             with (
                 mock.patch.dict(os.environ, {}, clear=True),
+                mock.patch("aicage.docker.build.get_container_runtime", return_value="podman"),
                 mock.patch(
                     "aicage.docker.build.subprocess.run",
                     return_value=CompletedProcess([], 0),
@@ -100,7 +106,7 @@ class LocalBuildRunnerTests(TestCase):
         command = run_mock.call_args.args[0]
         self.assertEqual(
             [
-                "docker",
+                "podman",
                 "build",
                 "--no-cache",
                 "--file",
@@ -124,6 +130,7 @@ class LocalBuildRunnerTests(TestCase):
                     {"HTTP_PROXY": "http://proxy-http:8080"},
                     clear=True,
                 ),
+                mock.patch("aicage.docker.build.get_container_runtime", return_value="podman"),
                 mock.patch(
                     "aicage.docker.build.find_packaged_path",
                     return_value=Path("/tmp/build/Dockerfile"),
@@ -150,6 +157,7 @@ class LocalBuildRunnerTests(TestCase):
             dockerfile_path = Path(tmp_dir) / "Dockerfile"
             dockerfile_path.write_text("FROM ubuntu:latest\n", encoding="utf-8")
             with (
+                mock.patch("aicage.docker.build.get_container_runtime", return_value="podman"),
                 mock.patch(
                     "aicage.docker.build.subprocess.run",
                     return_value=CompletedProcess([], 1),
@@ -170,6 +178,7 @@ class LocalBuildRunnerTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "build.log"
             with (
+                mock.patch("aicage.docker.build.get_container_runtime", return_value="podman"),
                 mock.patch(
                     "aicage.docker.build.find_packaged_path",
                     return_value=Path("/tmp/Dockerfile"),
@@ -195,6 +204,7 @@ class LocalBuildRunnerTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "build.log"
             with (
+                mock.patch("aicage.docker.build.get_container_runtime", return_value="podman"),
                 mock.patch(
                     "aicage.docker.build.find_packaged_path",
                     return_value=Path("/tmp/Dockerfile"),
@@ -217,6 +227,7 @@ class LocalBuildRunnerTests(TestCase):
         logger = mock.Mock()
         with (
             mock.patch("aicage.docker.build.get_logger", return_value=logger),
+            mock.patch("aicage.docker.build.get_container_runtime", return_value="podman"),
             mock.patch(
                 "aicage.docker.build.subprocess.run",
                 return_value=CompletedProcess([], 1),

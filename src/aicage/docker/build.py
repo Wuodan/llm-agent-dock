@@ -8,6 +8,7 @@ from aicage.config.resources import find_packaged_path
 from aicage.config.runtime_config import RunConfig
 from aicage.docker.cli import run_docker_command
 from aicage.docker.errors import DockerError
+from aicage.docker.runtime import get_container_runtime
 
 
 def run_build(
@@ -23,10 +24,9 @@ def run_build(
 
     dockerfile_path = find_packaged_path("agent-build/Dockerfile")
     build_root = _build_context_dir(run_config, dockerfile_path)
-    # Docker SDK does not support BuildKit; keep CLI build for compatibility.
-    # See: https://github.com/docker/docker-py/issues/2230
+    runtime = get_container_runtime()
     command = [
-        "docker",
+        runtime,
         "build",
         "--no-cache",
         "--file",
@@ -81,10 +81,9 @@ def run_extended_build(
             if target_ref != run_config.selection.image_ref:
                 intermediate_refs.append(target_ref)
             dockerfile_path = extension.dockerfile_path or dockerfile_builtin
-            # Docker SDK does not support BuildKit; keep CLI build for compatibility.
-            # See: https://github.com/docker/docker-py/issues/2230
+            runtime = get_container_runtime()
             command = [
-                "docker",
+                runtime,
                 "build",
                 "--no-cache",
                 "--file",
@@ -130,8 +129,9 @@ def run_custom_base_build(
     print(f"[aicage] Building custom base image {image_ref} (logs: {log_path})...")
     logger.info("Building custom base image %s (logs: %s)", image_ref, log_path)
 
+    runtime = get_container_runtime()
     command = [
-        "docker",
+        runtime,
         "build",
         "--no-cache",
         "--file",
@@ -183,9 +183,10 @@ def _parse_image_ref(image_ref: str) -> tuple[str, str]:
 
 def _cleanup_intermediate_images(intermediate_refs: list[str]) -> None:
     logger = get_logger()
+    runtime = get_container_runtime()
     for image_ref in intermediate_refs:
         result = run_docker_command(
-            ["docker", "image", "rm", "-f", image_ref],
+            [runtime, "image", "rm", "-f", image_ref],
             check=False,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,

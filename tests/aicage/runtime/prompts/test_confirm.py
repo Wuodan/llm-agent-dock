@@ -36,7 +36,7 @@ class PromptConfirmTests(TestCase):
         with mock.patch("aicage.runtime.prompts.confirm._prompt_yes_no", return_value=True) as prompt_mock:
             self.assertTrue(confirm.prompt_persist_docker_socket())
         prompt_mock.assert_called_once_with(
-            "Persist mounting the Docker socket for this project?",
+            "Persist mounting the container runtime socket for this project?",
             default=True,
         )
 

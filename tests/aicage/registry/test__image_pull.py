@@ -1,44 +1,32 @@
 import io
-import json
+import subprocess
 import tempfile
 from pathlib import Path
 from unittest import TestCase, mock
 
-from docker.errors import DockerException
-
+from aicage.docker.errors import DockerError
 from aicage.registry import _image_pull as image_pull
-
-
-class FakeDockerApi:
-    def __init__(self, events: list[object], exc: Exception | None = None) -> None:
-        self._events = events
-        self._exc = exc
-        self.calls: list[tuple[str, bool, bool]] = []
-
-    def pull(self, image_ref: str, stream: bool, decode: bool) -> list[object]:
-        self.calls.append((image_ref, stream, decode))
-        if self._exc is not None:
-            raise self._exc
-        return list(self._events)
-
-
-class FakeDockerClient:
-    def __init__(self, api: FakeDockerApi) -> None:
-        self.api = api
 
 
 class DockerInvocationTests(TestCase):
     def test_pull_image_success_writes_log(self) -> None:
         image_ref = "repo:tag"
-        api = FakeDockerApi(
-            events=[
-                {"status": "Pulling from org/repo", "id": "repo:tag"},
-                {"status": "Downloading", "id": "abc123"},
-            ]
-        )
-        client = FakeDockerClient(api)
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
+
+            def _pull_side_effect(
+                command: list[str],
+                *,
+                check: bool,
+                stdout: object = None,
+                stderr: object = None,
+            ) -> subprocess.CompletedProcess[str]:
+                del check, stderr
+                assert command == ["podman", "pull", image_ref]
+                assert stdout is not None
+                stdout.write("Pulling from org/repo\nDownloaded newer image\n")
+                return subprocess.CompletedProcess(command, 0)
+
             with (
                 mock.patch(
                     "aicage.registry._pull_decision.get_local_repo_digest",
@@ -55,10 +43,11 @@ class DockerInvocationTests(TestCase):
                     "aicage.registry._image_pull.resolve_verified_digest",
                     return_value="repo@sha256:verified",
                 ) as verify_mock,
+                mock.patch("aicage.docker.pull.get_container_runtime", return_value="podman"),
                 mock.patch(
-                    "aicage.docker.pull.get_docker_pull_client",
-                    return_value=client,
-                ),
+                    "aicage.docker.pull.run_docker_command",
+                    side_effect=_pull_side_effect,
+                ) as pull_mock,
                 mock.patch("aicage.registry._image_pull.cleanup_old_digest") as cleanup_mock,
                 mock.patch("aicage.registry._image_pull.pull_log_path", return_value=log_path),
                 mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
@@ -71,23 +60,12 @@ class DockerInvocationTests(TestCase):
                 "sha256:old",
                 image_ref,
             )
+            pull_mock.assert_called_once()
             self.assertIn("Pulling image repo:tag", stdout.getvalue())
-            log_lines = log_path.read_text(encoding="utf-8").splitlines()
-            self.assertEqual(2, len(log_lines))
-            self.assertEqual(
-                {"status": "Pulling from org/repo", "id": "repo:tag"},
-                json.loads(log_lines[0]),
-            )
-            self.assertEqual(
-                {"status": "Downloading", "id": "abc123"},
-                json.loads(log_lines[1]),
-            )
-            self.assertEqual([("repo:tag", True, True)], api.calls)
+            self.assertIn("Pulling from org/repo", log_path.read_text(encoding="utf-8"))
 
-    def test_pull_image_raises_on_sdk_error(self) -> None:
+    def test_pull_image_raises_on_pull_error(self) -> None:
         image_ref = "repo:tag"
-        api = FakeDockerApi(events=[], exc=DockerException("network down"))
-        client = FakeDockerClient(api)
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
             with (
@@ -106,15 +84,16 @@ class DockerInvocationTests(TestCase):
                     "aicage.registry._image_pull.resolve_verified_digest",
                     return_value="repo@sha256:verified",
                 ) as verify_mock,
+                mock.patch("aicage.docker.pull.get_container_runtime", return_value="podman"),
                 mock.patch(
-                    "aicage.docker.pull.get_docker_pull_client",
-                    return_value=client,
+                    "aicage.docker.pull.run_docker_command",
+                    return_value=subprocess.CompletedProcess(["podman", "pull"], 1),
                 ),
                 mock.patch("aicage.registry._image_pull.cleanup_old_digest") as cleanup_mock,
                 mock.patch("aicage.registry._image_pull.pull_log_path", return_value=log_path),
                 mock.patch("sys.stdout", new_callable=io.StringIO),
             ):
-                with self.assertRaises(DockerException):
+                with self.assertRaisesRegex(DockerError, "Image pull failed"):
                     image_pull.pull_image(image_ref)
             remote_mock.assert_not_called()
             verify_mock.assert_called_once_with(image_ref)
@@ -139,13 +118,13 @@ class DockerInvocationTests(TestCase):
                 mock.patch(
                     "aicage.registry._image_pull.resolve_verified_digest"
                 ) as verify_mock,
-                mock.patch("aicage.docker.pull.get_docker_pull_client") as client_mock,
+                mock.patch("aicage.docker.pull.run_docker_command") as pull_mock,
                 mock.patch("aicage.registry._image_pull.cleanup_old_digest") as cleanup_mock,
                 mock.patch("aicage.registry._image_pull.pull_log_path", return_value=log_path),
                 mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
             ):
                 image_pull.pull_image(image_ref)
-            client_mock.assert_not_called()
+            pull_mock.assert_not_called()
             verify_mock.assert_not_called()
             local_repo_mock.assert_called_once()
             cleanup_mock.assert_not_called()
@@ -170,13 +149,13 @@ class DockerInvocationTests(TestCase):
                 mock.patch(
                     "aicage.registry._image_pull.resolve_verified_digest"
                 ) as verify_mock,
-                mock.patch("aicage.docker.pull.get_docker_pull_client") as client_mock,
+                mock.patch("aicage.docker.pull.run_docker_command") as pull_mock,
                 mock.patch("aicage.registry._image_pull.cleanup_old_digest") as cleanup_mock,
                 mock.patch("aicage.registry._image_pull.pull_log_path", return_value=log_path),
                 mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
             ):
                 image_pull.pull_image(image_ref)
-            client_mock.assert_not_called()
+            pull_mock.assert_not_called()
             verify_mock.assert_not_called()
             local_repo_mock.assert_called_once()
             cleanup_mock.assert_not_called()

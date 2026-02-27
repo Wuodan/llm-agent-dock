@@ -21,9 +21,9 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
     Docker args are captured as an opaque string; precedence is resolved later.
     """
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--dry-run", action="store_true", help="Print docker run command without executing.")
+    parser.add_argument("--dry-run", action="store_true", help="Print container run command without executing.")
     parser.add_argument("-y", "--yes", action="store_true", help="Use defaults for all prompts.")
-    parser.add_argument("--docker", action="store_true", help="Mount the host Docker socket into the container.")
+    parser.add_argument("--docker", action="store_true", help="Mount the host container runtime socket.")
     parser.add_argument(
         "--share",
         action="append",
@@ -58,15 +58,15 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "  aicage --config remove [<agent>]\n"
             "  aicage --version\n\n"
             "Arguments:\n"
-            "  --dry-run        Print the generated docker run command and exit.\n"
+            "  --dry-run        Print the generated container run command and exit.\n"
             "  -y, --yes        Use default answers for all prompts.\n"
-            "  --docker         Mount /var/run/docker.sock into the container.\n"
+            "  --docker         Mount the host container runtime socket into the container.\n"
             "  --share <path>   Mount a host path into the container. Repeatable.\n"
             "  --config <cmd>   Run config command: info, remove [agent].\n"
             "  -v, --version    Print aicage version and exit.\n"
             "  -h, --help       Show this help and exit.\n\n"
             "Behavior:\n"
-            "  - <docker-args> are forwarded verbatim to docker run.\n"
+            "  - <docker-args> are forwarded verbatim to the selected container runtime.\n"
             "  - If docker args are present, use '--' before <agent>.\n"
             "  - <agent-args> are forwarded verbatim to the agent.\n"
         )
