@@ -141,6 +141,7 @@ class RunCommandTests(TestCase):
     def test_assemble_includes_env_and_mounts(self) -> None:
         with (
             mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
+            mock.patch("aicage.docker.run.os.name", "posix"),
             mock.patch("aicage.docker.run.resolve_user_ids", return_value=["-e", "AICAGE_HOST_USER=me"]),
         ):
             run_args = DockerRunArgs(
@@ -158,6 +159,7 @@ class RunCommandTests(TestCase):
             )
             cmd = run._assemble_docker_run(run_args)
         self.assertEqual("podman", cmd[0])
+        self.assertIn("--userns=keep-id", cmd)
         self.assertIn("-e", cmd)
         self.assertIn("EXTRA=1", cmd)
         self.assertIn("--mount", cmd)
@@ -165,3 +167,36 @@ class RunCommandTests(TestCase):
         container_mount = PurePosixPath("/opt/one").as_posix()
         self.assertIn(f"type=bind,src={host_mount},dst={container_mount},readonly", cmd)
         self.assertNotIn("AICAGE_AGENT_CONFIG_PATH", " ".join(cmd))
+
+    def test_assemble_skips_keep_id_when_userns_is_already_set(self) -> None:
+        with (
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="podman"),
+            mock.patch("aicage.docker.run.os.name", "posix"),
+            mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]),
+        ):
+            run_args = DockerRunArgs(
+                image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                merged_docker_args="--userns=host --net=host",
+                agent_args=[],
+            )
+            cmd = run._assemble_docker_run(run_args)
+
+        self.assertEqual("podman", cmd[0])
+        self.assertNotIn("--userns=keep-id", cmd)
+        self.assertIn("--userns=host", cmd)
+
+    def test_assemble_skips_keep_id_for_docker(self) -> None:
+        with (
+            mock.patch("aicage.docker.run.get_container_runtime", return_value="docker"),
+            mock.patch("aicage.docker.run.os.name", "posix"),
+            mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]),
+        ):
+            run_args = DockerRunArgs(
+                image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                merged_docker_args="",
+                agent_args=[],
+            )
+            cmd = run._assemble_docker_run(run_args)
+
+        self.assertEqual("docker", cmd[0])
+        self.assertNotIn("--userns=keep-id", cmd)

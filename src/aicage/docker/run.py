@@ -1,3 +1,4 @@
+import os
 import shlex
 import subprocess
 from pathlib import Path
@@ -72,12 +73,16 @@ def run_builder_version_check(image_ref: str, definition_dir: Path) -> subproces
 
 
 def _assemble_docker_run(args: DockerRunArgs) -> list[str]:
-    cmd: list[str] = [get_container_runtime(), "run", "--rm", "-it"]
+    runtime = get_container_runtime()
+    cmd: list[str] = [runtime, "run", "--rm", "-it"]
     cmd.extend(resolve_user_ids())
     for env in args.env:
         cmd.extend(["-e", f"{env.name}={env.value}"])
     for mount in args.mounts:
         append_mount(cmd, mount.host_path, mount.container_path, read_only=mount.read_only)
+
+    if _needs_keep_id_userns(runtime, args.merged_docker_args):
+        cmd.append("--userns=keep-id")
 
     if args.merged_docker_args:
         cmd.extend(shlex.split(args.merged_docker_args))
@@ -85,3 +90,20 @@ def _assemble_docker_run(args: DockerRunArgs) -> list[str]:
     cmd.append(args.image_ref)
     cmd.extend(args.agent_args)
     return cmd
+
+
+def _needs_keep_id_userns(runtime: str, merged_docker_args: str) -> bool:
+    if runtime != "podman" or os.name == "nt":
+        return False
+
+    runtime_args = shlex.split(merged_docker_args)
+    return not _has_userns_arg(runtime_args)
+
+
+def _has_userns_arg(runtime_args: list[str]) -> bool:
+    for index, arg in enumerate(runtime_args):
+        if arg.startswith("--userns="):
+            return True
+        if arg == "--userns" and index + 1 < len(runtime_args):
+            return True
+    return False
