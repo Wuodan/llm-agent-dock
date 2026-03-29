@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-03-30
+
+### Changed
+
+- Allow `aicage --config` without an explicit subcommand and treat it as `info`.
+- Extensions can now define share mounts.
+
 ### Internal
 
-- Moved repository rule tests into `tests/repo_rules` so repo-level structure and visibility checks are kept
-  separate from package-specific tests.
-- Genericized `_version.py` references in repository rule docs and lint helpers.
-- Emptied package `__init__.py` files in `tests` to keep them marker-only.
+- Switched config schema validation to `jsonschema`.
+- Moved repository rule tests into `tests/repo_rules`.
 
 ## [1.0.0] - 2026-03-26
 
