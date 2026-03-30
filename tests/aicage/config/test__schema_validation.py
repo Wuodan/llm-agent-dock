@@ -10,7 +10,7 @@ class SchemaValidationTests(TestCase):
 
         self.assertIsInstance(payload.get("properties"), dict)
 
-    def test_validate_schema_mapping_applies_normalizer_and_validator(self) -> None:
+    def test_validate_schema_mapping_applies_normalizer(self) -> None:
         schema = {
             "properties": {"name": {"type": "string"}, "enabled": {"type": "boolean"}},
             "required": ["name"],
@@ -22,18 +22,11 @@ class SchemaValidationTests(TestCase):
             _payload.setdefault("enabled", True)
             return _payload
 
-        def validator(value: object, schema_entry: dict[str, object], context: str) -> None:
-            if schema_entry.get("type") == "string" and not isinstance(value, str):
-                raise ConfigError(f"{context} must be a string.")
-            if schema_entry.get("type") == "boolean" and not isinstance(value, bool):
-                raise ConfigError(f"{context} must be a boolean.")
-
         payload = validate_schema_mapping(
             {"name": "agent"},
             schema,
             "example",
             normalizer=normalizer,
-            value_validator=validator,
         )
 
         self.assertEqual({"name": "agent", "enabled": True}, payload)
@@ -47,3 +40,23 @@ class SchemaValidationTests(TestCase):
         schema = {"properties": {"name": {"type": "string"}}, "required": [], "additionalProperties": False}
         with self.assertRaises(ConfigError):
             validate_schema_mapping({"name": "agent", "extra": "value"}, schema, "example")
+
+    def test_validate_schema_mapping_rejects_nested_invalid_value(self) -> None:
+        schema = {
+            "properties": {
+                "agent_path": {
+                    "type": "object",
+                    "properties": {
+                        "files": {
+                            "type": "array",
+                            "items": {"type": "string", "pattern": ".*\\S.*"},
+                        }
+                    },
+                    "additionalProperties": False,
+                }
+            },
+            "required": [],
+            "additionalProperties": False,
+        }
+        with self.assertRaises(ConfigError):
+            validate_schema_mapping({"agent_path": {"files": [" "]}}, schema, "example")

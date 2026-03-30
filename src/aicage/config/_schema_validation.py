@@ -3,10 +3,12 @@ from collections.abc import Callable
 from functools import lru_cache
 from typing import Any
 
+from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
+
 from aicage.config.errors import ConfigError
 from aicage.config.resources import find_packaged_path
 
-_SchemaValidator = Callable[[Any, dict[str, Any], str], None]
 _Normalizer = Callable[[dict[str, Any]], dict[str, Any]]
 
 
@@ -22,33 +24,23 @@ def validate_schema_mapping(
     context: str,
     *,
     normalizer: _Normalizer | None = None,
-    value_validator: _SchemaValidator | None = None,
 ) -> dict[str, Any]:
     if not isinstance(mapping, dict):
         raise ConfigError(f"{context} must be a mapping.")
-
-    properties = schema.get("properties", {})
-    required = set(schema.get("required", []))
-    additional = schema.get("additionalProperties", True)
-
-    missing = sorted(required - set(mapping))
-    if missing:
-        raise ConfigError(f"{context} missing required keys: {', '.join(missing)}.")
-
-    if additional is False:
-        unknown = sorted(set(mapping) - set(properties))
-        if unknown:
-            raise ConfigError(f"{context} contains unsupported keys: {', '.join(unknown)}.")
 
     normalized = dict(mapping)
     if normalizer is not None:
         normalized = normalizer(normalized)
 
-    if value_validator is not None:
-        for key, value in normalized.items():
-            schema_entry = properties.get(key)
-            if schema_entry is None:
-                continue
-            value_validator(value, schema_entry, f"{context}.{key}")
-
+    validator = Draft202012Validator(schema)
+    errors = sorted(validator.iter_errors(normalized), key=lambda error: list(error.path))
+    if errors:
+        raise ConfigError(_error_message(context, errors[0]))
     return normalized
+
+
+def _error_message(context: str, error: ValidationError) -> str:
+    if error.path:
+        path = ".".join(str(token) for token in error.path)
+        return f"{context}.{path} {error.message}"
+    return f"{context} {error.message}"

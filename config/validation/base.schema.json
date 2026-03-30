@@ -9,13 +9,16 @@
   ],
   "properties": {
     "from_image": {
-      "type": "string"
+      "type": "string",
+      "pattern": ".*\\S.*"
     },
     "base_image_distro": {
-      "type": "string"
+      "type": "string",
+      "pattern": ".*\\S.*"
     },
     "base_image_description": {
-      "type": "string"
+      "type": "string",
+      "pattern": ".*\\S.*"
     },
     "build_local": {
       "type": "boolean",
