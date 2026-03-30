@@ -21,6 +21,7 @@ class MissingExtensionsTests(TestCase):
                 extension_id="extra",
                 name="Extra",
                 description="Extra tools",
+                shares=[],
                 directory=Path(tmp_dir),
                 scripts_dir=Path(tmp_dir),
                 dockerfile_path=None,

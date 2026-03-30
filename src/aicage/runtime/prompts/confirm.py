@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from aicage._logging import get_logger
 from aicage.runtime._errors import RuntimeExecutionError
@@ -28,20 +27,29 @@ def prompt_persist_docker_socket() -> bool:
         print(
             "Info: You must enable 'Expose daemon on tcp://localhost:2375 without TLS' "
             "in Docker Desktop settings to use --docker on Windows."
-        )
+    )
     return _prompt_yes_no("Persist mounting the Docker socket for this project?", default=True)
 
 
-def prompt_mount_git_support(items: list[tuple[str, str, Path]]) -> list[str]:
+def prompt_mount_git_support(
+    git_items: list[tuple[str, str]],
+    extension_items: list[tuple[str, str]],
+) -> list[str]:
+    items = [*git_items, *extension_items]
     if assume_yes_enabled():
         selected_keys = [item[0] for item in items]
         get_logger().info("Prompt git support mounts selected -> %s (assume-yes)", selected_keys)
         return selected_keys
     ensure_tty_for_prompt()
     logger = get_logger()
-    print("Enable Git support in the container by mounting:")
-    for idx, (_, label, path) in enumerate(items, start=1):
-        print(f"  {idx}) {label}: {path}")
+    if git_items:
+        print("Enable Git support in the container by mounting:")
+        for idx, (_, description) in enumerate(git_items, start=1):
+            print(f"  {idx}) {description}")
+    if extension_items:
+        print("Mounts from extensions:")
+        for idx, (_, description) in enumerate(extension_items, start=len(git_items) + 1):
+            print(f"  {idx}) {description}")
     response = input("Select mounts (comma-separated numbers) [all, default on Enter]: ").strip()
     if not response:
         selected = set(range(1, len(items) + 1))

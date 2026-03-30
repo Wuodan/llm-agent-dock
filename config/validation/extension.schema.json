@@ -12,6 +12,12 @@
     },
     "description": {
       "type": "string"
+    },
+    "shares": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "additionalProperties": false

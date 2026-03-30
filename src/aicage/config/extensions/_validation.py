@@ -19,4 +19,14 @@ def _validate_value(value: Any, schema_entry: dict[str, Any], context: str) -> N
     if schema_type == "string":
         expect_string(value, context)
         return
+    if schema_type == "array":
+        if not isinstance(value, list):
+            raise ConfigError(f"{context} must be a list.")
+        items = schema_entry.get("items", {})
+        item_type = items.get("type")
+        if item_type != "string":
+            raise ConfigError(f"{context} has unsupported item type '{item_type}'.")
+        for index, item in enumerate(value):
+            expect_string(item, f"{context}[{index}]")
+        return
     raise ConfigError(f"{context} has unsupported schema type '{schema_type}'.")

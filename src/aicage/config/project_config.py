@@ -13,6 +13,7 @@ _AGENT_MOUNTS_KEY: str = "mounts"
 _AGENT_IMAGE_REF_KEY: str = "image_ref"
 _AGENT_EXTENSIONS_KEY: str = "extensions"
 _AGENT_SHARES_KEY: str = "shares"
+_AGENT_EXTENSION_MOUNTS_KEY: str = "extension_mounts"
 
 _MOUNT_GITCONFIG_KEY: str = "gitconfig"
 _MOUNT_GITROOT_KEY: str = "gitroot"
@@ -62,6 +63,7 @@ class AgentConfig:
     image_ref: str | None = None
     extensions: list[str] = field(default_factory=list)
     shares: list[str] = field(default_factory=list)
+    extension_mounts: dict[str, bool] = field(default_factory=dict)
 
     @classmethod
     def from_mapping(cls, data: dict[str, Any]) -> "AgentConfig":
@@ -73,6 +75,7 @@ class AgentConfig:
             image_ref=data.get(_AGENT_IMAGE_REF_KEY),
             extensions=read_str_list_or_empty(data.get(_AGENT_EXTENSIONS_KEY)),
             shares=read_str_list_or_empty(data.get(_AGENT_SHARES_KEY)),
+            extension_mounts=_read_bool_dict_or_empty(data.get(_AGENT_EXTENSION_MOUNTS_KEY)),
         )
 
     def to_mapping(self) -> dict[str, Any]:
@@ -90,7 +93,19 @@ class AgentConfig:
             payload[_AGENT_EXTENSIONS_KEY] = list(self.extensions)
         if self.shares:
             payload[_AGENT_SHARES_KEY] = list(self.shares)
+        if self.extension_mounts:
+            payload[_AGENT_EXTENSION_MOUNTS_KEY] = dict(self.extension_mounts)
         return payload
+
+
+def _read_bool_dict_or_empty(value: Any) -> dict[str, bool]:
+    if not isinstance(value, dict):
+        return {}
+    return {
+        key: item
+        for key, item in value.items()
+        if isinstance(key, str) and key and isinstance(item, bool)
+    }
 
 
 @dataclass

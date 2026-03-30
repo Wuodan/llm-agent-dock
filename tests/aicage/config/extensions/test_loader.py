@@ -25,6 +25,25 @@ class ExtensionDiscoveryTests(TestCase):
         metadata = extensions["sample"]
         self.assertEqual("Sample", metadata.name)
         self.assertEqual("Desc", metadata.description)
+        self.assertEqual([], metadata.shares)
+
+    def test_load_extensions_reads_shares(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            extension_root = Path(tmp_dir) / "extension"
+            extension_dir = extension_root / "sample"
+            write_extension(
+                extension_dir,
+                name="Sample",
+                description="Desc",
+                extra_lines=["shares:", "  - ~/.m2", "  - ~/.cache:ro"],
+            )
+            with mock.patch(
+                "aicage.config.extensions.loader.CUSTOM_EXTENSIONS_DIR",
+                Path(extension_root),
+            ):
+                extensions = extensions_module.load_extensions()
+
+        self.assertEqual(["~/.m2", "~/.cache:ro"], extensions["sample"].shares)
 
     def test_extension_hash_changes_on_script_edit(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -75,7 +94,7 @@ class ExtensionDiscoveryTests(TestCase):
 
         self.assertEqual({}, extensions)
 
-    def test_load_extensions_requires_scripts_dir(self) -> None:
+    def test_load_extensions_requires_scripts_or_shares(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             extension_root = Path(tmp_dir) / "extension"
             extension_dir = extension_root / "sample"
@@ -88,8 +107,31 @@ class ExtensionDiscoveryTests(TestCase):
                 "aicage.config.extensions.loader.CUSTOM_EXTENSIONS_DIR",
                 Path(extension_root),
             ):
-                with self.assertRaises(ConfigError):
+                with self.assertRaises(ConfigError) as ctx:
                     extensions_module.load_extensions()
+        self.assertEqual(
+            "Extension 'sample' must define shares or provide scripts/ directory.",
+            str(ctx.exception),
+        )
+
+    def test_load_extensions_allows_share_only_extension(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            extension_root = Path(tmp_dir) / "extension"
+            extension_dir = extension_root / "sample"
+            extension_dir.mkdir(parents=True)
+            (extension_dir / "extension.yml").write_text(
+                extension_definition("Sample", "Desc", extra_lines=["shares:", "  - ~/.m2"]),
+                encoding="utf-8",
+            )
+            with mock.patch(
+                "aicage.config.extensions.loader.CUSTOM_EXTENSIONS_DIR",
+                Path(extension_root),
+            ):
+                extensions = extensions_module.load_extensions()
+
+        metadata = extensions["sample"]
+        self.assertEqual(["~/.m2"], metadata.shares)
+        self.assertFalse(metadata.scripts_dir.exists())
 
     def test_load_extensions_requires_definition(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

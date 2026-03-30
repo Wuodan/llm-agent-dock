@@ -48,7 +48,11 @@ class HomeGuardTests(TestCase):
                 context = mock.Mock()
                 context.project_cfg = mock.Mock(path=str(project_path))
                 context.project_cfg.agents = mock.Mock()
-                context.project_cfg.agents.setdefault.return_value = mock.Mock()
+                agent_cfg = mock.Mock()
+                agent_cfg.extensions = []
+                agent_cfg.extension_mounts = {}
+                context.project_cfg.agents.setdefault.return_value = agent_cfg
+                context.extensions = {}
                 resolver.resolve_docker_args(context, "codex", None)
 
         guard_mock.assert_called_once()

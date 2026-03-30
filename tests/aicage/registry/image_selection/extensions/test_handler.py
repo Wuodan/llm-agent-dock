@@ -78,6 +78,7 @@ class ExtensionHandlerTests(TestCase):
             extension_id=extension_id,
             name=extension_id,
             description="desc",
+            shares=[],
             directory=base,
             scripts_dir=base,
             dockerfile_path=None,

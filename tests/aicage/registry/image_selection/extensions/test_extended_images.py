@@ -99,6 +99,7 @@ class ExtendedImageSelectionTests(TestCase):
             extension_id="ext",
             name="Ext",
             description="Desc",
+            shares=[],
             directory=Path("/tmp/ext"),
             scripts_dir=Path("/tmp/ext/scripts"),
             dockerfile_path=None,

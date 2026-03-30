@@ -10,11 +10,17 @@ def extension_definition(name: str, description: str, extra_lines: list[str] | N
     return join_yaml(lines)
 
 
-def write_extension(path: Path, *, name: str, description: str) -> None:
+def write_extension(
+    path: Path,
+    *,
+    name: str,
+    description: str,
+    extra_lines: list[str] | None = None,
+) -> None:
     scripts_dir = path / "scripts"
     scripts_dir.mkdir(parents=True, exist_ok=True)
     (path / "extension.yml").write_text(
-        extension_definition(name, description),
+        extension_definition(name, description, extra_lines=extra_lines),
         encoding="utf-8",
     )
     (scripts_dir / "01-install.sh").write_text(

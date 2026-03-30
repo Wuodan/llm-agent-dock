@@ -6,7 +6,7 @@ from aicage.config.config_store import SettingsStore
 from aicage.constants import DEFAULT_EXTENDED_IMAGE_NAME
 
 from .._helpers import (
-    assert_marker_extension_present,
+    assert_marker_extension_ready,
     copy_custom_base_sample,
     copy_forge_sample,
     copy_marker_extension_sample,
@@ -37,6 +37,8 @@ def test_custom_base_extension_builds_and_runs(
     is_custom_agent: bool,
 ) -> None:
     require_integration()
+    share_dir = tmp_path / f"{agent_name}-marker-share"
+    share_dir.mkdir()
     workspace, env = setup_workspace(
         monkeypatch,
         tmp_path,
@@ -53,10 +55,15 @@ def test_custom_base_extension_builds_and_runs(
     extension_dir = custom_extensions_dir() / "marker"
     extension_dir.parent.mkdir(parents=True, exist_ok=True)
     copy_marker_extension_sample(extension_dir)
+    (extension_dir / "extension.yml").write_text(
+        (extension_dir / "extension.yml").read_text(encoding="utf-8").rstrip()
+        + f"\nshares:\n  - {share_dir}\n",
+        encoding="utf-8",
+    )
 
     _configure_extension(workspace, agent_name, _CUSTOM_BASE_NAME)
 
-    assert_marker_extension_present(env, workspace, agent_name)
+    assert_marker_extension_ready(env, workspace, agent_name, share_dir=share_dir)
 
 
 def _configure_extension(workspace: Path, agent_name: str, base_name: str) -> None:

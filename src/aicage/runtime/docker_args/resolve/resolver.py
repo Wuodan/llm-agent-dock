@@ -11,7 +11,7 @@ from aicage.runtime.env_vars import AICAGE_WORKSPACE
 from aicage.runtime.run_args import EnvVar, MountSpec
 
 from .._resolvers import _agent_config, _docker_socket, _git_config, _git_root, _gpg, _project, _shares, _ssh_keys
-from .._support._git_support import resolve_git_support_prefs
+from .._support._mount_prompt import resolve_mount_prompt_prefs
 from ._mounts import map_mount_requests
 
 
@@ -22,7 +22,12 @@ def resolve_docker_args(
 ) -> tuple[list[MountSpec], list[EnvVar]]:
     agent_cfg = context.project_cfg.agents.setdefault(agent, AgentConfig())
     project_path = Path(context.project_cfg.path).resolve()
-    resolve_git_support_prefs(project_path, agent_cfg)
+    mount_prompt_prefs = resolve_mount_prompt_prefs(project_path, agent_cfg, context.extensions)
+    if mount_prompt_prefs is not None:
+        for key in ("gitconfig", "gitroot", "gnupg", "ssh"):
+            if getattr(agent_cfg.mounts, key) is None:
+                setattr(agent_cfg.mounts, key, key in mount_prompt_prefs.git_mounts)
+        agent_cfg.extension_mounts.update(mount_prompt_prefs.extension_mounts)
     resolved = [_resolve_provider(provider, context, agent, parsed) for provider in _resolver_sequence()]
     mount_requests = list(chain.from_iterable(item.mounts for item in resolved))
     env = list(chain.from_iterable(item.env for item in resolved))

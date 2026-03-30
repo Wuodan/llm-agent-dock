@@ -1,12 +1,9 @@
-from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
-from aicage.config.project_config import AgentConfig
 from aicage.paths import HOST_GNUPG_DIR, HOST_SSH_DIR
 
-from ...prompts.confirm import prompt_mount_git_support
 from ._exec import capture_stdout
 from ._signing import is_commit_signing_enabled, resolve_signing_format
 
@@ -92,17 +89,19 @@ def uses_ssh_remotes(project_path: Path) -> bool:
     return False
 
 
-def resolve_git_support_prefs(project_path: Path, agent_cfg: AgentConfig) -> None:
-    mounts_cfg = agent_cfg.mounts
-    items: list[_GitSupportPromptItem] = []
+def git_support_prompt_items(
+    project_path: Path,
+    mounts_cfg: _MountPrefs,
+) -> list[tuple[str, str]]:
+    git_items: list[_GitSupportPromptItem] = []
 
     git_config = resolve_git_config_path()
     if git_config and git_config.exists() and mounts_cfg.gitconfig is None:
-        items.append(_GitSupportPromptItem("gitconfig", "Git config (name/email)", git_config))
+        git_items.append(_GitSupportPromptItem("gitconfig", "Git config (name/email)", git_config))
 
     git_root = resolve_git_root(project_path)
     if git_root and git_root != project_path and mounts_cfg.gitroot is None:
-        items.append(_GitSupportPromptItem("gitroot", "Git root (repository access)", git_root))
+        git_items.append(_GitSupportPromptItem("gitroot", "Git root (repository access)", git_root))
 
     signing_enabled = is_commit_signing_enabled(project_path)
     signing_format = resolve_signing_format(project_path) if signing_enabled else None
@@ -111,7 +110,7 @@ def resolve_git_support_prefs(project_path: Path, agent_cfg: AgentConfig) -> Non
     if ssh_needed and mounts_cfg.ssh is None:
         ssh_dir = resolve_ssh_dir()
         if ssh_dir.exists():
-            items.append(
+            git_items.append(
                 _GitSupportPromptItem(
                     "ssh",
                     "SSH keys (for Git SSH/signing)",
@@ -123,25 +122,11 @@ def resolve_git_support_prefs(project_path: Path, agent_cfg: AgentConfig) -> Non
     if needs_gnupg and mounts_cfg.gnupg is None:
         gpg_home = resolve_gpg_home()
         if gpg_home and gpg_home.exists():
-            items.append(
+            git_items.append(
                 _GitSupportPromptItem(
                     "gnupg",
                     "GnuPG keys (for Git signing)",
                     gpg_home,
                 )
             )
-
-    if not items:
-        return
-
-    selected = set(prompt_mount_git_support(_format_prompt_items(items)))
-    for item in items:
-        _set_mount_pref(mounts_cfg, item.key, item.key in selected)
-
-
-def _format_prompt_items(items: Iterable[_GitSupportPromptItem]) -> list[tuple[str, str, Path]]:
-    return [(item.key, item.label, item.path) for item in items]
-
-
-def _set_mount_pref(mounts_cfg: _MountPrefs, key: str, value: bool) -> None:
-    setattr(mounts_cfg, key, value)
+    return [(item.key, f"{item.label}: {item.path}") for item in git_items]

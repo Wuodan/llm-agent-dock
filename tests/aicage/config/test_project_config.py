@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from aicage.config.project_config import (
     _AGENT_BASE_KEY,
+    _AGENT_EXTENSION_MOUNTS_KEY,
     _AGENT_SHARES_KEY,
     _DOCKER_ARGS_KEY,
     _PROJECT_AGENTS_KEY,
@@ -37,6 +38,24 @@ class ProjectConfigTests(TestCase):
                     "codex": {
                         _AGENT_BASE_KEY: "ubuntu",
                         _AGENT_SHARES_KEY: ["/tmp/one", "/tmp/two:ro"],
+                    }
+                },
+            },
+            cfg.to_mapping(),
+        )
+
+    def test_to_mapping_includes_extension_mounts(self) -> None:
+        cfg = ProjectConfig(
+            path="/repo",
+            agents={"codex": AgentConfig(base="ubuntu", extension_mounts={"gh": True, "maven": False})},
+        )
+        self.assertEqual(
+            {
+                _PROJECT_PATH_KEY: "/repo",
+                _PROJECT_AGENTS_KEY: {
+                    "codex": {
+                        _AGENT_BASE_KEY: "ubuntu",
+                        _AGENT_EXTENSION_MOUNTS_KEY: {"gh": True, "maven": False},
                     }
                 },
             },

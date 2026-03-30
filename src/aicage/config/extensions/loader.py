@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+from aicage._lists import read_str_list_or_empty
 from aicage.config._yaml import expect_string
 from aicage.config.errors import ConfigError
 from aicage.config.extensions._validation import validate_extension_mapping
@@ -28,6 +29,7 @@ class ExtensionMetadata:
     extension_id: str
     name: str
     description: str
+    shares: list[str]
     directory: Path
     scripts_dir: Path
     dockerfile_path: Path | None
@@ -44,14 +46,16 @@ def load_extensions() -> dict[str, ExtensionMetadata]:
         extension_id = entry.name
         definition_path = _find_extension_definition(entry)
         mapping = validate_extension_mapping(load_yaml(definition_path))
+        shares = read_str_list_or_empty(mapping.get("shares"))
         scripts_dir = entry / _SCRIPTS_DIRNAME
-        if not scripts_dir.is_dir():
-            raise ConfigError(f"Extension '{extension_id}' is missing scripts/ directory.")
+        if not scripts_dir.is_dir() and not shares:
+            raise ConfigError(f"Extension '{extension_id}' must define shares or provide scripts/ directory.")
         dockerfile_path = entry / _DOCKERFILE_NAME
         extensions[extension_id] = ExtensionMetadata(
             extension_id=extension_id,
             name=expect_string(mapping.get(_EXTENSION_NAME_KEY), _EXTENSION_NAME_KEY),
             description=expect_string(mapping.get(_EXTENSION_DESCRIPTION_KEY), _EXTENSION_DESCRIPTION_KEY),
+            shares=shares,
             directory=entry,
             scripts_dir=scripts_dir,
             dockerfile_path=dockerfile_path if dockerfile_path.is_file() else None,

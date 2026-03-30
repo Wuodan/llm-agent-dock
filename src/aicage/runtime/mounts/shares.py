@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path, PureWindowsPath
 
-from aicage.cli_types import ParsedArgs
 from aicage.errors import AicageError
 
 
@@ -11,22 +10,20 @@ class ShareSpec:
     read_only: bool
 
 
-def resolve_share_mounts(
-    parsed: ParsedArgs,
+def resolve_share_specs(
+    raw_shares: list[str],
     cwd: Path,
 ) -> list[ShareSpec]:
     share_mounts: list[ShareSpec] = []
-    if not parsed.shares:
+    if not raw_shares:
         return share_mounts
     mounted_hosts: set[Path] = set()
-    for raw in parsed.shares:
+    for raw in raw_shares:
         share = _parse_share(raw, cwd)
         if share.host_path in mounted_hosts:
             continue
         mounted_hosts.add(share.host_path)
-        share_mounts.append(
-            ShareSpec(host_path=share.host_path, read_only=share.read_only)
-        )
+        share_mounts.append(ShareSpec(host_path=share.host_path, read_only=share.read_only))
     return share_mounts
 
 

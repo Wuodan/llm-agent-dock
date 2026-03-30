@@ -86,6 +86,7 @@ The complete user documentation lives in the wiki:
 - Share additional host folders:
   - `aicage --share ~/.m2 <agent>`
   - `aicage --share /path/to/data:ro <agent>`
+  - Extensions can also define extra shares (host mounts).
 - Let the agent use Docker:
   - `aicage --docker <agent>`
 - Set environment variables:
@@ -140,12 +141,13 @@ aicage <agent>
 
 These are only samples. Use them to learn the structure, then replace or edit them with your own definitions.
 `aicage` detects whatever you place under `~/.aicage-custom` and offers it during selection.
+Extensions can install tools and request additional host mounts.
 
 After adding or changing custom definitions, restart `aicage`.
 
 If your project is already configured for an agent, `aicage` will keep using the saved config. To reconfigure (and
 see new bases/agents/extensions), run `aicage --config remove` and start `aicage` again. To reset only one agent
-entry, use `aicage --config remove <agent>`. Use `aicage --config info` to inspect the current config.
+entry, use `aicage --config remove <agent>`. Use `aicage --config` to inspect the current config.
 
 - Extensions: [Customization-Extensions](https://github.com/aicage/aicage/wiki/Customization-Extensions)
 - Custom agents: [Customization-Agents](https://github.com/aicage/aicage/wiki/Customization-Agents)
@@ -159,7 +161,8 @@ Image updates are handled automatically; see [Updates](https://github.com/aicage
 - `-y`, `--yes` applies default answers for all prompts and suppresses prompt output.
 - `--docker` mounts `/run/docker.sock` into the container to enable Docker-in-Docker workflows.
 - `--share <path>` mounts a host path into the container at the same path. Repeatable; add `:ro` for read-only.
-- `--config info` prints the project config path and its contents.
+- Extensions can also request grouped host mounts during setup.
+- `--config` prints the project config path and its contents.
 - `--config remove [<agent>]` removes the full project config or only one agent entry.
 
 Configuration file formats are documented in [CONFIG.md](CONFIG.md). Extension authoring is documented in

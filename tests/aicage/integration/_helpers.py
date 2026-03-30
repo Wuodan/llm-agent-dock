@@ -174,6 +174,8 @@ def setup_marker_extension_workspace(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
     agent_name: str,
+    *,
+    shares: list[str] | None = None,
 ) -> tuple[Path, dict[str, str], str]:
     require_integration()
     workspace, env = setup_workspace(
@@ -185,6 +187,13 @@ def setup_marker_extension_workspace(
     extension_dir = custom_extensions_dir() / "marker"
     extension_dir.parent.mkdir(parents=True, exist_ok=True)
     copy_marker_extension_sample(extension_dir)
+    if shares:
+        definition_path = extension_dir / "extension.yml"
+        share_lines = ["shares:", *[f"  - {share}" for share in shares]]
+        definition_path.write_text(
+            definition_path.read_text(encoding="utf-8").rstrip() + "\n" + "\n".join(share_lines) + "\n",
+            encoding="utf-8",
+        )
     image_ref = f"{DEFAULT_EXTENDED_IMAGE_NAME}:{agent_name}-ubuntu-marker"
     store = SettingsStore()
     project_cfg = store.load_project(workspace)
@@ -209,10 +218,12 @@ def run_agent_version(env: dict[str, str], workspace: Path, agent_name: str) -> 
     assert output_lines[-1]
 
 
-def assert_marker_extension_present(
+def assert_marker_extension_ready(
     env: dict[str, str],
     workspace: Path,
     agent_name: str,
+    *,
+    share_dir: Path | None = None,
 ) -> None:
     exit_code, output = run_cli_pty(
         [agent_name, "-lc", "test -f /usr/local/share/aicage-extensions/marker.txt"],
@@ -220,6 +231,15 @@ def assert_marker_extension_present(
         cwd=workspace,
     )
     assert exit_code == 0, output
+
+    if share_dir is not None:
+        container_path = paths_module.container_project_path(share_dir).as_posix()
+        exit_code, output = run_cli_pty(
+            [agent_name, "-lc", f"test -d {container_path}"],
+            env=env,
+            cwd=workspace,
+        )
+        assert exit_code == 0, output
 
 
 def force_record_agent_version(

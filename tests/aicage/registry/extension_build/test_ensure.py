@@ -114,6 +114,7 @@ class EnsureExtendedImageTests(TestCase):
             extension_id=extension_id,
             name=extension_id,
             description="desc",
+            shares=[],
             directory=Path("/tmp/ext"),
             scripts_dir=Path("/tmp/ext/scripts"),
             dockerfile_path=None,

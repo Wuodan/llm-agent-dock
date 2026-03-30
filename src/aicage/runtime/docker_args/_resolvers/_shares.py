@@ -1,9 +1,12 @@
+from collections.abc import Mapping
 from pathlib import Path
 
 from aicage.cli_types import ParsedArgs
 from aicage.config.context import ConfigContext
+from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.config.project_config import AgentConfig
 from aicage.runtime.docker_args._support._resolver_types import MountRequest, ResolvedArgs
-from aicage.runtime.mounts.shares import ShareSpec, resolve_share_mounts
+from aicage.runtime.mounts.shares import ShareSpec, resolve_share_specs
 
 
 def resolve(
@@ -15,6 +18,23 @@ def resolve(
     if parsed is None:
         return ResolvedArgs()
     cwd = Path.cwd().resolve()
-    share_mounts: list[ShareSpec] = resolve_share_mounts(parsed, cwd)
+    agent_cfg: AgentConfig = context.project_cfg.agents.setdefault(agent, AgentConfig())
+    extension_shares = _approved_extension_shares(agent_cfg, context.extensions)
+    share_mounts: list[ShareSpec] = resolve_share_specs([*parsed.shares, *extension_shares], cwd)
     mounts = [MountRequest(host_path=share.host_path, read_only=share.read_only) for share in share_mounts]
     return ResolvedArgs(mounts=mounts)
+
+
+def _approved_extension_shares(
+    agent_cfg: AgentConfig,
+    available_extensions: Mapping[str, ExtensionMetadata],
+) -> list[str]:
+    shares: list[str] = []
+    for extension_id in agent_cfg.extensions:
+        if not agent_cfg.extension_mounts.get(extension_id):
+            continue
+        extension = available_extensions.get(extension_id)
+        if extension is None:
+            continue
+        shares.extend(extension.shares)
+    return shares
