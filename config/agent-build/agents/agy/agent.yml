@@ -1,0 +1,10 @@
+agent_path:
+  directories:
+    - ~/.gemini
+agent_full_name: Antigravity CLI
+agent_homepage: https://antigravity.google/docs/cli-overview
+build_local: true
+base_exclude:
+  - alpine
+base_distro_exclude:
+  - Alpine
