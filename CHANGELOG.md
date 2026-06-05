@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-06-05
+
+### Added
+
+- Added the Antigravity CLI agent as `Antigravity` (`agy`).
+
+### Internal
+
+- Synced bundled agent install/version scripts with the current upstream agent images.
+- Hardened releases to fail when a pushed tag does not point to a commit on `main`.
+- Bumped pinned GitHub Actions and the `ruff` development dependency.
+
 ## [1.1.8] - 2026-05-15
 
 ### Fixed
