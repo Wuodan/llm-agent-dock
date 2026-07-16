@@ -5,4 +5,4 @@ PyYAML>=6.0.3,<7
 textual>=8.2.8,<9
 
 # Updates due to reports by 'osv-scanner'
-idna>=3.15,<4
+idna>=3.18,<4
