@@ -7,6 +7,7 @@ from aicage.config.project_config import AgentConfig
 from aicage.runtime.docker_args.support.resolver_types import MountRequest, ResolvedArgs
 from aicage.runtime.run_args import EnvVar
 
+_AICAGE_ENABLE_OSC52_CLIPBOARD = "AICAGE_ENABLE_OSC52_CLIPBOARD"
 _DISPLAY = "DISPLAY"
 _WAYLAND_DISPLAY = "WAYLAND_DISPLAY"
 _XAUTHORITY = "XAUTHORITY"
@@ -17,13 +18,11 @@ _X11_SOCKET_DIR = Path(
 
 
 def describe_host_clipboard_access() -> str:
-    if os.name == "nt":
-        return "Not supported on Windows hosts."
-    resolved = _resolve_host_clipboard_access()
-    if resolved is None:
-        return "No supported Linux host clipboard detected."
-    _args, description = resolved
-    return description
+    return _resolve_host_clipboard_access().description
+
+
+def clipboard_requires_confirmation() -> bool:
+    return _resolve_host_clipboard_access().requires_confirmation
 
 
 def resolve(
@@ -33,20 +32,34 @@ def resolve(
 ) -> ResolvedArgs:
     _ = parsed
     agent_cfg: AgentConfig = context.project_cfg.agents[agent]
-    if agent_cfg.mounts.clipboard is not True or os.name == "nt":
+    if agent_cfg.mounts.clipboard is not True:
         return ResolvedArgs()
-    resolved = _resolve_host_clipboard_access()
-    return ResolvedArgs() if resolved is None else resolved[0]
+    return _resolve_host_clipboard_access().resolved_args
 
 
-def _resolve_host_clipboard_access() -> tuple[ResolvedArgs, str] | None:
+class _ResolvedClipboardAccess:
+    def __init__(
+        self,
+        resolved_args: ResolvedArgs,
+        description: str,
+        requires_confirmation: bool,
+    ) -> None:
+        self.resolved_args = resolved_args
+        self.description = description
+        self.requires_confirmation = requires_confirmation
+
+
+def _resolve_host_clipboard_access() -> _ResolvedClipboardAccess:
     wayland = _resolve_wayland()
     if wayland is not None:
         return wayland
-    return _resolve_x11()
+    x11 = _resolve_x11()
+    if x11 is not None:
+        return x11
+    return _resolve_osc52()
 
 
-def _resolve_wayland() -> tuple[ResolvedArgs, str] | None:
+def _resolve_wayland() -> _ResolvedClipboardAccess | None:
     runtime_dir = os.environ.get(_XDG_RUNTIME_DIR)
     display = os.environ.get(_WAYLAND_DISPLAY)
     if not runtime_dir or not display:
@@ -54,19 +67,22 @@ def _resolve_wayland() -> tuple[ResolvedArgs, str] | None:
     socket_path = Path(runtime_dir) / display
     if not socket_path.exists():
         return None
-    return (
-        ResolvedArgs(
+    return _ResolvedClipboardAccess(
+        resolved_args=ResolvedArgs(
             mounts=[MountRequest(host_path=socket_path)],
             env=[
                 EnvVar(name=_XDG_RUNTIME_DIR, value=runtime_dir),
                 EnvVar(name=_WAYLAND_DISPLAY, value=display),
             ],
         ),
-        f"Wayland socket {socket_path}; env {_XDG_RUNTIME_DIR}, {_WAYLAND_DISPLAY}",
+        description=(
+            f"Wayland socket {socket_path}; env {_XDG_RUNTIME_DIR}, {_WAYLAND_DISPLAY}"
+        ),
+        requires_confirmation=True,
     )
 
 
-def _resolve_x11() -> tuple[ResolvedArgs, str] | None:
+def _resolve_x11() -> _ResolvedClipboardAccess | None:
     display = os.environ.get(_DISPLAY)
     if not display or not _X11_SOCKET_DIR.exists():
         return None
@@ -80,4 +96,18 @@ def _resolve_x11() -> tuple[ResolvedArgs, str] | None:
             mounts.append(MountRequest(host_path=xauthority_path, read_only=True))
             env.append(EnvVar(name=_XAUTHORITY, value=xauthority))
             details.append(f"read-only {_XAUTHORITY} {xauthority_path}")
-    return ResolvedArgs(mounts=mounts, env=env), "; ".join(details)
+    return _ResolvedClipboardAccess(
+        resolved_args=ResolvedArgs(mounts=mounts, env=env),
+        description="; ".join(details),
+        requires_confirmation=True,
+    )
+
+
+def _resolve_osc52() -> _ResolvedClipboardAccess:
+    return _ResolvedClipboardAccess(
+        resolved_args=ResolvedArgs(
+            env=[EnvVar(name=_AICAGE_ENABLE_OSC52_CLIPBOARD, value="1")]
+        ),
+        description="OSC 52 terminal clipboard fallback; no host mounts",
+        requires_confirmation=False,
+    )

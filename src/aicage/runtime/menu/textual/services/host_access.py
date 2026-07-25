@@ -66,11 +66,15 @@ def current_docker_option(
         description=None,
         persisted=persisted,
         enabled=docker_selection_key("socket") in selected,
+        requires_confirmation=True,
     )
 
 
 def current_clipboard_option(
-    selected: set[str], persisted: bool | None, description: str | None
+    selected: set[str],
+    persisted: bool | None,
+    description: str | None,
+    requires_confirmation: bool,
 ) -> DockerOptionValue:
     return DockerOptionValue(
         key="clipboard",
@@ -78,6 +82,7 @@ def current_clipboard_option(
         description=description,
         persisted=persisted,
         enabled=docker_selection_key("clipboard") in selected,
+        requires_confirmation=requires_confirmation,
     )
 
 
@@ -89,7 +94,11 @@ def _build_confirmation_request(
         docker_options=[
             option
             for option in docker_options
-            if option.enabled and option.persisted is not True
+            if (
+                option.enabled
+                and option.persisted is not True
+                and option.requires_confirmation
+            )
         ],
         git_support_shares=[
             item

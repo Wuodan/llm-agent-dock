@@ -1,4 +1,3 @@
-import sys
 from typing import TypeVar
 
 from textual import work
@@ -13,6 +12,7 @@ from aicage.registry.image_selection.extensions.missing_extensions import (
     ensure_extensions_exist,
 )
 from aicage.runtime.docker_args.resolvers.clipboard import (
+    clipboard_requires_confirmation,
     describe_host_clipboard_access,
 )
 from aicage.runtime.menu._interaction_types import ConfigSelectionResult
@@ -236,11 +236,8 @@ class ConfigApp(TextualApp[ConfigSelectionResult | None]):
                 CustomShareValue(share) for share in self._draft.agent_cfg.shares
             ],
             docker_socket_enabled=bool(self._draft.agent_cfg.mounts.docker),
-            show_clipboard=sys.platform.startswith("linux"),
+            show_clipboard=True,
             clipboard_enabled=bool(self._draft.agent_cfg.mounts.clipboard),
-            clipboard_description=(
-                describe_host_clipboard_access()
-                if sys.platform.startswith("linux")
-                else None
-            ),
+            clipboard_description=describe_host_clipboard_access(),
+            clipboard_requires_confirmation=clipboard_requires_confirmation(),
         )

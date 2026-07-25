@@ -12,3 +12,4 @@ class OverviewState:
     show_clipboard: bool = False
     clipboard_enabled: bool = False
     clipboard_description: str | None = None
+    clipboard_requires_confirmation: bool = True

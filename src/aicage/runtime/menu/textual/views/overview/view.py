@@ -206,6 +206,7 @@ class Overview(Container):
                     selected,
                     clipboard_value,
                     self._state.clipboard_description,
+                    self._state.clipboard_requires_confirmation,
                 )
             )
         return options

@@ -106,7 +106,10 @@ class HostAccessTests(TestCase):
 
     def test_current_clipboard_option_updates_enabled_state(self) -> None:
         value = host_access.current_clipboard_option(
-            {"docker:clipboard"}, None, "Wayland socket /run/user/1000/wayland-0"
+            {"docker:clipboard"},
+            None,
+            "Wayland socket /run/user/1000/wayland-0",
+            True,
         )
 
         self.assertEqual(
@@ -115,6 +118,7 @@ class HostAccessTests(TestCase):
                 "Clipboard integration",
                 "Wayland socket /run/user/1000/wayland-0",
                 None,
+                True,
                 True,
             ),
             value,
@@ -176,6 +180,25 @@ class HostAccessTests(TestCase):
         self.assertEqual([docker_options[1]], values.docker_options)
         self.assertEqual([built_in_shares[0]], values.git_support_shares)
         self.assertEqual([built_in_shares[1]], values.extension_shares)
+
+    def test_build_confirmation_request_skips_non_sensitive_clipboard_option(
+        self,
+    ) -> None:
+        values = host_access._build_confirmation_request(
+            [],
+            [
+                DockerOptionValue(
+                    "clipboard",
+                    "Clipboard integration",
+                    "OSC 52 terminal clipboard fallback; no host mounts",
+                    None,
+                    True,
+                    False,
+                )
+            ],
+        )
+
+        self.assertEqual([], values.docker_options)
 
     def test_merge_confirmed_host_access_applies_confirmed_values(self) -> None:
         built_in_shares = [

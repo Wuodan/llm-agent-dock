@@ -323,6 +323,34 @@ class ConfigAppTests(TestCase):
 
         self.assertFalse(accepted)
 
+    def test_confirm_undecided_built_in_shares_applies_osc52_clipboard_without_popup(
+        self,
+    ) -> None:
+        app = _build_app()
+        overview = mock.Mock()
+        overview.current_built_in_shares.return_value = []
+        overview.current_custom_shares.return_value = []
+        overview.current_host_options.return_value = [
+            DockerOptionValue(
+                "clipboard",
+                "Clipboard integration",
+                "OSC 52 terminal clipboard fallback; no host mounts",
+                None,
+                True,
+                False,
+            )
+        ]
+
+        with (
+            mock.patch.object(app, "_overview", return_value=overview),
+            mock.patch.object(app, "_push_view", new=mock.AsyncMock()) as push_view,
+        ):
+            accepted = asyncio.run(app._confirm_undecided_built_in_shares())
+
+        self.assertTrue(accepted)
+        self.assertTrue(app._draft.agent_cfg.mounts.clipboard)
+        push_view.assert_not_called()
+
     def test_confirm_undecided_built_in_shares_persists_extension_share_selection(
         self,
     ) -> None:

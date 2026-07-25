@@ -57,6 +57,7 @@ The overview brings the most common choices together in one place:
 - `Extensions`: optional local additions that install tools or request extra host shares.
 - `Docker Args`: extra `docker run` arguments such as `-e`, `-p`, or `--network`.
 - `Docker socket`: lets the agent use Docker on the host when you explicitly enable it.
+- `Clipboard sharing`: lets agents write to clipboard.
 - `OK`: saves the current project config for that agent and starts the container.
 
 ## Common next steps
@@ -93,6 +94,10 @@ See [Extensions](https://github.com/aicage/aicage/wiki/Customization-Extensions)
 ### Docker socket access
 
 If you want the agent to run Docker commands, enable `Docker socket` in the setup screen.
+
+### Clipboard sharing
+
+Use `Clipboard sharing` in the setup screen for agents which write to clipboard.
 
 ## Full documentation
 

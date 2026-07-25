@@ -36,6 +36,7 @@ class DockerOptionValue:
     description: str | None
     persisted: bool | None
     enabled: bool
+    requires_confirmation: bool = True
 
 
 @dataclass(frozen=True)

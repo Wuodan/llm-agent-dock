@@ -5,6 +5,7 @@ from aicage.cli_types import ParsedArgs
 from aicage.config.context import ConfigContext
 from aicage.config.project_config import AgentConfig, _AgentMounts, _ProjectConfig
 from aicage.runtime.docker_args.resolvers.clipboard import (
+    clipboard_requires_confirmation,
     describe_host_clipboard_access,
     resolve,
 )
@@ -36,14 +37,18 @@ class ClipboardMountTests(TestCase):
             description,
         )
 
-    def test_describe_host_clipboard_access_returns_no_supported_message(self) -> None:
+    def test_describe_host_clipboard_access_returns_osc52_fallback_message(
+        self,
+    ) -> None:
         with (
             mock.patch(f"{_MODULE}.os.name", "posix"),
             mock.patch.dict(f"{_MODULE}.os.environ", {}, clear=True),
         ):
             description = describe_host_clipboard_access()
 
-        self.assertEqual("No supported Linux host clipboard detected.", description)
+        self.assertEqual(
+            "OSC 52 terminal clipboard fallback; no host mounts", description
+        )
 
     def test_resolve_prefers_wayland_when_socket_available(self) -> None:
         agent_cfg = AgentConfig(mounts=_AgentMounts(clipboard=True))
@@ -116,6 +121,30 @@ class ClipboardMountTests(TestCase):
 
         self.assertEqual([], resolved.mounts)
         self.assertEqual([], resolved.env)
+
+    def test_resolve_falls_back_to_osc52_env_without_mounts(self) -> None:
+        agent_cfg = AgentConfig(mounts=_AgentMounts(clipboard=True))
+        context = _build_context(agent_cfg)
+        with (
+            mock.patch(f"{_MODULE}.os.name", "nt"),
+            mock.patch.dict(f"{_MODULE}.os.environ", {}, clear=True),
+        ):
+            resolved = resolve(context, "codex", _build_parsed())
+
+        self.assertEqual([], resolved.mounts)
+        self.assertEqual(
+            [("AICAGE_ENABLE_OSC52_CLIPBOARD", "1")],
+            [(item.name, item.value) for item in resolved.env],
+        )
+
+    def test_clipboard_requires_confirmation_returns_false_for_osc52(self) -> None:
+        with (
+            mock.patch(f"{_MODULE}.os.name", "nt"),
+            mock.patch.dict(f"{_MODULE}.os.environ", {}, clear=True),
+        ):
+            requires_confirmation = clipboard_requires_confirmation()
+
+        self.assertFalse(requires_confirmation)
 
 
 def _build_context(agent_cfg: AgentConfig) -> ConfigContext:
