@@ -33,7 +33,7 @@ class ImageUpdateConfirmScreen(CancelableScreen[bool | None]):
                     Button("Pull newer", id="pull_newer", variant="primary"),
                     classes="screen_actions",
                 ),
-                classes="screen_shell",
+                classes="confirm_shell",
             ),
             classes="screen_frame",
         )
