@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.8] - 2026-07-25
+
+### Fixed
+
+- Canceling image setup from the UI now stops active setup work more reliably, including on Windows.
+
+### Changed
+
+- Added an OSC 52 clipboard fallback so clipboard sharing now works beyond native Linux Wayland/X11 host
+  integration, including non-Linux hosts and Linux terminal sessions without display-server clipboard access.
+- Clipboard sharing is now available from the setup overview on every host.
+
 ## [1.4.7] - 2026-07-23
 
 ### Changed
