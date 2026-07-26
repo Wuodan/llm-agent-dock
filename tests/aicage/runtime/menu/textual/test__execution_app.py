@@ -1,5 +1,3 @@
-import os
-import signal
 from unittest import TestCase, mock
 
 from aicage.runtime.menu.textual import _execution_app
@@ -36,15 +34,20 @@ class ExecutionAppTests(TestCase):
 
         run_mock.assert_called_once_with()
 
-    def test_action_cancel_interrupts_process_group(self) -> None:
+    def test_action_cancel_cancels_current_execution_cleanup_and_exits(self) -> None:
         app = _execution_app.ExecutionApp(mock.Mock())
 
-        with mock.patch(
-            "aicage.runtime.menu.textual._execution_app.os.killpg"
-        ) as killpg_mock:
+        with (
+            mock.patch(
+                "aicage.runtime.menu.textual._execution_app.cancel_current_execution_cleanup"
+            ) as cancel_mock,
+            mock.patch.object(app, "exit") as exit_mock,
+        ):
             app.action_cancel()
 
-        killpg_mock.assert_called_once_with(os.getpgrp(), signal.SIGINT)
+        cancel_mock.assert_called_once_with()
+        exit_mock.assert_called_once()
+        self.assertIsInstance(exit_mock.call_args.args[0], KeyboardInterrupt)
 
     def test_run_execution_exits_with_error(self) -> None:
         operation = mock.Mock(side_effect=RuntimeError("boom"))
@@ -54,11 +57,15 @@ class ExecutionAppTests(TestCase):
         with (
             mock.patch.object(app, "query_one", return_value=screen),
             mock.patch.object(app, "call_from_thread") as call_from_thread_mock,
+            mock.patch(
+                "aicage.runtime.menu.textual._execution_app.current_execution_cleanup"
+            ) as cleanup_mock,
         ):
             _call_work(app, "_run_execution")
 
         call_from_thread_mock.assert_called_once()
         self.assertIsInstance(call_from_thread_mock.call_args.args[1], RuntimeError)
+        cleanup_mock.assert_called_once_with()
 
     def test_run_execution_exits_with_none_on_success(self) -> None:
         operation = mock.Mock()
@@ -68,7 +75,11 @@ class ExecutionAppTests(TestCase):
         with (
             mock.patch.object(app, "query_one", return_value=screen),
             mock.patch.object(app, "call_from_thread") as call_from_thread_mock,
+            mock.patch(
+                "aicage.runtime.menu.textual._execution_app.current_execution_cleanup"
+            ) as cleanup_mock,
         ):
             _call_work(app, "_run_execution")
 
         call_from_thread_mock.assert_called_once_with(app.exit, None)
+        cleanup_mock.assert_called_once_with()

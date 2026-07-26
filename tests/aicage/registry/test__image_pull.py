@@ -26,6 +26,10 @@ class FakeDockerApi:
 class FakeDockerClient:
     def __init__(self, api: FakeDockerApi) -> None:
         self.api = api
+        self.closed = False
+
+    def close(self) -> None:
+        self.closed = True
 
 
 class DockerInvocationTests(TestCase):

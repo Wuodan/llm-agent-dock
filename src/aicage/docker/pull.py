@@ -2,6 +2,7 @@ import json
 import time
 from pathlib import Path
 
+from aicage._execution_cleanup import register_cleanup
 from aicage._logging import get_logger
 from aicage.docker._client import get_docker_pull_client
 from aicage.docker._pull_progress import PullProgress
@@ -23,6 +24,7 @@ def run_pull(
     logger.info("Pulling image %s (logs: %s)", image_ref, log_path)
 
     client = get_docker_pull_client()
+    register_cleanup(client.close)
     with log_path.open("w", encoding="utf-8") as log_handle:
         for event in client.api.pull(image_ref, stream=True, decode=True):
             line = _format_pull_event(event)

@@ -2,6 +2,7 @@ import subprocess  # nosec B404 -- subprocess is required to stream docker build
 from pathlib import Path
 from typing import TextIO
 
+from aicage._execution_cleanup import register_process
 from aicage._logging import get_logger
 from aicage._proxy import proxy_build_args_from_host
 from aicage.config.extensions.loader import ExtensionMetadata
@@ -251,6 +252,7 @@ def _run_build_command(
             text=True,
             encoding="utf-8",
         ) as process:
+            register_process(process)
             if process.stdout is None:
                 raise RuntimeError("Docker build process did not provide stdout.")
             for line in process.stdout:

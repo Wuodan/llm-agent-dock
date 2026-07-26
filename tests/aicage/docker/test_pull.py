@@ -12,14 +12,18 @@ class DockerPullTests(TestCase):
         client.api.pull.return_value = [{"status": "downloaded"}, b"done\n"]
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
-            with mock.patch(
-                "aicage.docker.pull.get_docker_pull_client", return_value=client
+            with (
+                mock.patch(
+                    "aicage.docker.pull.get_docker_pull_client", return_value=client
+                ),
+                mock.patch("aicage.docker.pull.register_cleanup") as register_mock,
             ):
                 run_pull("ghcr.io/aicage/aicage:latest", log_path)
 
             payload = log_path.read_text(encoding="utf-8")
         self.assertIn('"status": "downloaded"', payload)
         self.assertIn("done", payload)
+        register_mock.assert_called_once_with(client.close)
 
     def test_run_pull_renders_progress_and_writes_logs(self) -> None:
         client = mock.Mock()

@@ -1,6 +1,7 @@
 import subprocess  # nosec B404 -- subprocess is the intended wrapper for Docker CLI execution.
 from typing import Literal, TextIO, overload
 
+from aicage._execution_cleanup import register_process
 from aicage.docker.errors import DockerError
 
 
@@ -12,12 +13,19 @@ def _run_docker_command(
     stderr: TextIO | int | None = None,
 ) -> subprocess.CompletedProcess[str] | subprocess.CompletedProcess[bytes]:
     try:
-        return subprocess.run(  # nosec B603 -- command is a caller-built Docker CLI argv list without shell usage.
+        with subprocess.Popen(  # nosec B603 -- command is a caller-built Docker CLI argv list without shell usage.
             command,
-            check=check,
             stdout=stdout,
             stderr=stderr,
-        )
+        ) as process:
+            register_process(process)
+            process.wait()
+            result: (
+                subprocess.CompletedProcess[str] | subprocess.CompletedProcess[bytes]
+            ) = subprocess.CompletedProcess(command, process.returncode)
+        if check and result.returncode != 0:
+            raise subprocess.CalledProcessError(result.returncode, command)
+        return result
     except FileNotFoundError as exc:
         raise DockerError(
             "Docker CLI not found. Install Docker and ensure it is on PATH."
@@ -53,12 +61,28 @@ def run_docker_command_capture(
     text: bool,
 ) -> subprocess.CompletedProcess[str] | subprocess.CompletedProcess[bytes]:
     try:
-        return subprocess.run(  # nosec B603 -- command is a caller-built Docker CLI argv list without shell usage.
+        with subprocess.Popen(  # nosec B603 -- command is a caller-built Docker CLI argv list without shell usage.
             command,
-            check=check,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=text,
-        )
+        ) as process:
+            register_process(process)
+            stdout, stderr = process.communicate()
+            result = subprocess.CompletedProcess(
+                command,
+                process.returncode,
+                stdout=stdout,
+                stderr=stderr,
+            )
+        if check and result.returncode != 0:
+            raise subprocess.CalledProcessError(
+                result.returncode,
+                command,
+                output=result.stdout,
+                stderr=result.stderr,
+            )
+        return result
     except FileNotFoundError as exc:
         raise DockerError(
             "Docker CLI not found. Install Docker and ensure it is on PATH."

@@ -311,9 +311,12 @@ class LocalBuildRunnerTests(TestCase):
         popen_context.__exit__ = mock.Mock(return_value=None)
         log_handle = mock.Mock()
 
-        with mock.patch(
-            "aicage.docker.build.subprocess.Popen", return_value=popen_context
-        ) as popen_mock:
+        with (
+            mock.patch(
+                "aicage.docker.build.subprocess.Popen", return_value=popen_context
+            ) as popen_mock,
+            mock.patch("aicage.docker.build.register_process") as register_mock,
+        ):
             returncode = build._run_build_command(
                 ["docker", "build"], log_handle, reporter
             )
@@ -338,6 +341,7 @@ class LocalBuildRunnerTests(TestCase):
                 mock.call("build", "step 2"),
             ]
         )
+        register_mock.assert_called_once_with(process)
 
     @staticmethod
     def test_cleanup_intermediate_images_logs_failures() -> None:
@@ -345,7 +349,7 @@ class LocalBuildRunnerTests(TestCase):
         with (
             mock.patch("aicage.docker.build.get_logger", return_value=logger),
             mock.patch(
-                "aicage.docker.build.subprocess.run",
+                "aicage.docker.build._run_docker_command",
                 return_value=CompletedProcess([], 1),
             ),
         ):

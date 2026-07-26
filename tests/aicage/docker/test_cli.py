@@ -8,23 +8,28 @@ from aicage.docker.errors import DockerError
 class DockerCliTests(TestCase):
     @staticmethod
     def test_run_docker_command_passes_through() -> None:
-        process: subprocess.CompletedProcess[str] = subprocess.CompletedProcess(
-            ["docker", "run"], 0
-        )
-        with mock.patch(
-            "aicage.docker.cli.subprocess.run", return_value=process
-        ) as run_mock:
+        process = mock.Mock()
+        process.returncode = 0
+        process.wait.return_value = 0
+        process_context = mock.Mock()
+        process_context.__enter__ = mock.Mock(return_value=process)
+        process_context.__exit__ = mock.Mock(return_value=None)
+        with (
+            mock.patch(
+                "aicage.docker.cli.subprocess.Popen", return_value=process_context
+            ) as run_mock,
+            mock.patch("aicage.docker.cli.register_process") as register_mock,
+        ):
             result = _run_docker_command(["docker", "run"], check=True)
 
-        run_mock.assert_called_once_with(
-            ["docker", "run"], check=True, stdout=None, stderr=None
-        )
-        assert result is process
+        run_mock.assert_called_once_with(["docker", "run"], stdout=None, stderr=None)
+        register_mock.assert_called_once_with(process)
+        assert result.returncode == 0
 
     @staticmethod
     def test_run_docker_command_raises_clean_error_on_missing_docker() -> None:
         with mock.patch(
-            "aicage.docker.cli.subprocess.run", side_effect=FileNotFoundError
+            "aicage.docker.cli.subprocess.Popen", side_effect=FileNotFoundError
         ):
             try:
                 _run_docker_command(["docker", "run"], check=True)
@@ -35,20 +40,27 @@ class DockerCliTests(TestCase):
 
     @staticmethod
     def test_run_docker_command_capture_returns_process() -> None:
-        process: subprocess.CompletedProcess[str] = subprocess.CompletedProcess(
-            ["docker", "run"], 0, stdout="ok", stderr=""
-        )
-        with mock.patch(
-            "aicage.docker.cli.subprocess.run", return_value=process
-        ) as run_mock:
+        process = mock.Mock()
+        process.returncode = 0
+        process.communicate.return_value = ("ok", "")
+        process_context = mock.Mock()
+        process_context.__enter__ = mock.Mock(return_value=process)
+        process_context.__exit__ = mock.Mock(return_value=None)
+        with (
+            mock.patch(
+                "aicage.docker.cli.subprocess.Popen", return_value=process_context
+            ) as run_mock,
+            mock.patch("aicage.docker.cli.register_process") as register_mock,
+        ):
             result = run_docker_command_capture(
                 ["docker", "run"], check=False, text=True
             )
 
         run_mock.assert_called_once_with(
             ["docker", "run"],
-            check=False,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
         )
-        assert result is process
+        register_mock.assert_called_once_with(process)
+        assert result.stdout == "ok"

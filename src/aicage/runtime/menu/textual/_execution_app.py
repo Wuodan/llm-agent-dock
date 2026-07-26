@@ -1,9 +1,10 @@
-import os
-import signal
-
 from textual import work
 from textual.app import ComposeResult
 
+from aicage._execution_cleanup import (
+    cancel_current_execution_cleanup,
+    current_execution_cleanup,
+)
 from aicage.runtime.menu._interaction_types import ImageSetupOperation
 
 from ._textual_app import TextualApp
@@ -23,17 +24,16 @@ class ExecutionApp(TextualApp[BaseException | None]):
         self._run_execution()
 
     def action_cancel(self) -> None:
-        try:
-            os.killpg(os.getpgrp(), signal.SIGINT)
-        except (OSError, PermissionError):
-            signal.raise_signal(signal.SIGINT)
+        cancel_current_execution_cleanup()
+        self.exit(KeyboardInterrupt())
 
     @work(thread=True, exclusive=True)
     def _run_execution(self) -> None:
         reporter = ExecutionReporter(self.query_one(ExecutionScreen))
         error: BaseException | None = None
         try:
-            self._operation(reporter)
+            with current_execution_cleanup():
+                self._operation(reporter)
         except BaseException as exc:
             error = exc
         self.call_from_thread(self.exit, error)
