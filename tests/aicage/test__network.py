@@ -34,10 +34,20 @@ class NetworkTests(TestCase):
         )
         self.assertEqual("auth_401_403", classify_network_failure(error))
 
+    def test_classify_network_failure_other_http_error(self) -> None:
+        headers = Message()
+        error = urllib.error.HTTPError(
+            "https://example.test", 500, "Server Error", headers, None
+        )
+        self.assertEqual("http_error", classify_network_failure(error))
+
     def test_host_from_url_returns_hostname(self) -> None:
         self.assertEqual(
             "api.github.com", host_from_url("https://api.github.com/repos")
         )
+
+    def test_host_from_url_returns_original_when_hostname_missing(self) -> None:
+        self.assertEqual("not-a-url", host_from_url("not-a-url"))
 
     def test_require_http_url_accepts_https(self) -> None:
         self.assertEqual(

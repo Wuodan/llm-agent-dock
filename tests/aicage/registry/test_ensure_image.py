@@ -137,6 +137,30 @@ class EnsureImageTests(TestCase):
 
         assert plan.action is ImageSetupAction.CONFIRM_UPDATE
 
+    @staticmethod
+    def test_image_setup_plan_skips_when_local_build_is_current() -> None:
+        run_config = _run_config(build_local=True, extensions=[])
+
+        with mock.patch(
+            "aicage.registry.ensure_image.agent_build_setup_plan",
+            return_value=mock.Mock(action=_AgentBuildSetupAction.USE_LOCAL),
+        ):
+            plan = image_setup_plan(run_config)
+
+        assert plan.action is ImageSetupAction.SKIP
+
+    @staticmethod
+    def test_image_setup_plan_reports_confirmation_for_local_build_update() -> None:
+        run_config = _run_config(build_local=True, extensions=[])
+
+        with mock.patch(
+            "aicage.registry.ensure_image.agent_build_setup_plan",
+            return_value=mock.Mock(action=_AgentBuildSetupAction.CONFIRM_UPDATE),
+        ):
+            plan = image_setup_plan(run_config)
+
+        assert plan.action is ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
+
 
 def _run_config(
     build_local: bool,

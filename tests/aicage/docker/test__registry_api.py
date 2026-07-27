@@ -1,4 +1,5 @@
 import urllib.error
+from email.message import Message
 from unittest import TestCase, mock
 
 from aicage.docker import _registry_api
@@ -38,6 +39,18 @@ class RemoteApiTests(TestCase):
         with mock.patch(
             "aicage.docker._registry_api.urllib.request.urlopen",
             side_effect=urllib.error.URLError("boom"),
+        ):
+            with self.assertRaises(_registry_api._RegistryDiscoveryError):
+                _registry_api._fetch_json("https://example.test/api", None)
+
+    def test_fetch_json_raises_on_http_error(self) -> None:
+        headers = Message()
+        error = urllib.error.HTTPError(
+            "https://example.test/api", 500, "boom", hdrs=headers, fp=None
+        )
+        with mock.patch(
+            "aicage.docker._registry_api.urllib.request.urlopen",
+            side_effect=error,
         ):
             with self.assertRaises(_registry_api._RegistryDiscoveryError):
                 _registry_api._fetch_json("https://example.test/api", None)

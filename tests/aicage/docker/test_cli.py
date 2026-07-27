@@ -39,6 +39,22 @@ class DockerCliTests(TestCase):
                 raise AssertionError("Expected DockerError")
 
     @staticmethod
+    def test_run_docker_command_raises_clean_error_on_non_zero_exit() -> None:
+        process = mock.Mock()
+        process.returncode = 2
+        process.wait.return_value = 2
+        process_context = mock.Mock()
+        process_context.__enter__ = mock.Mock(return_value=process)
+        process_context.__exit__ = mock.Mock(return_value=None)
+        with mock.patch(
+            "aicage.docker.cli.subprocess.Popen", return_value=process_context
+        ):
+            with TestCase().assertRaises(DockerError) as raised:
+                _run_docker_command(["docker", "run"], check=True)
+
+        assert "exit code 2" in str(raised.exception)
+
+    @staticmethod
     def test_run_docker_command_capture_returns_process() -> None:
         process = mock.Mock()
         process.returncode = 0
@@ -64,3 +80,33 @@ class DockerCliTests(TestCase):
         )
         register_mock.assert_called_once_with(process)
         assert result.stdout == "ok"
+
+    @staticmethod
+    def test_run_docker_command_capture_raises_clean_error_on_missing_docker() -> None:
+        with mock.patch(
+            "aicage.docker.cli.subprocess.Popen", side_effect=FileNotFoundError
+        ):
+            try:
+                run_docker_command_capture(["docker", "run"], check=True, text=True)
+            except DockerError as exc:
+                assert "Docker CLI not found" in str(exc)
+            else:
+                raise AssertionError("Expected DockerError")
+
+    @staticmethod
+    def test_run_docker_command_capture_raises_clean_error_on_non_zero_exit() -> None:
+        process = mock.Mock()
+        process.returncode = 3
+        process.communicate.return_value = ("", "broken")
+        process_context = mock.Mock()
+        process_context.__enter__ = mock.Mock(return_value=process)
+        process_context.__exit__ = mock.Mock(return_value=None)
+        with mock.patch(
+            "aicage.docker.cli.subprocess.Popen", return_value=process_context
+        ):
+            try:
+                run_docker_command_capture(["docker", "run"], check=True, text=True)
+            except DockerError as exc:
+                assert "exit code 3" in str(exc)
+            else:
+                raise AssertionError("Expected DockerError")

@@ -61,3 +61,22 @@ class DockerClientTests(TestCase):
             "Docker is not running or not reachable. Start Docker and retry.",
             str(raised.exception),
         )
+
+    def test_get_docker_pull_client_raises_clean_error_when_docker_missing(self) -> None:
+        host = mock.Mock(host="unix:///run/docker.sock")
+        with (
+            mock.patch(
+                "aicage.docker._client.get_active_docker_host", return_value=host
+            ),
+            mock.patch(
+                "aicage.docker._client.docker.DockerClient",
+                side_effect=DockerException("boom"),
+            ),
+        ):
+            with self.assertRaises(DockerError) as raised:
+                _client.get_docker_pull_client()
+
+        self.assertEqual(
+            "Docker is not running or not reachable. Start Docker and retry.",
+            str(raised.exception),
+        )
