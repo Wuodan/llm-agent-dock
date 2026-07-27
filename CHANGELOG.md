@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.9] - 2026-07-27
+
+### Changed
+
+- Build shell-based extensions in one batch when creating extended images, which reduces extension build overhead and
+  speeds up image preparation for users who enable multiple shell-based extensions.
+
 ## [1.4.8] - 2026-07-25
 
 ### Fixed
