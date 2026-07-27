@@ -4,8 +4,8 @@ from pathlib import Path
 
 from aicage._execution_cleanup import register_cleanup
 from aicage._logging import get_logger
-from aicage.docker._client import get_docker_pull_client
-from aicage.docker._pull_progress import PullProgress
+from aicage.docker.execution import client as _docker_client
+from aicage.docker.image.progress import PullProgress
 from aicage.docker.reporting import OperationReporter
 
 
@@ -23,7 +23,7 @@ def run_pull(
         reporter.on_phase_started("pull", f"Pulling image {image_ref}", log_path)
     logger.info("Pulling image %s (logs: %s)", image_ref, log_path)
 
-    client = get_docker_pull_client()
+    client = _docker_client.get_docker_pull_client()
     register_cleanup(client.close)
     with log_path.open("w", encoding="utf-8") as log_handle:
         for event in client.api.pull(image_ref, stream=True, decode=True):

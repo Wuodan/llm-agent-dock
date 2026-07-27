@@ -2,7 +2,7 @@ from pathlib import Path
 
 from aicage.config.base.models import BaseMetadata
 from aicage.constants import LOCAL_IMAGE_BASE_REPOSITORY
-from aicage.docker.build import run_custom_base_build
+from aicage.docker.build.custom_base import run
 from aicage.docker.query import (
     cleanup_old_digest,
     get_local_repo_digest_for_repo,
@@ -39,7 +39,7 @@ def ensure(
                 target_image_ref, LOCAL_IMAGE_BASE_REPOSITORY
             )
         log_path = build_log_path(base)
-        run_custom_base_build(
+        run(
             build_root=base_dir,
             from_image=base_metadata.from_image,
             image_ref=target_image_ref,

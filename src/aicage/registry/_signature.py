@@ -14,7 +14,7 @@ from aicage.constants import (
     IMAGE_UTIL_REPOSITORY,
     IMAGE_UTIL_SOURCE_URL,
 )
-from aicage.docker.cli import run_docker_command_capture
+from aicage.docker.execution.cli import run_docker_command_capture
 from aicage.docker.pull import run_pull
 from aicage.docker.query import (
     cleanup_old_digest,

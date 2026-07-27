@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from aicage.docker.cli import run_docker_command_capture
+from aicage.docker.execution.cli import run_docker_command_capture
 from aicage.paths import HOST_DOCKER_SOCKET_PATH
 from aicage.runtime.env_vars import DOCKER_HOST
 

@@ -43,9 +43,7 @@ class EnsureCustomBaseImageTests(TestCase):
                     "aicage.registry.base_build.ensure.get_remote_digest",
                     return_value="sha256:remote",
                 ),
-                mock.patch(
-                    "aicage.registry.base_build.ensure.run_custom_base_build"
-                ) as build_mock,
+                mock.patch("aicage.registry.base_build.ensure.run") as build_mock,
             ):
                 _ensure.ensure("custom", base_metadata, base_dir)
 
@@ -77,9 +75,7 @@ class EnsureCustomBaseImageTests(TestCase):
                     "aicage.registry.base_build.ensure.get_remote_digest",
                     return_value="sha256:remote",
                 ),
-                mock.patch(
-                    "aicage.registry.base_build.ensure.run_custom_base_build"
-                ) as build_mock,
+                mock.patch("aicage.registry.base_build.ensure.run") as build_mock,
             ):
                 store = BuildStore()
                 store.save(
@@ -118,7 +114,7 @@ class EnsureCustomBaseImageTests(TestCase):
                     return_value="sha256:remote",
                 ),
                 mock.patch(
-                    "aicage.registry.base_build.ensure.run_custom_base_build",
+                    "aicage.registry.base_build.ensure.run",
                     side_effect=DockerError("build failed"),
                 ),
             ):
@@ -145,9 +141,7 @@ class EnsureCustomBaseImageTests(TestCase):
                 "aicage.registry.base_build.ensure._should_rebuild",
                 return_value=True,
             ),
-            mock.patch(
-                "aicage.registry.base_build.ensure.run_custom_base_build"
-            ) as build_mock,
+            mock.patch("aicage.registry.base_build.ensure.run") as build_mock,
             mock.patch(
                 "aicage.registry.base_build.ensure.get_remote_digest",
                 return_value="sha256:remote",
@@ -190,7 +184,7 @@ class EnsureCustomBaseImageTests(TestCase):
                 "aicage.registry.base_build.ensure.get_remote_digest",
                 return_value="sha256:remote",
             ) as digest_mock,
-            mock.patch("aicage.registry.base_build.ensure.run_custom_base_build"),
+            mock.patch("aicage.registry.base_build.ensure.run"),
             mock.patch(
                 "aicage.registry.base_build.ensure.build_log_path",
                 return_value=Path("/test-tmp/logs/custom-base.log"),

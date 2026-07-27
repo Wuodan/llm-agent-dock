@@ -47,9 +47,7 @@ class EnsureExtendedImageTests(TestCase):
                 "aicage.registry.extension_build.ensure.should_rebuild",
                 return_value=False,
             ),
-            mock.patch(
-                "aicage.registry.extension_build.ensure.run_extended_build"
-            ) as run_mock,
+            mock.patch("aicage.registry.extension_build.ensure.run") as run_mock,
         ):
             ensure(run_config)
         run_mock.assert_not_called()
@@ -78,9 +76,7 @@ class EnsureExtendedImageTests(TestCase):
                 "aicage.registry.extension_build.ensure.should_rebuild",
                 return_value=True,
             ),
-            mock.patch(
-                "aicage.registry.extension_build.ensure.run_extended_build"
-            ) as run_mock,
+            mock.patch("aicage.registry.extension_build.ensure.run") as run_mock,
             mock.patch(
                 "aicage.registry.extension_build.ensure.get_local_repo_digest_for_repo",
                 return_value="sha256:old",

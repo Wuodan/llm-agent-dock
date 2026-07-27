@@ -14,7 +14,8 @@ class DockerPullTests(TestCase):
             log_path = Path(tmp_dir) / "pull.log"
             with (
                 mock.patch(
-                    "aicage.docker.pull.get_docker_pull_client", return_value=client
+                    "aicage.docker.execution.client.get_docker_pull_client",
+                    return_value=client,
                 ),
                 mock.patch("aicage.docker.pull.register_cleanup") as register_mock,
             ):
@@ -45,12 +46,13 @@ class DockerPullTests(TestCase):
             log_path = Path(tmp_dir) / "pull.log"
             with (
                 mock.patch(
-                    "aicage.docker.pull.get_docker_pull_client", return_value=client
+                    "aicage.docker.execution.client.get_docker_pull_client",
+                    return_value=client,
                 ),
                 mock.patch("sys.stdout", stdout),
                 mock.patch.object(stdout, "isatty", return_value=True),
                 mock.patch(
-                    "aicage.docker._pull_progress.shutil.get_terminal_size",
+                    "aicage.docker.image.progress.shutil.get_terminal_size",
                     return_value=mock.Mock(columns=200),
                 ),
                 mock.patch(
@@ -82,7 +84,8 @@ class DockerPullTests(TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
             with mock.patch(
-                "aicage.docker.pull.get_docker_pull_client", return_value=client
+                "aicage.docker.execution.client.get_docker_pull_client",
+                return_value=client,
             ):
                 run_pull("ghcr.io/aicage/aicage:latest", log_path, reporter=reporter)
 
@@ -112,7 +115,8 @@ class DockerPullTests(TestCase):
             log_path = Path(tmp_dir) / "pull.log"
             with (
                 mock.patch(
-                    "aicage.docker.pull.get_docker_pull_client", return_value=client
+                    "aicage.docker.execution.client.get_docker_pull_client",
+                    return_value=client,
                 ),
                 mock.patch(
                     "aicage.docker.pull._report_progress"

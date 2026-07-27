@@ -88,7 +88,9 @@ class HostTimezoneTests(TestCase):
 
         self.assertIsNone(result)
 
-    def test_resolve_posix_timezone_returns_none_when_zoneinfo_has_no_suffix(self) -> None:
+    def test_resolve_posix_timezone_returns_none_when_zoneinfo_has_no_suffix(
+        self,
+    ) -> None:
         timezone_file = mock.Mock()
         timezone_file.is_file.return_value = False
         localtime_path = mock.Mock()

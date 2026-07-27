@@ -1,7 +1,7 @@
 import io
 from unittest import TestCase, mock
 
-from aicage.docker._pull_progress import PullProgress
+from aicage.docker.image.progress import PullProgress
 
 
 class PullProgressTests(TestCase):
@@ -40,7 +40,7 @@ class PullProgressTests(TestCase):
             mock.patch("sys.stdout", stdout),
             mock.patch.object(stdout, "isatty", return_value=True),
             mock.patch(
-                "aicage.docker._pull_progress.shutil.get_terminal_size",
+                "aicage.docker.image.progress.shutil.get_terminal_size",
                 return_value=mock.Mock(columns=200),
             ),
         ):
@@ -150,7 +150,7 @@ class PullProgressTests(TestCase):
             mock.patch("sys.stdout", stdout),
             mock.patch.object(stdout, "isatty", return_value=True),
             mock.patch(
-                "aicage.docker._pull_progress.shutil.get_terminal_size",
+                "aicage.docker.image.progress.shutil.get_terminal_size",
                 return_value=mock.Mock(columns=200),
             ),
         ):
@@ -200,7 +200,7 @@ class PullProgressTests(TestCase):
             mock.patch.object(stdout, "isatty", return_value=False),
             mock.patch.object(stderr, "isatty", return_value=True),
             mock.patch(
-                "aicage.docker._pull_progress.shutil.get_terminal_size",
+                "aicage.docker.image.progress.shutil.get_terminal_size",
                 return_value=mock.Mock(columns=200),
             ),
         ):

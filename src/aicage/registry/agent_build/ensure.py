@@ -5,7 +5,7 @@ from pathlib import Path
 from aicage._logging import get_logger
 from aicage.config.agent.models import AgentMetadata
 from aicage.config.run_config import RunConfig
-from aicage.docker.build import run_build
+from aicage.docker.build.agent import run
 from aicage.docker.query import (
     cleanup_old_digest,
     get_local_repo_digest_for_repo,
@@ -176,7 +176,7 @@ def _run_build(
     image_repository = repository_from_image_ref(image_ref)
     old_digest = get_local_repo_digest_for_repo(image_ref, image_repository)
     log_path = build_log_path(run_config.agent, run_config.selection.base)
-    run_build(
+    run(
         run_config=run_config,
         base_image_ref=base_image_ref,
         image_ref=image_ref,

@@ -19,7 +19,7 @@ class RunCommandTests(TestCase):
             mock.patch(
                 "aicage.docker.run._assemble_docker_run", return_value=["docker", "run"]
             ),
-            mock.patch("aicage.docker.run._run_docker_command") as run_mock,
+            mock.patch("aicage.docker.execution.cli.run_docker_command") as run_mock,
             mock.patch(
                 "aicage.docker.run.get_local_repo_digest_for_repo",
                 return_value="sha256:old",

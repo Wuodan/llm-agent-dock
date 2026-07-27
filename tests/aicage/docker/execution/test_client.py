@@ -2,8 +2,8 @@ from unittest import TestCase, mock
 
 from docker.errors import DockerException
 
-from aicage.docker import _client
 from aicage.docker.errors import DockerError
+from aicage.docker.execution import client as _client
 
 
 class DockerClientTests(TestCase):
@@ -16,9 +16,12 @@ class DockerClientTests(TestCase):
         host = mock.Mock(host="unix:///run/docker.sock")
         with (
             mock.patch(
-                "aicage.docker._client.get_active_docker_host", return_value=host
+                "aicage.docker.execution.client.get_active_docker_host",
+                return_value=host,
             ),
-            mock.patch("aicage.docker._client.docker.DockerClient") as client_ctor,
+            mock.patch(
+                "aicage.docker.execution.client.docker.DockerClient"
+            ) as client_ctor,
         ):
             _client.get_docker_client()
 
@@ -32,9 +35,12 @@ class DockerClientTests(TestCase):
         host = mock.Mock(host="unix:///run/docker.sock")
         with (
             mock.patch(
-                "aicage.docker._client.get_active_docker_host", return_value=host
+                "aicage.docker.execution.client.get_active_docker_host",
+                return_value=host,
             ),
-            mock.patch("aicage.docker._client.docker.DockerClient") as client_ctor,
+            mock.patch(
+                "aicage.docker.execution.client.docker.DockerClient"
+            ) as client_ctor,
         ):
             _client.get_docker_pull_client()
 
@@ -47,10 +53,11 @@ class DockerClientTests(TestCase):
         host = mock.Mock(host="unix:///run/docker.sock")
         with (
             mock.patch(
-                "aicage.docker._client.get_active_docker_host", return_value=host
+                "aicage.docker.execution.client.get_active_docker_host",
+                return_value=host,
             ),
             mock.patch(
-                "aicage.docker._client.docker.DockerClient",
+                "aicage.docker.execution.client.docker.DockerClient",
                 side_effect=DockerException("boom"),
             ),
         ):
@@ -62,14 +69,17 @@ class DockerClientTests(TestCase):
             str(raised.exception),
         )
 
-    def test_get_docker_pull_client_raises_clean_error_when_docker_missing(self) -> None:
+    def test_get_docker_pull_client_raises_clean_error_when_docker_missing(
+        self,
+    ) -> None:
         host = mock.Mock(host="unix:///run/docker.sock")
         with (
             mock.patch(
-                "aicage.docker._client.get_active_docker_host", return_value=host
+                "aicage.docker.execution.client.get_active_docker_host",
+                return_value=host,
             ),
             mock.patch(
-                "aicage.docker._client.docker.DockerClient",
+                "aicage.docker.execution.client.docker.DockerClient",
                 side_effect=DockerException("boom"),
             ),
         ):

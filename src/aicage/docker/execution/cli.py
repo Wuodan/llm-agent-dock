@@ -5,7 +5,7 @@ from aicage._execution_cleanup import register_process
 from aicage.docker.errors import DockerError
 
 
-def _run_docker_command(
+def run_docker_command(
     command: list[str],
     *,
     check: bool,

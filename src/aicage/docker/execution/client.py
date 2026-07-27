@@ -8,9 +8,8 @@ from aicage.constants import (
     DOCKER_LOCAL_METADATA_TIMEOUT_SECONDS,
     DOCKER_PULL_REQUEST_TIMEOUT_SECONDS,
 )
+from aicage.docker.errors import DockerError
 from aicage.docker.runtime import get_active_docker_host
-
-from .errors import DockerError
 
 
 @lru_cache(maxsize=1)

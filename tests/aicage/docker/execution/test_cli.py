@@ -1,8 +1,8 @@
 import subprocess
 from unittest import TestCase, mock
 
-from aicage.docker.cli import _run_docker_command, run_docker_command_capture
 from aicage.docker.errors import DockerError
+from aicage.docker.execution.cli import run_docker_command, run_docker_command_capture
 
 
 class DockerCliTests(TestCase):
@@ -16,11 +16,12 @@ class DockerCliTests(TestCase):
         process_context.__exit__ = mock.Mock(return_value=None)
         with (
             mock.patch(
-                "aicage.docker.cli.subprocess.Popen", return_value=process_context
+                "aicage.docker.execution.cli.subprocess.Popen",
+                return_value=process_context,
             ) as run_mock,
-            mock.patch("aicage.docker.cli.register_process") as register_mock,
+            mock.patch("aicage.docker.execution.cli.register_process") as register_mock,
         ):
-            result = _run_docker_command(["docker", "run"], check=True)
+            result = run_docker_command(["docker", "run"], check=True)
 
         run_mock.assert_called_once_with(["docker", "run"], stdout=None, stderr=None)
         register_mock.assert_called_once_with(process)
@@ -29,10 +30,11 @@ class DockerCliTests(TestCase):
     @staticmethod
     def test_run_docker_command_raises_clean_error_on_missing_docker() -> None:
         with mock.patch(
-            "aicage.docker.cli.subprocess.Popen", side_effect=FileNotFoundError
+            "aicage.docker.execution.cli.subprocess.Popen",
+            side_effect=FileNotFoundError,
         ):
             try:
-                _run_docker_command(["docker", "run"], check=True)
+                run_docker_command(["docker", "run"], check=True)
             except DockerError as exc:
                 assert "Docker CLI not found" in str(exc)
             else:
@@ -47,10 +49,11 @@ class DockerCliTests(TestCase):
         process_context.__enter__ = mock.Mock(return_value=process)
         process_context.__exit__ = mock.Mock(return_value=None)
         with mock.patch(
-            "aicage.docker.cli.subprocess.Popen", return_value=process_context
+            "aicage.docker.execution.cli.subprocess.Popen",
+            return_value=process_context,
         ):
             with TestCase().assertRaises(DockerError) as raised:
-                _run_docker_command(["docker", "run"], check=True)
+                run_docker_command(["docker", "run"], check=True)
 
         assert "exit code 2" in str(raised.exception)
 
@@ -64,9 +67,10 @@ class DockerCliTests(TestCase):
         process_context.__exit__ = mock.Mock(return_value=None)
         with (
             mock.patch(
-                "aicage.docker.cli.subprocess.Popen", return_value=process_context
+                "aicage.docker.execution.cli.subprocess.Popen",
+                return_value=process_context,
             ) as run_mock,
-            mock.patch("aicage.docker.cli.register_process") as register_mock,
+            mock.patch("aicage.docker.execution.cli.register_process") as register_mock,
         ):
             result = run_docker_command_capture(
                 ["docker", "run"], check=False, text=True
@@ -84,7 +88,8 @@ class DockerCliTests(TestCase):
     @staticmethod
     def test_run_docker_command_capture_raises_clean_error_on_missing_docker() -> None:
         with mock.patch(
-            "aicage.docker.cli.subprocess.Popen", side_effect=FileNotFoundError
+            "aicage.docker.execution.cli.subprocess.Popen",
+            side_effect=FileNotFoundError,
         ):
             try:
                 run_docker_command_capture(["docker", "run"], check=True, text=True)
@@ -102,7 +107,8 @@ class DockerCliTests(TestCase):
         process_context.__enter__ = mock.Mock(return_value=process)
         process_context.__exit__ = mock.Mock(return_value=None)
         with mock.patch(
-            "aicage.docker.cli.subprocess.Popen", return_value=process_context
+            "aicage.docker.execution.cli.subprocess.Popen",
+            return_value=process_context,
         ):
             try:
                 run_docker_command_capture(["docker", "run"], check=True, text=True)

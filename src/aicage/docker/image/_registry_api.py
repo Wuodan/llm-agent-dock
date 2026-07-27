@@ -6,9 +6,8 @@ from typing import Any
 
 from aicage._network import classify_network_failure, host_from_url, require_http_url
 from aicage.constants import DOCKER_REGISTRY_REQUEST_TIMEOUT_SECONDS
-
-from .errors import _RegistryDiscoveryError
-from .types import _RegistryApiConfig
+from aicage.docker.errors import _RegistryDiscoveryError
+from aicage.docker.types import _RegistryApiConfig
 
 
 def _fetch_pull_token_for_repository(

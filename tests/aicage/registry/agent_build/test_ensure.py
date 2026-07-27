@@ -83,7 +83,7 @@ class EnsureLocalImageTests(TestCase):
             mock.patch(
                 "aicage.registry.agent_build.ensure.AgentVersionChecker"
             ) as checker_cls,
-            mock.patch("aicage.registry.agent_build.ensure.run_build") as build_mock,
+            mock.patch("aicage.registry.agent_build.ensure.run") as build_mock,
         ):
             ensure_module.ensure(run_config, update_approved=False)
         checker_cls.assert_not_called()
@@ -177,9 +177,7 @@ class EnsureLocalImageTests(TestCase):
                     "aicage.registry.agent_build.ensure.refresh_base_image",
                     return_value="ghcr.io/aicage/aicage-image-base@sha256:base",
                 ) as refresh_mock,
-                mock.patch(
-                    "aicage.registry.agent_build.ensure.run_build"
-                ) as build_mock,
+                mock.patch("aicage.registry.agent_build.ensure.run") as build_mock,
                 mock.patch(
                     "aicage.registry.agent_build.ensure.get_local_repo_digest_for_repo",
                     return_value="sha256:old",
@@ -253,9 +251,7 @@ class EnsureLocalImageTests(TestCase):
                     "aicage.registry.agent_build._plan.base_layer_missing",
                     return_value=False,
                 ),
-                mock.patch(
-                    "aicage.registry.agent_build.ensure.run_build"
-                ) as build_mock,
+                mock.patch("aicage.registry.agent_build.ensure.run") as build_mock,
                 mock.patch(
                     "aicage.registry.agent_build.ensure.AgentVersionChecker"
                 ) as checker_cls,

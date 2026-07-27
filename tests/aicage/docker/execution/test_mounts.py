@@ -1,7 +1,7 @@
 from pathlib import Path, PurePosixPath
 from unittest import TestCase
 
-from aicage.docker._mounts import _format_mount_value, append_mount
+from aicage.docker.execution.mounts import _format_mount_value, append_mount
 
 
 class MountsTests(TestCase):

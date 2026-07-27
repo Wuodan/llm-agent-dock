@@ -62,7 +62,7 @@ class DockerInvocationTests(TestCase):
                     return_value="repo@sha256:verified",
                 ) as verify_mock,
                 mock.patch(
-                    "aicage.docker.pull.get_docker_pull_client",
+                    "aicage.docker.execution.client.get_docker_pull_client",
                     return_value=client,
                 ),
                 mock.patch(
@@ -141,7 +141,7 @@ class DockerInvocationTests(TestCase):
                     return_value="repo@sha256:verified",
                 ) as verify_mock,
                 mock.patch(
-                    "aicage.docker.pull.get_docker_pull_client",
+                    "aicage.docker.execution.client.get_docker_pull_client",
                     return_value=client,
                 ),
                 mock.patch(
@@ -177,7 +177,9 @@ class DockerInvocationTests(TestCase):
                 mock.patch(
                     "aicage.registry._image_pull.resolve_verified_digest"
                 ) as verify_mock,
-                mock.patch("aicage.docker.pull.get_docker_pull_client") as client_mock,
+                mock.patch(
+                    "aicage.docker.execution.client.get_docker_pull_client"
+                ) as client_mock,
                 mock.patch(
                     "aicage.registry._image_pull.cleanup_old_digest"
                 ) as cleanup_mock,
@@ -212,7 +214,9 @@ class DockerInvocationTests(TestCase):
                 mock.patch(
                     "aicage.registry._image_pull.resolve_verified_digest"
                 ) as verify_mock,
-                mock.patch("aicage.docker.pull.get_docker_pull_client") as client_mock,
+                mock.patch(
+                    "aicage.docker.execution.client.get_docker_pull_client"
+                ) as client_mock,
                 mock.patch(
                     "aicage.registry._image_pull.cleanup_old_digest"
                 ) as cleanup_mock,

@@ -3,14 +3,14 @@ import subprocess  # nosec B404 -- subprocess exceptions are part of the Docker 
 from docker.errors import DockerException, ImageNotFound
 
 from aicage._logging import get_logger
+from aicage.docker.execution import cli as _docker_cli
+from aicage.docker.execution import client as _docker_client
 
-from ._client import get_docker_client
-from .cli import _run_docker_command
 from .types import ImageRefRepository
 
 
 def local_image_exists(image_ref: str) -> bool:
-    client = get_docker_client()
+    client = _docker_client.get_docker_client()
     try:
         client.images.get(image_ref)
     except ImageNotFound:
@@ -24,7 +24,7 @@ def get_local_repo_digest(image: ImageRefRepository) -> str | None:
 
 def get_local_repo_digest_for_repo(image_ref: str, repository: str) -> str | None:
     try:
-        client = get_docker_client()
+        client = _docker_client.get_docker_client()
         image = client.images.get(image_ref)
     except (ImageNotFound, DockerException):
         return None
@@ -45,7 +45,7 @@ def get_local_repo_digest_for_repo(image_ref: str, repository: str) -> str | Non
 
 def get_local_rootfs_layers(image_ref: str) -> list[str] | None:
     try:
-        client = get_docker_client()
+        client = _docker_client.get_docker_client()
         image = client.images.get(image_ref)
     except (ImageNotFound, DockerException):
         return None
@@ -64,7 +64,7 @@ def get_local_rootfs_layers(image_ref: str) -> list[str] | None:
 
 def _remove_image_ref(image_ref: str, target_label: str) -> None:
     logger = get_logger()
-    result = _run_docker_command(
+    result = _docker_cli.run_docker_command(
         ["docker", "image", "rm", image_ref],
         check=False,
         stdout=subprocess.DEVNULL,
