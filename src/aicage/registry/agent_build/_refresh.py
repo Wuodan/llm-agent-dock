@@ -3,9 +3,9 @@ from enum import Enum
 
 from aicage._logging import get_logger
 from aicage.docker.query import get_local_repo_digest_for_repo
-from aicage.docker.reporting import OperationReporter
 from aicage.registry._errors import RegistryError
 from aicage.registry.digest.remote_digest import get_remote_digest
+from aicage.reporting import OperationReporter
 
 from ._digest import resolve_base_digest
 
@@ -26,7 +26,7 @@ def refresh_base_image(
     base_image_ref: str,
     base_repository: str,
     update_approved: bool,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> str:
     logger = get_logger()
     plan = refresh_base_image_plan(base_image_ref, base_repository)

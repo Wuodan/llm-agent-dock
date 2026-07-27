@@ -3,8 +3,8 @@ from pathlib import Path
 from aicage._logging import get_logger
 from aicage.config.agent.models import AgentMetadata
 from aicage.constants import VERSION_CHECK_IMAGE
-from aicage.docker.reporting import OperationReporter
 from aicage.registry._errors import RegistryError
+from aicage.reporting import OperationReporter
 
 from ._command import run_host, run_version_check_image
 from ._store import VersionCheckStore
@@ -19,7 +19,7 @@ class AgentVersionChecker:
         agent_name: str,
         agent_metadata: AgentMetadata,
         definition_dir: Path,
-        reporter: OperationReporter | None = None,
+        reporter: OperationReporter,
     ) -> str:
         logger = get_logger()
         script_path = definition_dir / "version.sh"

@@ -20,7 +20,7 @@ class OperationReporter(Protocol):
     def on_phase_failed(self, phase: str, message: str, log_path: Path) -> None: ...
 
 
-class _ConsoleOperationReporter:
+class ConsoleOperationReporter(OperationReporter):
     def on_phase_started(self, phase: str, message: str, log_path: Path) -> None:
         del self, phase
         print(f"[aicage] {message} (logs: {log_path})...")
@@ -42,7 +42,3 @@ class _ConsoleOperationReporter:
 
     def on_phase_failed(self, phase: str, message: str, log_path: Path) -> None:
         del self, phase, message, log_path
-
-
-def _default_operation_reporter() -> OperationReporter:
-    return _ConsoleOperationReporter()

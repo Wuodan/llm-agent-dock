@@ -18,12 +18,12 @@ class EnsureExtendedImageTests(TestCase):
     def test_ensure_raises_without_extensions(self) -> None:
         run_config = self._run_config(extensions=[])
         with self.assertRaises(RegistryError):
-            ensure(run_config)
+            ensure(run_config, reporter=mock.Mock())
 
     def test_ensure_raises_on_missing_extension(self) -> None:
         run_config = self._run_config(extensions=["missing"], available_extensions={})
         with self.assertRaises(RegistryError):
-            ensure(run_config)
+            ensure(run_config, reporter=mock.Mock())
 
     def test_ensure_skips_when_not_needed(self) -> None:
         extension = self._extension("ext")
@@ -49,7 +49,7 @@ class EnsureExtendedImageTests(TestCase):
             ),
             mock.patch("aicage.registry.extension_build.ensure.run") as run_mock,
         ):
-            ensure(run_config)
+            ensure(run_config, reporter=mock.Mock())
         run_mock.assert_not_called()
         store.save.assert_not_called()
 
@@ -93,7 +93,7 @@ class EnsureExtendedImageTests(TestCase):
                 return_value="2024-01-01T00:00:00+00:00",
             ),
         ):
-            ensure(run_config)
+            ensure(run_config, reporter=mock.Mock())
         run_mock.assert_called_once()
         cleanup_mock.assert_called_once_with(
             DEFAULT_EXTENDED_IMAGE_NAME,

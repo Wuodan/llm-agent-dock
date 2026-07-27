@@ -28,6 +28,7 @@ class EnsureLocalImageTests(TestCase):
     @staticmethod
     def test_ensure_runs_for_custom_agent() -> None:
         run_config = build_custom_run_config()
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             state_dir = Path(tmp_dir) / "state"
             with (
@@ -48,11 +49,14 @@ class EnsureLocalImageTests(TestCase):
                 ) as checker_cls,
             ):
                 checker_cls.return_value.get_version.return_value = "1.2.3"
-                ensure_module.ensure(run_config, update_approved=False)
+                ensure_module.ensure(
+                    run_config, update_approved=False, reporter=reporter
+                )
             refresh_mock.assert_called_once()
 
     def test_ensure_raises_on_version_failure(self) -> None:
         run_config = build_run_config()
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.agent_build.ensure.refresh_base_image",
@@ -66,11 +70,14 @@ class EnsureLocalImageTests(TestCase):
                 "version failed"
             )
             with self.assertRaises(RegistryError):
-                ensure_module.ensure(run_config, update_approved=False)
+                ensure_module.ensure(
+                    run_config, update_approved=False, reporter=reporter
+                )
 
     @staticmethod
     def test_ensure_uses_local_agent_image_when_base_refresh_fails() -> None:
         run_config = build_run_config()
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.agent_build.ensure.refresh_base_image",
@@ -85,7 +92,7 @@ class EnsureLocalImageTests(TestCase):
             ) as checker_cls,
             mock.patch("aicage.registry.agent_build.ensure.run") as build_mock,
         ):
-            ensure_module.ensure(run_config, update_approved=False)
+            ensure_module.ensure(run_config, update_approved=False, reporter=reporter)
         checker_cls.assert_not_called()
         build_mock.assert_not_called()
 
@@ -93,6 +100,7 @@ class EnsureLocalImageTests(TestCase):
         self,
     ) -> None:
         run_config = build_run_config()
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.agent_build.ensure.refresh_base_image",
@@ -104,12 +112,15 @@ class EnsureLocalImageTests(TestCase):
             ),
         ):
             with self.assertRaises(RegistryError) as raised:
-                ensure_module.ensure(run_config, update_approved=False)
+                ensure_module.ensure(
+                    run_config, update_approved=False, reporter=reporter
+                )
         self.assertIn("offline", str(raised.exception))
 
     @staticmethod
     def test_ensure_uses_custom_base() -> None:
         run_config = build_run_config()
+        reporter = mock.Mock()
         run_config = RunConfig(
             project_path=run_config.project_path,
             agent=run_config.agent,
@@ -149,7 +160,7 @@ class EnsureLocalImageTests(TestCase):
             ) as checker_cls,
         ):
             checker_cls.return_value.get_version.return_value = "1.2.3"
-            ensure_module.ensure(run_config, update_approved=False)
+            ensure_module.ensure(run_config, update_approved=False, reporter=reporter)
         base_mock.assert_called_once()
         refresh_mock.assert_not_called()
 
@@ -214,6 +225,7 @@ class EnsureLocalImageTests(TestCase):
             state_dir = Path(tmp_dir) / "state"
             log_dir = Path(tmp_dir) / "logs"
             run_config = build_run_config()
+            reporter = mock.Mock()
             record_path = state_dir / "claude-ubuntu.yml"
             record_path.parent.mkdir(parents=True, exist_ok=True)
             record_path.write_text(
@@ -257,13 +269,16 @@ class EnsureLocalImageTests(TestCase):
                 ) as checker_cls,
             ):
                 checker_cls.return_value.get_version.return_value = "1.2.3"
-                ensure_module.ensure(run_config, update_approved=False)
+                ensure_module.ensure(
+                    run_config, update_approved=False, reporter=reporter
+                )
 
             build_mock.assert_not_called()
 
     @staticmethod
     def test_setup_plan_reports_confirmation_when_base_refresh_requires_it() -> None:
         run_config = build_run_config()
+        reporter = mock.Mock()
 
         with mock.patch(
             "aicage.registry.agent_build.ensure.refresh_base_image_plan",
@@ -272,6 +287,6 @@ class EnsureLocalImageTests(TestCase):
                 action=_BaseRefreshAction.CONFIRM_PULL,
             ),
         ):
-            plan = ensure_module.setup_plan(run_config)
+            plan = ensure_module.setup_plan(run_config, reporter)
 
         assert plan.action is _AgentBuildSetupAction.CONFIRM_UPDATE

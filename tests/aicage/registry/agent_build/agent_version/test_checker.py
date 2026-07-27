@@ -13,6 +13,7 @@ from aicage.registry.agent_build.agent_version.checker import AgentVersionChecke
 
 class AgentVersionCheckTests(TestCase):
     def test_get_version_uses_host_success_and_persists(self) -> None:
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             agent_dir = Path(tmp_dir) / "custom"
             agent_dir.mkdir()
@@ -36,6 +37,7 @@ class AgentVersionCheckTests(TestCase):
                     "custom",
                     self._agent_metadata(),
                     definition_dir=agent_dir,
+                    reporter=reporter,
                 )
 
             self.assertEqual("1.2.3", result)
@@ -45,6 +47,7 @@ class AgentVersionCheckTests(TestCase):
             self.assertEqual("1.2.3", data[_VERSION_KEY])
 
     def test_get_version_uses_version_check_image_and_persists(self) -> None:
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             agent_dir = Path(tmp_dir) / "custom"
             agent_dir.mkdir()
@@ -67,13 +70,14 @@ class AgentVersionCheckTests(TestCase):
                     return_value=command._CommandResult(
                         success=True, output="1.2.3", error=""
                     ),
-                ),
+                ) as run_version_check_image_mock,
             ):
                 checker = AgentVersionChecker()
                 result = checker.get_version(
                     "custom",
                     self._agent_metadata(),
                     definition_dir=agent_dir,
+                    reporter=reporter,
                 )
 
             self.assertEqual("1.2.3", result)
@@ -81,8 +85,14 @@ class AgentVersionCheckTests(TestCase):
             self.assertTrue(stored.is_file())
             data = yaml.safe_load(stored.read_text(encoding="utf-8"))
             self.assertEqual("1.2.3", data[_VERSION_KEY])
+            run_version_check_image_mock.assert_called_once_with(
+                "ghcr.io/aicage/aicage-image-util:agent-version",
+                agent_dir,
+                reporter=reporter,
+            )
 
     def test_get_version_raises_when_version_check_image_fails(self) -> None:
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             agent_dir = Path(tmp_dir) / "custom"
             agent_dir.mkdir()
@@ -107,7 +117,7 @@ class AgentVersionCheckTests(TestCase):
                         output="",
                         error="version check failed",
                     ),
-                ),
+                ) as run_version_check_image_mock,
             ):
                 checker = AgentVersionChecker()
                 with self.assertRaises(RegistryError) as raised:
@@ -115,10 +125,17 @@ class AgentVersionCheckTests(TestCase):
                         "custom",
                         self._agent_metadata(build_local=False),
                         definition_dir=agent_dir,
+                        reporter=reporter,
                     )
             self.assertIn("version check failed", str(raised.exception))
+            run_version_check_image_mock.assert_called_once_with(
+                "ghcr.io/aicage/aicage-image-util:agent-version",
+                agent_dir,
+                reporter=reporter,
+            )
 
     def test_get_version_uses_cached_version_for_local_agent_when_offline(self) -> None:
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             agent_dir = Path(tmp_dir) / "custom"
             agent_dir.mkdir()
@@ -162,12 +179,18 @@ class AgentVersionCheckTests(TestCase):
                     "custom",
                     self._agent_metadata(),
                     definition_dir=agent_dir,
+                    reporter=reporter,
                 )
 
             self.assertEqual("9.9.9", result)
-            image_check_mock.assert_called_once()
+            image_check_mock.assert_called_once_with(
+                "ghcr.io/aicage/aicage-image-util:agent-version",
+                agent_dir,
+                reporter=reporter,
+            )
 
     def test_get_version_raises_on_missing_version_script(self) -> None:
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             agent_dir = Path(tmp_dir) / "custom"
             agent_dir.mkdir()
@@ -182,6 +205,7 @@ class AgentVersionCheckTests(TestCase):
                         "custom",
                         self._agent_metadata(),
                         definition_dir=agent_dir,
+                        reporter=reporter,
                     )
             self.assertFalse((store_dir / "custom.yml").exists())
 

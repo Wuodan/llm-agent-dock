@@ -120,6 +120,7 @@ class DockerInvocationTests(TestCase):
 
     def test_pull_image_raises_on_sdk_error(self) -> None:
         image_ref = "repo:tag"
+        reporter = mock.Mock()
         api = FakeDockerApi(events=[], exc=DockerException("network down"))
         client = FakeDockerClient(api)
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -153,13 +154,18 @@ class DockerInvocationTests(TestCase):
                 mock.patch("sys.stdout", new_callable=io.StringIO),
             ):
                 with self.assertRaises(DockerException):
-                    image_pull.pull_image(image_ref, update_approved=False)
+                    image_pull.pull_image(
+                        image_ref,
+                        update_approved=False,
+                        reporter=reporter,
+                    )
             remote_mock.assert_not_called()
-            verify_mock.assert_called_once_with(image_ref, reporter=None)
+            verify_mock.assert_called_once_with(image_ref, reporter=reporter)
             cleanup_mock.assert_not_called()
 
     def test_pull_image_skips_when_up_to_date(self) -> None:
         image_ref = "repo:tag"
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
             with (
@@ -188,7 +194,11 @@ class DockerInvocationTests(TestCase):
                 ),
                 mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
             ):
-                image_pull.pull_image(image_ref, update_approved=False)
+                image_pull.pull_image(
+                    image_ref,
+                    update_approved=False,
+                    reporter=reporter,
+                )
             client_mock.assert_not_called()
             verify_mock.assert_not_called()
             local_repo_mock.assert_not_called()
@@ -197,6 +207,7 @@ class DockerInvocationTests(TestCase):
 
     def test_pull_image_skips_when_remote_unknown(self) -> None:
         image_ref = "repo:tag"
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
             with (
@@ -225,7 +236,11 @@ class DockerInvocationTests(TestCase):
                 ),
                 mock.patch("sys.stdout", new_callable=io.StringIO) as stdout,
             ):
-                image_pull.pull_image(image_ref, update_approved=False)
+                image_pull.pull_image(
+                    image_ref,
+                    update_approved=False,
+                    reporter=reporter,
+                )
             client_mock.assert_not_called()
             verify_mock.assert_not_called()
             local_repo_mock.assert_not_called()

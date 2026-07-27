@@ -94,6 +94,7 @@ class AgentVersionImagesTests(TestCase):
     @staticmethod
     def test_ensure_version_check_image_skips_pull_when_remote_unknown() -> None:
         image_ref = VERSION_CHECK_IMAGE
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
             with (
@@ -119,7 +120,9 @@ class AgentVersionImagesTests(TestCase):
                     return_value=log_path,
                 ),
             ):
-                _images.ensure_version_check_image(image_ref=image_ref)
+                _images.ensure_version_check_image(
+                    image_ref=image_ref, reporter=reporter
+                )
         remote_mock.assert_called_once()
         verify_mock.assert_not_called()
         pull_mock.assert_not_called()

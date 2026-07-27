@@ -6,7 +6,7 @@ from typing import TextIO
 from aicage._proxy import proxy_build_args_from_host
 from aicage.config.extensions.loader import ExtensionMetadata
 from aicage.config.resources import find_packaged_path
-from aicage.docker.reporting import OperationReporter
+from aicage.reporting import OperationReporter
 
 from . import _common
 

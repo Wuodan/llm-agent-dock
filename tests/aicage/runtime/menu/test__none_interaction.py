@@ -11,16 +11,16 @@ from aicage.runtime.menu import _none_interaction
 from ._test_support import _build_context, _build_draft
 
 
-class CreateNoneInteractionTests(TestCase):
-    def test_create_none_interaction(self) -> None:
-        resolved = _none_interaction.create_none_interaction()
+class NoneInteractionTests(TestCase):
+    def test_init(self) -> None:
+        resolved = _none_interaction._NoneInteraction(mock.Mock())
 
         self.assertEqual("_NoneInteraction", resolved.__class__.__name__)
 
 
 class ConfigureRunTests(TestCase):
     def test_configure_run(self) -> None:
-        resolved = _none_interaction.create_none_interaction()
+        resolved = _none_interaction._NoneInteraction(mock.Mock())
         draft = _build_draft(
             AgentConfig(base="ubuntu"),
             ParsedArgs(False, "--cli", "codex", [], False, ["logs"], None, menu="none"),
@@ -47,22 +47,28 @@ class ConfigureRunTests(TestCase):
 
 class ExecuteImageSetupTests(TestCase):
     def test_execute_image_setup(self) -> None:
-        resolved = _none_interaction.create_none_interaction()
-        operation = mock.Mock()
+        reporter = mock.Mock()
+        resolved = _none_interaction._NoneInteraction(reporter)
+        run_config = mock.Mock()
 
-        resolved.execute_image_setup(operation)
+        with mock.patch("aicage.runtime.menu._none_interaction.ensure_image") as ensure:
+            resolved.execute_image_setup(run_config, update_approved=True)
 
-        operation.assert_called_once_with(None)
+        ensure.assert_called_once_with(
+            run_config,
+            update_approved=True,
+            reporter=reporter,
+        )
 
 
 class RuntimeUpdateTests(TestCase):
     def test_confirm_aicage_update(self) -> None:
-        resolved = _none_interaction.create_none_interaction()
+        resolved = _none_interaction._NoneInteraction(mock.Mock())
 
         self.assertTrue(resolved.confirm_aicage_update("1.0.0", "1.1.0"))
 
     def test_confirm_image_update(self) -> None:
-        resolved = _none_interaction.create_none_interaction()
+        resolved = _none_interaction._NoneInteraction(mock.Mock())
 
         self.assertTrue(resolved.confirm_image_update("repo:tag"))
 

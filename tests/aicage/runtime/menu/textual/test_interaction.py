@@ -6,13 +6,14 @@ from aicage.config.project_config import AgentConfig
 from aicage.registry.image_selection.models import ImageSelection
 from aicage.runtime.menu._interaction_types import ConfigSelectionResult
 from aicage.runtime.menu.textual import interaction
+from aicage.runtime.menu.textual.services.execution_reporting import ExecutionReporter
 
 from .._test_support import _build_context, _build_draft
 
 
 class ConfigureRunTests(TestCase):
     def test_configure_run(self) -> None:
-        resolved = interaction.TextualInteraction()
+        resolved = interaction.TextualInteraction(ExecutionReporter())
         draft = _build_draft(
             AgentConfig(base="ubuntu"),
             ParsedArgs(False, "", "codex", [], False, [], None, menu="ui"),
@@ -36,39 +37,47 @@ class ConfigureRunTests(TestCase):
 
 class ExecuteImageSetupTests(TestCase):
     def test_execute_image_setup(self) -> None:
-        resolved = interaction.TextualInteraction()
-        operation = mock.Mock()
+        reporter = ExecutionReporter()
+        resolved = interaction.TextualInteraction(reporter)
+        run_config = mock.Mock()
 
         with mock.patch(
-            "aicage.runtime.menu.textual.interaction._execute_image_setup_with_textual_app"
-        ) as execute_mock:
-            resolved.execute_image_setup(operation)
+            "aicage.runtime.menu.textual.interaction.ExecutionApp.run",
+            return_value=None,
+        ) as run_mock:
+            resolved.execute_image_setup(run_config, update_approved=True)
 
-        execute_mock.assert_called_once_with(operation)
+        run_mock.assert_called_once_with(inline=True)
 
 
 class TextualInteractionTests(TestCase):
+    def test_reporter(self) -> None:
+        reporter = ExecutionReporter()
+
+        resolved = interaction.TextualInteraction(reporter)
+
+        self.assertIs(reporter, resolved.reporter)
+
     def test_confirm_image_update(self) -> None:
         with mock.patch(
-            "aicage.runtime.menu.textual.interaction._confirm_image_update_with_textual_app",
+            "aicage.runtime.menu.textual.interaction.ImageUpdateApp.run",
             return_value=True,
         ) as confirm_mock:
-            confirmed = interaction.TextualInteraction().confirm_image_update(
-                "repo:tag"
-            )
+            confirmed = interaction.TextualInteraction(
+                ExecutionReporter()
+            ).confirm_image_update("repo:tag")
 
         self.assertTrue(confirmed)
-        confirm_mock.assert_called_once_with("repo:tag")
+        confirm_mock.assert_called_once_with(inline=True)
 
     def test_confirm_aicage_update(self) -> None:
         with mock.patch(
-            "aicage.runtime.menu.prompts.interaction.SimpleInteraction.confirm_aicage_update",
+            "aicage.runtime.menu.textual.interaction.prompt_update_aicage",
             return_value=False,
         ) as confirm_mock:
-            confirmed = interaction.TextualInteraction().confirm_aicage_update(
-                "1.0.0",
-                "1.1.0",
-            )
+            confirmed = interaction.TextualInteraction(
+                ExecutionReporter()
+            ).confirm_aicage_update("1.0.0", "1.1.0")
 
         self.assertFalse(confirmed)
         confirm_mock.assert_called_once_with("1.0.0", "1.1.0")
@@ -163,7 +172,7 @@ class EditDraftWithTextualAppTests(TestCase):
         ):
             interaction._edit_draft_with_textual_app(draft, _build_context())
 
-    def test__confirm_image_update_with_textual_app_raises_keyboard_interrupt_for_none(
+    def test_confirm_image_update_raises_keyboard_interrupt_for_none(
         self,
     ) -> None:
         with (
@@ -173,12 +182,12 @@ class EditDraftWithTextualAppTests(TestCase):
             ),
             self.assertRaises(KeyboardInterrupt),
         ):
-            interaction._confirm_image_update_with_textual_app("repo:tag")
+            interaction.TextualInteraction(ExecutionReporter()).confirm_image_update(
+                "repo:tag"
+            )
 
-    def test__execute_image_setup_with_textual_app_raises_app_error(self) -> None:
-        operation = mock.Mock()
-        app_mock = mock.Mock()
-        app_mock.run.return_value = RuntimeError("boom")
+    def test_execute_image_setup_raises_app_error(self) -> None:
+        run_config = mock.Mock()
 
         with (
             mock.patch(
@@ -187,4 +196,7 @@ class EditDraftWithTextualAppTests(TestCase):
             ),
             self.assertRaises(RuntimeError),
         ):
-            interaction._execute_image_setup_with_textual_app(operation)
+            interaction.TextualInteraction(ExecutionReporter()).execute_image_setup(
+                run_config,
+                update_approved=True,
+            )

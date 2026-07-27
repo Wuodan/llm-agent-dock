@@ -1,19 +1,26 @@
 from copy import deepcopy
 
 from aicage.config.context import ConfigContext
+from aicage.config.run_config import RunConfig
 from aicage.config.run_config_draft import RunConfigDraft
-from aicage.runtime.menu._interaction_types import (
-    ConfigSelectionResult,
-    ImageSetupOperation,
-)
-from aicage.runtime.menu.prompts.interaction import SimpleInteraction
+from aicage.reporting import OperationReporter
+from aicage.runtime.menu._interaction_types import ConfigSelectionResult
+from aicage.runtime.menu.prompts.interaction import prompt_update_aicage
 
 from ._config_app import ConfigApp
 from ._execution_app import ExecutionApp
 from ._image_update_app import ImageUpdateApp
+from .services.execution_reporting import ExecutionReporter
 
 
 class TextualInteraction:
+    def __init__(self, reporter: ExecutionReporter) -> None:
+        self._reporter = reporter
+
+    @property
+    def reporter(self) -> OperationReporter:
+        return self._reporter
+
     def configure_run(
         self,
         draft: RunConfigDraft,
@@ -28,13 +35,22 @@ class TextualInteraction:
         installed_version: str,
         latest_version: str,
     ) -> bool:
-        return _confirm_update_aicage(installed_version, latest_version)
+        return prompt_update_aicage(installed_version, latest_version)
 
     def confirm_image_update(self, image_ref: str) -> bool:
-        return _confirm_image_update_with_textual_app(image_ref)
+        result = ImageUpdateApp(image_ref).run(inline=True)
+        if result is None:
+            raise KeyboardInterrupt
+        return result
 
-    def execute_image_setup(self, operation: ImageSetupOperation) -> None:
-        _execute_image_setup_with_textual_app(operation)
+    def execute_image_setup(self, run_config: RunConfig, update_approved: bool) -> None:
+        result = ExecutionApp(
+            run_config,
+            update_approved,
+            self._reporter,
+        ).run(inline=True)
+        if isinstance(result, BaseException):
+            raise result
 
 
 def _edit_draft_with_textual_app(
@@ -54,20 +70,3 @@ def _edit_draft_with_textual_app(
         raise result
     draft.consume_overview_prefill()
     return result
-
-
-def _confirm_update_aicage(installed_version: str, latest_version: str) -> bool:
-    return SimpleInteraction().confirm_aicage_update(installed_version, latest_version)
-
-
-def _confirm_image_update_with_textual_app(image_ref: str) -> bool:
-    result = ImageUpdateApp(image_ref).run(inline=True)
-    if result is None:
-        raise KeyboardInterrupt
-    return result
-
-
-def _execute_image_setup_with_textual_app(operation: ImageSetupOperation) -> None:
-    result = ExecutionApp(operation).run(inline=True)
-    if isinstance(result, BaseException):
-        raise result

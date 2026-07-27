@@ -94,9 +94,9 @@ class AgentVersionCommandTests(TestCase):
             run_mock.assert_not_called()
 
     def test_run_version_check_image_returns_error_on_failure(self) -> None:
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             definition_dir = Path(tmp_dir)
-            reporter = mock.Mock()
             with (
                 mock.patch(
                     "aicage.registry.agent_build.agent_version._command.ensure_version_check_image"
@@ -119,6 +119,7 @@ class AgentVersionCommandTests(TestCase):
             )
 
     def test_run_version_check_image_returns_error_on_prepare_exception(self) -> None:
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             definition_dir = Path(tmp_dir)
             with (
@@ -133,6 +134,7 @@ class AgentVersionCommandTests(TestCase):
                 result = _command.run_version_check_image(
                     "ghcr.io/aicage/aicage-image-util:agent-version",
                     definition_dir,
+                    reporter=reporter,
                 )
             self.assertFalse(result.success)
             self.assertEqual("offline", result.error)

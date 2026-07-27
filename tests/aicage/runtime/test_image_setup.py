@@ -37,7 +37,6 @@ class PrepareImageTests(TestCase):
         run_config = mock.Mock()
         run_config.selection.base_image_ref = "repo:tag"
         interaction = mock.Mock(confirm_image_update=mock.Mock(return_value=True))
-        reporter = mock.Mock()
 
         with (
             mock.patch(
@@ -46,25 +45,16 @@ class PrepareImageTests(TestCase):
                     action=ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
                 ),
             ),
-            mock.patch("aicage.runtime.image_setup.ensure_image") as ensure_image_mock,
         ):
-            interaction.execute_image_setup.side_effect = lambda operation: operation(
-                reporter
-            )
             image_setup.prepare_image(run_config, interaction)
 
         interaction.confirm_image_update.assert_called_once_with("repo:tag")
-        ensure_image_mock.assert_called_once_with(
-            run_config,
-            update_approved=True,
-            reporter=reporter,
-        )
+        interaction.execute_image_setup.assert_called_once_with(run_config, True)
 
     def test_prepare_image_passes_rejected_update_to_ensure_image(self) -> None:
         run_config = mock.Mock()
         run_config.selection.base_image_ref = "repo:tag"
         interaction = mock.Mock(confirm_image_update=mock.Mock(return_value=False))
-        reporter = mock.Mock()
 
         with (
             mock.patch(
@@ -73,19 +63,11 @@ class PrepareImageTests(TestCase):
                     action=ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
                 ),
             ),
-            mock.patch("aicage.runtime.image_setup.ensure_image") as ensure_image_mock,
         ):
-            interaction.execute_image_setup.side_effect = lambda operation: operation(
-                reporter
-            )
             image_setup.prepare_image(run_config, interaction)
 
         interaction.confirm_image_update.assert_called_once_with("repo:tag")
-        ensure_image_mock.assert_called_once_with(
-            run_config,
-            update_approved=False,
-            reporter=reporter,
-        )
+        interaction.execute_image_setup.assert_called_once_with(run_config, False)
 
     def test_prepare_image_skips_execution_when_only_confirmation_declined(
         self,
@@ -99,12 +81,8 @@ class PrepareImageTests(TestCase):
                 "aicage.runtime.image_setup.image_setup_plan",
                 return_value=ImageSetupPlan(action=ImageSetupAction.CONFIRM_UPDATE),
             ),
-            mock.patch("aicage.runtime.image_setup.ensure_image") as ensure_image_mock,
         ):
-            interaction.execute_image_setup.side_effect = lambda operation: operation(
-                mock.Mock()
-            )
             image_setup.prepare_image(run_config, interaction)
 
         interaction.confirm_image_update.assert_called_once_with("repo:tag")
-        ensure_image_mock.assert_not_called()
+        interaction.execute_image_setup.assert_not_called()

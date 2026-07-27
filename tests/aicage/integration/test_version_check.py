@@ -2,6 +2,7 @@ import os
 import stat
 import tempfile
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
@@ -71,6 +72,7 @@ def test_version_check_falls_back_to_builder(
                 local_definition_dir=agent_dir,
             ),
             agent_dir,
+            reporter=mock.Mock(),
         )
 
         assert result

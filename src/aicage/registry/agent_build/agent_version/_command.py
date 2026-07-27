@@ -6,8 +6,8 @@ from pathlib import Path
 
 from aicage._logging import get_logger
 from aicage.constants import HOST_VERSION_CHECK_TIMEOUT_SECONDS
-from aicage.docker.reporting import OperationReporter
 from aicage.docker.run import run_builder_version_check
+from aicage.reporting import OperationReporter
 
 from ._images import ensure_version_check_image
 
@@ -24,7 +24,7 @@ class _CommandResult:
 def run_version_check_image(
     image_ref: str,
     definition_dir: Path,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> _CommandResult:
     try:
         ensure_version_check_image(image_ref, reporter=reporter)

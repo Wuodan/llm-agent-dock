@@ -23,6 +23,7 @@ class EnsureCustomBaseImageTests(TestCase):
 
     def test_ensure_builds_when_missing(self) -> None:
         base_metadata = self._base_metadata()
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             base_dir = Path(tmp_dir) / "custom"
             base_dir.mkdir()
@@ -45,7 +46,7 @@ class EnsureCustomBaseImageTests(TestCase):
                 ),
                 mock.patch("aicage.registry.base_build.ensure.run") as build_mock,
             ):
-                _ensure.ensure("custom", base_metadata, base_dir)
+                _ensure.ensure("custom", base_metadata, base_dir, reporter=reporter)
 
             build_mock.assert_called_once()
             record_path = state_dir / "base-custom.yml"
@@ -55,6 +56,7 @@ class EnsureCustomBaseImageTests(TestCase):
 
     def test_ensure_skips_when_digest_matches(self) -> None:
         base_metadata = self._base_metadata()
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             base_dir = Path(tmp_dir) / "custom"
             base_dir.mkdir()
@@ -87,12 +89,13 @@ class EnsureCustomBaseImageTests(TestCase):
                         built_at="2024-01-01T00:00:00+00:00",
                     )
                 )
-                _ensure.ensure("custom", base_metadata, base_dir)
+                _ensure.ensure("custom", base_metadata, base_dir, reporter=reporter)
 
             build_mock.assert_not_called()
 
     def test_ensure_raises_on_build_failure(self) -> None:
         base_metadata = self._base_metadata()
+        reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             base_dir = Path(tmp_dir) / "custom"
             base_dir.mkdir()
@@ -119,7 +122,7 @@ class EnsureCustomBaseImageTests(TestCase):
                 ),
             ):
                 with self.assertRaises(DockerError):
-                    _ensure.ensure("custom", base_metadata, base_dir)
+                    _ensure.ensure("custom", base_metadata, base_dir, reporter=reporter)
 
     @staticmethod
     def test_ensure_cleans_up_old_digest() -> None:
@@ -131,6 +134,7 @@ class EnsureCustomBaseImageTests(TestCase):
             build_local=True,
             local_definition_dir=Path("/test-tmp/custom-base"),
         )
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.base_build.ensure.local_image_exists",
@@ -163,7 +167,12 @@ class EnsureCustomBaseImageTests(TestCase):
             ),
         ):
             store_cls.return_value.load.return_value = None
-            _ensure.ensure("custom", base_metadata, Path("/test-tmp/custom-base"))
+            _ensure.ensure(
+                "custom",
+                base_metadata,
+                Path("/test-tmp/custom-base"),
+                reporter=reporter,
+            )
 
         build_mock.assert_called_once()
         cleanup_mock.assert_called_once_with(
@@ -174,6 +183,7 @@ class EnsureCustomBaseImageTests(TestCase):
 
     def test_ensure_reads_source_digest(self) -> None:
         base_metadata = self._base_metadata()
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.base_build.ensure.local_image_exists",
@@ -199,6 +209,7 @@ class EnsureCustomBaseImageTests(TestCase):
                 "custom",
                 base_metadata,
                 Path("/test-tmp/custom-base"),
+                reporter=reporter,
             )
         digest_mock.assert_called_once_with("ubuntu:latest")
 

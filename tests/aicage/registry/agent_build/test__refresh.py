@@ -83,6 +83,7 @@ class RefreshBaseDigestTests(TestCase):
         self.assertIs(plan.action, _BaseRefreshAction.CONFIRM_PULL)
 
     def test_refresh_base_image_uses_local_digest_when_user_declines_pull(self) -> None:
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.agent_build._refresh.get_local_repo_digest_for_repo",
@@ -100,6 +101,7 @@ class RefreshBaseDigestTests(TestCase):
                 base_image_ref="ghcr.io/aicage/aicage-image-base:ubuntu",
                 base_repository="ghcr.io/aicage/aicage-image-base",
                 update_approved=False,
+                reporter=reporter,
             )
         self.assertEqual("ghcr.io/aicage/aicage-image-base@sha256:local", digest)
         resolve_mock.assert_not_called()
@@ -136,6 +138,7 @@ class RefreshBaseDigestTests(TestCase):
     def test_refresh_base_image_uses_verified_digest_when_local_matches_remote(
         self,
     ) -> None:
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.agent_build._refresh.get_local_repo_digest_for_repo",
@@ -153,11 +156,13 @@ class RefreshBaseDigestTests(TestCase):
                 base_image_ref="ghcr.io/aicage/aicage-image-base:ubuntu",
                 base_repository="ghcr.io/aicage/aicage-image-base",
                 update_approved=False,
+                reporter=reporter,
             )
         self.assertEqual("ghcr.io/aicage/aicage-image-base@sha256:local", digest)
         resolve_mock.assert_not_called()
 
     def test_refresh_base_image_verify_failure_uses_local_digest(self) -> None:
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.agent_build._refresh.get_local_repo_digest_for_repo",
@@ -175,11 +180,13 @@ class RefreshBaseDigestTests(TestCase):
                 base_image_ref="ghcr.io/aicage/aicage-image-base:ubuntu",
                 base_repository="ghcr.io/aicage/aicage-image-base",
                 update_approved=False,
+                reporter=reporter,
             )
         self.assertEqual("ghcr.io/aicage/aicage-image-base@sha256:local", digest)
         resolve_mock.assert_not_called()
 
     def test_refresh_base_image_verify_failure_without_local_raises(self) -> None:
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry.agent_build._refresh.get_local_repo_digest_for_repo",
@@ -195,6 +202,7 @@ class RefreshBaseDigestTests(TestCase):
                     base_image_ref="ghcr.io/aicage/aicage-image-base:ubuntu",
                     base_repository="ghcr.io/aicage/aicage-image-base",
                     update_approved=False,
+                    reporter=reporter,
                 )
         self.assertIn("Failed to resolve remote digest", str(context.exception))
 

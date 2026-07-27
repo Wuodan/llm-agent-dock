@@ -1,17 +1,17 @@
 from collections.abc import Callable
 
 from aicage.config.context import ConfigContext
+from aicage.config.run_config import RunConfig
 from aicage.config.run_config_draft import RunConfigDraft
+from aicage.registry.ensure_image import ensure_image
 from aicage.registry.image_selection.interaction import (
     BaseChoiceRequest,
     ExtensionChoiceOption,
 )
 from aicage.registry.image_selection.selection import select_agent_image
+from aicage.reporting import OperationReporter
 from aicage.runtime.docker_args.mount_preferences import apply_mount_preferences
-from aicage.runtime.menu._interaction_types import (
-    ConfigSelectionResult,
-    ImageSetupOperation,
-)
+from aicage.runtime.menu._interaction_types import ConfigSelectionResult
 
 from ._base import BaseSelectionRequest, prompt_for_base
 from ._confirm import (
@@ -30,6 +30,9 @@ _PersistSharesPrompt = Callable[[list[str], list[str]], bool]
 
 
 class SimpleInteraction:
+    def __init__(self, reporter: OperationReporter) -> None:
+        self.reporter = reporter
+
     def configure_run(
         self,
         draft: RunConfigDraft,
@@ -68,9 +71,14 @@ class SimpleInteraction:
 
     def execute_image_setup(
         self,
-        operation: ImageSetupOperation,
+        run_config: RunConfig,
+        update_approved: bool,
     ) -> None:
-        operation(None)
+        ensure_image(
+            run_config,
+            update_approved=update_approved,
+            reporter=self.reporter,
+        )
 
 
 class _SimpleSelectionInteraction:

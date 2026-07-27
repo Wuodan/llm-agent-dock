@@ -5,7 +5,8 @@ from aicage._execution_cleanup import (
     cancel_current_execution_cleanup,
     current_execution_cleanup,
 )
-from aicage.runtime.menu._interaction_types import ImageSetupOperation
+from aicage.config.run_config import RunConfig
+from aicage.registry.ensure_image import ensure_image
 
 from ._textual_app import TextualApp
 from .services.execution_reporting import ExecutionReporter
@@ -13,9 +14,16 @@ from .views.execution_screen import ExecutionScreen
 
 
 class ExecutionApp(TextualApp[BaseException | None]):
-    def __init__(self, operation: ImageSetupOperation) -> None:
+    def __init__(
+        self,
+        run_config: RunConfig,
+        update_approved: bool,
+        reporter: ExecutionReporter,
+    ) -> None:
         super().__init__("container setup")
-        self._operation = operation
+        self._run_config = run_config
+        self._update_approved = update_approved
+        self._reporter = reporter
 
     def compose(self) -> ComposeResult:
         yield ExecutionScreen()
@@ -30,11 +38,16 @@ class ExecutionApp(TextualApp[BaseException | None]):
 
     @work(thread=True, exclusive=True)
     def _run_execution(self) -> None:
-        reporter = ExecutionReporter(self.query_one(ExecutionScreen))
+        screen = self.query_one(ExecutionScreen)
+        self._reporter.attach_screen(screen)
         error: BaseException | None = None
         try:
             with current_execution_cleanup():
-                self._operation(reporter)
+                ensure_image(
+                    self._run_config,
+                    update_approved=self._update_approved,
+                    reporter=self._reporter,
+                )
         except BaseException as exc:
             error = exc
         self.call_from_thread(self.exit, error)

@@ -3,21 +3,12 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, mock
 
-from aicage.docker import reporting
-
-
-class DefaultOperationReporterTests(TestCase):
-    def test_default_operation_reporter_returns_console_operation_reporter(
-        self,
-    ) -> None:
-        reporter = reporting._default_operation_reporter()
-
-        self.assertIsInstance(reporter, reporting._ConsoleOperationReporter)
+from aicage import reporting
 
 
 class ConsoleOperationReporterTests(TestCase):
     def test_on_phase_started_prints_message_with_log_path(self) -> None:
-        reporter = reporting._default_operation_reporter()
+        reporter = reporting.ConsoleOperationReporter()
         stdout = io.StringIO()
 
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -31,7 +22,7 @@ class ConsoleOperationReporterTests(TestCase):
         )
 
     def test_on_phase_progress_does_not_print(self) -> None:
-        reporter = reporting._default_operation_reporter()
+        reporter = reporting.ConsoleOperationReporter()
         stdout = io.StringIO()
 
         with mock.patch("sys.stdout", stdout):
@@ -40,7 +31,7 @@ class ConsoleOperationReporterTests(TestCase):
         self.assertEqual("", stdout.getvalue())
 
     def test_on_phase_log_does_not_print(self) -> None:
-        reporter = reporting._default_operation_reporter()
+        reporter = reporting.ConsoleOperationReporter()
         stdout = io.StringIO()
 
         with mock.patch("sys.stdout", stdout):
@@ -49,7 +40,7 @@ class ConsoleOperationReporterTests(TestCase):
         self.assertEqual("", stdout.getvalue())
 
     def test_on_phase_finished_does_not_print(self) -> None:
-        reporter = reporting._default_operation_reporter()
+        reporter = reporting.ConsoleOperationReporter()
         stdout = io.StringIO()
 
         with mock.patch("sys.stdout", stdout):
@@ -58,7 +49,7 @@ class ConsoleOperationReporterTests(TestCase):
         self.assertEqual("", stdout.getvalue())
 
     def test_on_phase_failed_does_not_print(self) -> None:
-        reporter = reporting._default_operation_reporter()
+        reporter = reporting.ConsoleOperationReporter()
         stdout = io.StringIO()
 
         with tempfile.TemporaryDirectory() as tmp_dir:

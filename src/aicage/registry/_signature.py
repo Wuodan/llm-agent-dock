@@ -21,10 +21,10 @@ from aicage.docker.query import (
     get_local_repo_digest_for_repo,
     local_image_exists,
 )
-from aicage.docker.reporting import OperationReporter
 from aicage.registry._errors import RegistryError
 from aicage.registry._logs import pull_log_path
 from aicage.registry.digest.remote_digest import get_remote_digest
+from aicage.reporting import OperationReporter
 
 _OFFICIAL_IMAGE_ANNOTATIONS: dict[str, dict[str, str]] = {
     f"{IMAGE_REGISTRY}/{IMAGE_REPOSITORY}": {
@@ -45,7 +45,7 @@ _REPOSITORY_PARTS_WITH_OWNER: int = 3
 
 def resolve_verified_digest(
     image_ref: str,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> str:
     logger = get_logger()
     digest = get_remote_digest(image_ref)
@@ -170,7 +170,7 @@ def _format_cosign_output(result: subprocess.CompletedProcess[str]) -> str:
     return "\n".join(part for part in parts if part)
 
 
-def _ensure_cosign_image(reporter: OperationReporter | None = None) -> None:
+def _ensure_cosign_image(reporter: OperationReporter) -> None:
     logger = get_logger()
     repository = _repository_for_image(COSIGN_IMAGE_REF)
     local_digest = get_local_repo_digest_for_repo(COSIGN_IMAGE_REF, repository)

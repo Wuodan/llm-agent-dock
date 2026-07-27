@@ -6,7 +6,7 @@ from aicage.config.extensions.loader import ExtensionMetadata
 from aicage.config.run_config import RunConfig
 from aicage.docker.errors import DockerError
 from aicage.docker.execution import cli as _docker_cli
-from aicage.docker.reporting import OperationReporter, _default_operation_reporter
+from aicage.reporting import OperationReporter
 
 from ._dockerfile_extensions import build_dockerfile_extensions
 from ._shell_extensions import build_shell_extensions
@@ -17,12 +17,11 @@ def run(
     base_image_ref: str,
     extensions: list[ExtensionMetadata],
     log_path: Path,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> None:
     logger = get_logger()
-    operation_reporter = reporter or _default_operation_reporter()
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    operation_reporter.on_phase_started(
+    reporter.on_phase_started(
         "build",
         f"Building extended image {run_config.selection.image_ref}",
         log_path,
@@ -55,7 +54,7 @@ def run(
                 target_ref=target_ref,
                 shell_extensions=shell_extensions,
                 log_handle=log_handle,
-                operation_reporter=operation_reporter,
+                operation_reporter=reporter,
             )
             if returncode != 0:
                 logger.error(
@@ -63,7 +62,7 @@ def run(
                     run_config.selection.image_ref,
                     log_path,
                 )
-                operation_reporter.on_phase_failed(
+                reporter.on_phase_failed(
                     "build",
                     f"Extended image build failed for {run_config.selection.image_ref}",
                     log_path,
@@ -79,7 +78,7 @@ def run(
                     run_config=run_config,
                     current_image_ref=current_image_ref,
                     log_handle=log_handle,
-                    operation_reporter=operation_reporter,
+                    operation_reporter=reporter,
                 )
             )
             intermediate_refs.extend(dockerfile_intermediate_refs)
@@ -89,7 +88,7 @@ def run(
                     run_config.selection.image_ref,
                     log_path,
                 )
-                operation_reporter.on_phase_failed(
+                reporter.on_phase_failed(
                     "build",
                     f"Extended image build failed for {run_config.selection.image_ref}",
                     log_path,
@@ -98,7 +97,7 @@ def run(
                     f"Extended image build failed for {run_config.selection.image_ref}. See log at: {log_path}"
                 )
     _cleanup_intermediate_images(intermediate_refs)
-    operation_reporter.on_phase_finished(
+    reporter.on_phase_finished(
         "build",
         f"Extended image build finished for {run_config.selection.image_ref}",
     )

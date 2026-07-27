@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from enum import Enum
 
 from aicage.config.run_config import RunConfig
-from aicage.docker.reporting import OperationReporter
 from aicage.paths import CUSTOM_BASES_DIR
 from aicage.registry._image_pull import pull_image
 from aicage.registry._pull_decision import _PullDecisionAction, pull_decision_plan
@@ -13,6 +12,7 @@ from aicage.registry.extension_build.ensure import (
     build_needed as extension_build_needed,
 )
 from aicage.registry.extension_build.ensure import ensure as ensure_extended_image
+from aicage.reporting import OperationReporter
 
 
 class ImageSetupAction(Enum):
@@ -30,7 +30,7 @@ class ImageSetupPlan:
 def ensure_image(
     run_config: RunConfig,
     update_approved: bool,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> None:
     agent_metadata = run_config.context.agents[run_config.agent]
     base_metadata = run_config.context.bases[run_config.selection.base]
@@ -52,7 +52,10 @@ def ensure_image(
         ensure_extended_image(run_config, reporter=reporter)
 
 
-def image_setup_plan(run_config: RunConfig) -> ImageSetupPlan:
+def image_setup_plan(
+    run_config: RunConfig,
+    reporter: OperationReporter,
+) -> ImageSetupPlan:
     agent_metadata = run_config.context.agents[run_config.agent]
     base_metadata = run_config.context.bases[run_config.selection.base]
     custom_base = base_metadata.local_definition_dir.is_relative_to(CUSTOM_BASES_DIR)
@@ -66,7 +69,7 @@ def image_setup_plan(run_config: RunConfig) -> ImageSetupPlan:
             case _PullDecisionAction.CONFIRM_PULL:
                 action = ImageSetupAction.CONFIRM_UPDATE
     else:
-        agent_plan = agent_build_setup_plan(run_config)
+        agent_plan = agent_build_setup_plan(run_config, reporter)
         match agent_plan.action:
             case _AgentBuildSetupAction.USE_LOCAL:
                 action = ImageSetupAction.SKIP

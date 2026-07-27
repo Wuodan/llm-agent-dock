@@ -12,11 +12,11 @@ from aicage.docker.query import (
     local_image_exists,
 )
 from aicage.docker.refs import repository_from_image_ref
-from aicage.docker.reporting import OperationReporter
 from aicage.paths import CUSTOM_BASES_DIR
 from aicage.registry._build_flow import maybe_build
 from aicage.registry._errors import RegistryError
 from aicage.registry._time import now_iso
+from aicage.reporting import OperationReporter
 
 from ..base_build.ensure import build_needed as base_build_needed
 from ..base_build.ensure import ensure as ensure_base_build
@@ -46,7 +46,7 @@ class _AgentBuildSetupPlan:
 def ensure(
     run_config: RunConfig,
     update_approved: bool,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> None:
     agent_metadata = run_config.context.agents[run_config.agent]
     definition_dir = agent_metadata.local_definition_dir
@@ -82,7 +82,12 @@ def ensure(
             return
 
     store = BuildStore()
-    agent_version = _get_agent_version(run_config, agent_metadata, definition_dir)
+    agent_version = _get_agent_version(
+        run_config,
+        agent_metadata,
+        definition_dir,
+        reporter,
+    )
     maybe_build(
         load_record=lambda: store.load(run_config.agent, run_config.selection.base),
         should_rebuild=lambda record: should_rebuild(
@@ -105,7 +110,10 @@ def ensure(
     )
 
 
-def setup_plan(run_config: RunConfig) -> _AgentBuildSetupPlan:
+def setup_plan(
+    run_config: RunConfig,
+    reporter: OperationReporter,
+) -> _AgentBuildSetupPlan:
     agent_metadata = run_config.context.agents[run_config.agent]
     definition_dir = agent_metadata.local_definition_dir
     base_metadata = run_config.context.bases[run_config.selection.base]
@@ -138,7 +146,12 @@ def setup_plan(run_config: RunConfig) -> _AgentBuildSetupPlan:
         base_image = refresh_plan.image_ref
 
     store = BuildStore()
-    agent_version = _get_agent_version(run_config, agent_metadata, definition_dir)
+    agent_version = _get_agent_version(
+        run_config,
+        agent_metadata,
+        definition_dir,
+        reporter,
+    )
     action = (
         _AgentBuildSetupAction.BUILD
         if should_rebuild(
@@ -156,7 +169,7 @@ def _get_agent_version(
     run_config: RunConfig,
     agent_metadata: AgentMetadata,
     definition_dir: Path,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> str:
     checker = AgentVersionChecker()
     return checker.get_version(
@@ -171,7 +184,7 @@ def _run_build(
     run_config: RunConfig,
     base_image_ref: str,
     image_ref: str,
-    reporter: OperationReporter | None,
+    reporter: OperationReporter,
 ) -> None:
     image_repository = repository_from_image_ref(image_ref)
     old_digest = get_local_repo_digest_for_repo(image_ref, image_repository)

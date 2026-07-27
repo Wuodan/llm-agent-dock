@@ -2,40 +2,35 @@ from aicage._logging import get_logger
 from aicage.constants import IMAGE_REGISTRY
 from aicage.docker.pull import run_pull
 from aicage.docker.query import cleanup_old_digest, get_local_repo_digest_for_repo
-from aicage.docker.reporting import OperationReporter
 from aicage.registry._errors import RegistryError
 from aicage.registry._logs import pull_log_path
 from aicage.registry._signature import resolve_verified_digest
 from aicage.registry.digest.remote_digest import get_remote_digest
+from aicage.reporting import OperationReporter
 
 
-def ensure_version_check_image(
-    image_ref: str,
-    reporter: OperationReporter | None = None,
-) -> None:
+def ensure_version_check_image(image_ref: str, reporter: OperationReporter) -> None:
     repository = _local_repository(image_ref, IMAGE_REGISTRY)
     local_digest = get_local_repo_digest_for_repo(
         image_ref,
         repository,
     )
     if local_digest is None:
-        _pull_version_check_image(
-            image_ref, repository, local_digest, reporter=reporter
-        )
+        _pull_version_check_image(image_ref, repository, local_digest, reporter)
         return
 
     remote_digest = get_remote_digest(image_ref)
     if remote_digest is None or remote_digest == local_digest:
         return
 
-    _pull_version_check_image(image_ref, repository, local_digest, reporter=reporter)
+    _pull_version_check_image(image_ref, repository, local_digest, reporter)
 
 
 def _pull_version_check_image(
     image_ref: str,
     repository: str,
     local_digest: str | None,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> None:
     logger = get_logger()
     log_path = pull_log_path(image_ref)

@@ -5,7 +5,7 @@ from aicage.config.extensions.loader import ExtensionMetadata
 from aicage.config.resources import find_packaged_path
 from aicage.config.run_config import RunConfig
 from aicage.docker.errors import DockerError
-from aicage.docker.reporting import OperationReporter
+from aicage.reporting import OperationReporter
 
 from . import _common
 

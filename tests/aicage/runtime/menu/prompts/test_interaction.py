@@ -13,7 +13,7 @@ from .._test_support import _build_context, _build_draft
 
 class ConfigureRunTests(TestCase):
     def test_configure_run(self) -> None:
-        resolved = interaction.SimpleInteraction()
+        resolved = interaction.SimpleInteraction(mock.Mock())
         draft = _build_draft(
             AgentConfig(base="ubuntu"),
             ParsedArgs(
@@ -54,12 +54,20 @@ class ConfigureRunTests(TestCase):
 
 class ExecuteImageSetupTests(TestCase):
     def test_execute_image_setup(self) -> None:
-        resolved = interaction.SimpleInteraction()
-        operation = mock.Mock()
+        reporter = mock.Mock()
+        resolved = interaction.SimpleInteraction(reporter)
+        run_config = mock.Mock()
 
-        resolved.execute_image_setup(operation)
+        with mock.patch(
+            "aicage.runtime.menu.prompts.interaction.ensure_image"
+        ) as ensure:
+            resolved.execute_image_setup(run_config, update_approved=False)
 
-        operation.assert_called_once_with(None)
+        ensure.assert_called_once_with(
+            run_config,
+            update_approved=False,
+            reporter=reporter,
+        )
 
 
 class SimpleSelectionInteractionTests(TestCase):
@@ -125,7 +133,9 @@ class RuntimeUpdateInteractionTests(TestCase):
             "aicage.runtime.menu.prompts.interaction.prompt_update_aicage",
             return_value=True,
         ) as prompt_mock:
-            confirmed = interaction.SimpleInteraction().confirm_aicage_update(
+            confirmed = interaction.SimpleInteraction(
+                mock.Mock()
+            ).confirm_aicage_update(
                 "1.0.0",
                 "1.1.0",
             )
@@ -138,7 +148,9 @@ class RuntimeUpdateInteractionTests(TestCase):
             "aicage.runtime.menu.prompts.interaction.prompt_update_image",
             return_value=True,
         ) as prompt_mock:
-            confirmed = interaction.SimpleInteraction().confirm_image_update("repo:tag")
+            confirmed = interaction.SimpleInteraction(mock.Mock()).confirm_image_update(
+                "repo:tag"
+            )
 
         self.assertTrue(confirmed)
         prompt_mock.assert_called_once_with("repo:tag")

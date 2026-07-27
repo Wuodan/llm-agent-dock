@@ -11,6 +11,7 @@ class SignatureVerificationTests(TestCase):
         self,
     ) -> None:
         image_ref = "ghcr.io/aicage/aicage:agent"
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry._signature.get_remote_digest",
@@ -37,13 +38,16 @@ class SignatureVerificationTests(TestCase):
                 "aicage.registry._signature._verify_manifest_annotations"
             ) as annotation_mock,
         ):
-            digest_ref = _signature.resolve_verified_digest(image_ref)
+            digest_ref = _signature.resolve_verified_digest(
+                image_ref, reporter=reporter
+            )
         self.assertEqual("ghcr.io/aicage/aicage@sha256:abc", digest_ref)
         cosign_mock.assert_called_once_with("ghcr.io/aicage/aicage@sha256:abc")
         annotation_mock.assert_called_once_with("ghcr.io/aicage/aicage@sha256:abc")
 
     def test_resolve_verified_digest_raises_on_invalid_signature(self) -> None:
         image_ref = "ghcr.io/aicage/aicage:agent"
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry._signature.get_remote_digest",
@@ -71,11 +75,12 @@ class SignatureVerificationTests(TestCase):
             ) as annotation_mock,
         ):
             with self.assertRaises(RegistryError):
-                _signature.resolve_verified_digest(image_ref)
+                _signature.resolve_verified_digest(image_ref, reporter=reporter)
         annotation_mock.assert_not_called()
 
     def test_resolve_verified_digest_raises_on_unknown_error(self) -> None:
         image_ref = "ghcr.io/aicage/aicage:agent"
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry._signature.get_remote_digest",
@@ -103,11 +108,12 @@ class SignatureVerificationTests(TestCase):
             ) as annotation_mock,
         ):
             with self.assertRaises(RegistryError):
-                _signature.resolve_verified_digest(image_ref)
+                _signature.resolve_verified_digest(image_ref, reporter=reporter)
         annotation_mock.assert_not_called()
 
     def test_resolve_verified_digest_raises_when_digest_missing(self) -> None:
         image_ref = "ghcr.io/aicage/aicage:agent"
+        reporter = mock.Mock()
         with (
             mock.patch(
                 "aicage.registry._signature.get_remote_digest",
@@ -120,7 +126,7 @@ class SignatureVerificationTests(TestCase):
             mock.patch("aicage.registry._signature._run_cosign_verify") as cosign_mock,
         ):
             with self.assertRaises(RegistryError):
-                _signature.resolve_verified_digest(image_ref)
+                _signature.resolve_verified_digest(image_ref, reporter=reporter)
         digest_mock.assert_called_once_with(image_ref)
         cosign_mock.assert_not_called()
 

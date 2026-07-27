@@ -5,10 +5,27 @@ from aicage.runtime.menu.textual.services import execution_reporting
 
 
 class ExecutionReporterTests(TestCase):
+    def test_on_phase_started_raises_when_screen_not_attached(self) -> None:
+        reporter = execution_reporting.ExecutionReporter()
+
+        with self.assertRaises(RuntimeError):
+            reporter.on_phase_started(
+                "pull", "Pulling image repo:tag", Path("/test-tmp/pull.log")
+            )
+
+    def test_attach_screen(self) -> None:
+        screen = mock.Mock()
+        reporter = execution_reporting.ExecutionReporter()
+
+        reporter.attach_screen(screen)
+
+        self.assertIs(screen, reporter._screen)
+
     def test_on_phase_started_calls_screen_directly_without_app(self) -> None:
         screen = mock.Mock()
         del screen.app
-        reporter = execution_reporting.ExecutionReporter(screen)
+        reporter = execution_reporting.ExecutionReporter()
+        reporter.attach_screen(screen)
 
         reporter.on_phase_started(
             "pull", "Pulling image repo:tag", Path("/test-tmp/pull.log")
@@ -21,7 +38,8 @@ class ExecutionReporterTests(TestCase):
     def test_on_phase_started_dispatches_via_app_thread_bridge(self) -> None:
         screen = mock.Mock()
         screen.app = mock.Mock()
-        reporter = execution_reporting.ExecutionReporter(screen)
+        reporter = execution_reporting.ExecutionReporter()
+        reporter.attach_screen(screen)
 
         reporter.on_phase_started(
             "pull", "Pulling image repo:tag", Path("/test-tmp/pull.log")
@@ -38,7 +56,8 @@ class ExecutionReporterTests(TestCase):
         screen = mock.Mock()
         screen.app = mock.Mock()
         screen.app.call_from_thread.side_effect = RuntimeError("same thread")
-        reporter = execution_reporting.ExecutionReporter(screen)
+        reporter = execution_reporting.ExecutionReporter()
+        reporter.attach_screen(screen)
 
         reporter.on_phase_started(
             "pull", "Pulling image repo:tag", Path("/test-tmp/pull.log")
@@ -51,7 +70,8 @@ class ExecutionReporterTests(TestCase):
     def test_on_phase_progress_dispatches_expected_values(self) -> None:
         screen = mock.Mock()
         del screen.app
-        reporter = execution_reporting.ExecutionReporter(screen)
+        reporter = execution_reporting.ExecutionReporter()
+        reporter.attach_screen(screen)
 
         reporter.on_phase_progress("pull", "Downloading", 1, 2)
 
@@ -60,7 +80,8 @@ class ExecutionReporterTests(TestCase):
     def test_on_phase_log_dispatches_expected_values(self) -> None:
         screen = mock.Mock()
         del screen.app
-        reporter = execution_reporting.ExecutionReporter(screen)
+        reporter = execution_reporting.ExecutionReporter()
+        reporter.attach_screen(screen)
 
         reporter.on_phase_log("build", "step 1")
 
@@ -69,7 +90,8 @@ class ExecutionReporterTests(TestCase):
     def test_on_phase_finished_dispatches_expected_values(self) -> None:
         screen = mock.Mock()
         del screen.app
-        reporter = execution_reporting.ExecutionReporter(screen)
+        reporter = execution_reporting.ExecutionReporter()
+        reporter.attach_screen(screen)
 
         reporter.on_phase_finished("build", "done")
 
@@ -78,7 +100,8 @@ class ExecutionReporterTests(TestCase):
     def test_on_phase_failed_dispatches_expected_values(self) -> None:
         screen = mock.Mock()
         del screen.app
-        reporter = execution_reporting.ExecutionReporter(screen)
+        reporter = execution_reporting.ExecutionReporter()
+        reporter.attach_screen(screen)
 
         reporter.on_phase_failed("build", "failed", Path("/test-tmp/build.log"))
 

@@ -6,21 +6,18 @@ from aicage._execution_cleanup import register_cleanup
 from aicage._logging import get_logger
 from aicage.docker.execution import client as _docker_client
 from aicage.docker.image.progress import PullProgress
-from aicage.docker.reporting import OperationReporter
+from aicage.reporting import OperationReporter
 
 
 def run_pull(
     image_ref: str,
     log_path: Path,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> None:
     logger = get_logger()
     progress = PullProgress()
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    if reporter is None:
-        print(f"[aicage] Pulling image {image_ref} (logs: {log_path})...")
-    else:
-        reporter.on_phase_started("pull", f"Pulling image {image_ref}", log_path)
+    reporter.on_phase_started("pull", f"Pulling image {image_ref}", log_path)
     logger.info("Pulling image %s (logs: %s)", image_ref, log_path)
 
     client = _docker_client.get_docker_pull_client()
@@ -31,13 +28,11 @@ def run_pull(
             log_handle.write(f"{line}\n")
             log_handle.flush()
             progress.consume_event(event, time.monotonic())
-            if reporter is not None:
-                reporter.on_phase_log("pull", line)
-                _report_progress(reporter, progress, event)
+            reporter.on_phase_log("pull", line)
+            _report_progress(reporter, progress, event)
 
     progress.finish()
-    if reporter is not None:
-        reporter.on_phase_finished("pull", f"Pull finished for {image_ref}")
+    reporter.on_phase_finished("pull", f"Pull finished for {image_ref}")
 
     logger.info("Image pull succeeded for %s", image_ref)
 

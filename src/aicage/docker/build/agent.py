@@ -5,7 +5,7 @@ from aicage._proxy import proxy_build_args_from_host
 from aicage.config.resources import find_packaged_path
 from aicage.config.run_config import RunConfig
 from aicage.docker.errors import DockerError
-from aicage.docker.reporting import OperationReporter, _default_operation_reporter
+from aicage.reporting import OperationReporter
 
 from . import _common
 
@@ -15,14 +15,11 @@ def run(
     base_image_ref: str,
     image_ref: str,
     log_path: Path,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> None:
     logger = get_logger()
-    operation_reporter = reporter or _default_operation_reporter()
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    operation_reporter.on_phase_started(
-        "build", f"Building local image {image_ref}", log_path
-    )
+    reporter.on_phase_started("build", f"Building local image {image_ref}", log_path)
     logger.info("Building local image %s (logs: %s)", image_ref, log_path)
 
     dockerfile_path = find_packaged_path("agent-build/Dockerfile")
@@ -46,18 +43,16 @@ def run(
         returncode = _common.run_build_command(
             command,
             log_handle,
-            operation_reporter,
+            reporter,
         )
     if returncode != 0:
         logger.error("Local image build failed for %s (logs: %s)", image_ref, log_path)
-        operation_reporter.on_phase_failed(
+        reporter.on_phase_failed(
             "build", f"Local image build failed for {image_ref}", log_path
         )
         raise DockerError(
             f"Local image build failed for {image_ref}. See log at: {log_path}"
         )
 
-    operation_reporter.on_phase_finished(
-        "build", f"Local image build finished for {image_ref}"
-    )
+    reporter.on_phase_finished("build", f"Local image build finished for {image_ref}")
     logger.info("Local image build succeeded for %s", image_ref)

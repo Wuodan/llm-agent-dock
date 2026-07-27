@@ -83,26 +83,33 @@ class EnsureImageTests(TestCase):
     @staticmethod
     def test_image_setup_plan_true_when_pull_needed() -> None:
         run_config = _run_config(build_local=False, extensions=[])
+        reporter = mock.Mock()
 
         with mock.patch(
             "aicage.registry.ensure_image.pull_decision_plan",
             return_value=mock.Mock(action=_PullDecisionAction.PULL),
         ):
-            assert image_setup_plan(run_config).action is ImageSetupAction.SETUP
+            assert (
+                image_setup_plan(run_config, reporter).action is ImageSetupAction.SETUP
+            )
 
     @staticmethod
     def test_image_setup_plan_false_when_pull_not_needed_and_no_extensions() -> None:
         run_config = _run_config(build_local=False, extensions=[])
+        reporter = mock.Mock()
 
         with mock.patch(
             "aicage.registry.ensure_image.pull_decision_plan",
             return_value=mock.Mock(action=_PullDecisionAction.SKIP),
         ):
-            assert image_setup_plan(run_config).action is ImageSetupAction.SKIP
+            assert (
+                image_setup_plan(run_config, reporter).action is ImageSetupAction.SKIP
+            )
 
     @staticmethod
     def test_image_setup_plan_true_when_extensions_need_build() -> None:
         run_config = _run_config(build_local=False, extensions=["extra"])
+        reporter = mock.Mock()
 
         with (
             mock.patch(
@@ -113,53 +120,64 @@ class EnsureImageTests(TestCase):
                 "aicage.registry.ensure_image.extension_build_needed", return_value=True
             ),
         ):
-            assert image_setup_plan(run_config).action is ImageSetupAction.SETUP
+            assert (
+                image_setup_plan(run_config, reporter).action is ImageSetupAction.SETUP
+            )
 
     @staticmethod
     def test_image_setup_plan_true_for_local_build_without_running_preflight() -> None:
         run_config = _run_config(build_local=True, extensions=[])
+        reporter = mock.Mock()
 
         with mock.patch(
             "aicage.registry.ensure_image.agent_build_setup_plan",
             return_value=mock.Mock(action=_AgentBuildSetupAction.BUILD),
-        ):
-            assert image_setup_plan(run_config).action is ImageSetupAction.SETUP
+        ) as setup_plan_mock:
+            assert (
+                image_setup_plan(run_config, reporter).action is ImageSetupAction.SETUP
+            )
+        setup_plan_mock.assert_called_once_with(run_config, reporter)
 
     @staticmethod
     def test_image_setup_plan_reports_confirmation_when_remote_pull_differs() -> None:
         run_config = _run_config(build_local=False, extensions=[])
+        reporter = mock.Mock()
 
         with mock.patch(
             "aicage.registry.ensure_image.pull_decision_plan",
             return_value=mock.Mock(action=_PullDecisionAction.CONFIRM_PULL),
         ):
-            plan = image_setup_plan(run_config)
+            plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.CONFIRM_UPDATE
 
     @staticmethod
     def test_image_setup_plan_skips_when_local_build_is_current() -> None:
         run_config = _run_config(build_local=True, extensions=[])
+        reporter = mock.Mock()
 
         with mock.patch(
             "aicage.registry.ensure_image.agent_build_setup_plan",
             return_value=mock.Mock(action=_AgentBuildSetupAction.USE_LOCAL),
-        ):
-            plan = image_setup_plan(run_config)
+        ) as setup_plan_mock:
+            plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.SKIP
+        setup_plan_mock.assert_called_once_with(run_config, reporter)
 
     @staticmethod
     def test_image_setup_plan_reports_confirmation_for_local_build_update() -> None:
         run_config = _run_config(build_local=True, extensions=[])
+        reporter = mock.Mock()
 
         with mock.patch(
             "aicage.registry.ensure_image.agent_build_setup_plan",
             return_value=mock.Mock(action=_AgentBuildSetupAction.CONFIRM_UPDATE),
-        ):
-            plan = image_setup_plan(run_config)
+        ) as setup_plan_mock:
+            plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
+        setup_plan_mock.assert_called_once_with(run_config, reporter)
 
 
 def _run_config(

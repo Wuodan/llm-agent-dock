@@ -8,17 +8,17 @@ from aicage.docker.query import (
     get_local_repo_digest_for_repo,
 )
 from aicage.docker.refs import repository_from_image_ref
-from aicage.docker.reporting import OperationReporter
 from aicage.registry._build_flow import maybe_build
 from aicage.registry._errors import RegistryError
 from aicage.registry._time import now_iso
+from aicage.reporting import OperationReporter
 
 from ._logs import build_log_path
 from ._plan import should_rebuild
 from ._store import BuildRecord, BuildStore
 
 
-def ensure(run_config: RunConfig, reporter: OperationReporter | None = None) -> None:
+def ensure(run_config: RunConfig, reporter: OperationReporter) -> None:
     if not run_config.selection.extensions:
         raise RegistryError("No extensions selected for extended image build.")
 
@@ -68,7 +68,7 @@ def build_needed(run_config: RunConfig) -> bool:
 def _run_build(
     run_config: RunConfig,
     resolved: list[ExtensionMetadata],
-    reporter: OperationReporter | None,
+    reporter: OperationReporter,
 ) -> None:
     image_ref = run_config.selection.image_ref
     image_repository = repository_from_image_ref(image_ref)

@@ -8,10 +8,10 @@ from aicage.docker.query import (
     get_local_repo_digest_for_repo,
     local_image_exists,
 )
-from aicage.docker.reporting import OperationReporter
 from aicage.registry._build_flow import maybe_build
 from aicage.registry._time import now_iso
 from aicage.registry.digest.remote_digest import get_remote_digest
+from aicage.reporting import OperationReporter
 
 from ._logs import build_log_path
 from ._store import BuildRecord, BuildStore
@@ -25,7 +25,7 @@ def ensure(
     base: str,
     base_metadata: BaseMetadata,
     base_dir: Path,
-    reporter: OperationReporter | None = None,
+    reporter: OperationReporter,
 ) -> None:
     target_image_ref = image_ref(base)
     local_exists = local_image_exists(target_image_ref)

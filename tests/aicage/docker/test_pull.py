@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, mock
 
+from aicage import reporting
 from aicage.docker.pull import run_pull
 
 
@@ -19,7 +20,11 @@ class DockerPullTests(TestCase):
                 ),
                 mock.patch("aicage.docker.pull.register_cleanup") as register_mock,
             ):
-                run_pull("ghcr.io/aicage/aicage:latest", log_path)
+                run_pull(
+                    "ghcr.io/aicage/aicage:latest",
+                    log_path,
+                    reporter=reporting.ConsoleOperationReporter(),
+                )
 
             payload = log_path.read_text(encoding="utf-8")
         self.assertIn('"status": "downloaded"', payload)
@@ -59,7 +64,11 @@ class DockerPullTests(TestCase):
                     "aicage.docker.pull.time.monotonic", side_effect=[1.0, 2.0, 3.0]
                 ),
             ):
-                run_pull("ghcr.io/aicage/aicage:latest", log_path)
+                run_pull(
+                    "ghcr.io/aicage/aicage:latest",
+                    log_path,
+                    reporter=reporting.ConsoleOperationReporter(),
+                )
 
             payload = log_path.read_text(encoding="utf-8")
 
@@ -105,11 +114,12 @@ class DockerPullTests(TestCase):
             "Pull finished for ghcr.io/aicage/aicage:latest",
         )
 
-    def test_run_pull_without_reporter_skips_reporting_seam(self) -> None:
+    def test_run_pull_reports_progress_to_reporter(self) -> None:
         client = mock.Mock()
         client.api.pull.return_value = [
             {"status": "Pulling fs layer", "id": "layer-a", "progressDetail": {}}
         ]
+        reporter = mock.Mock()
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
@@ -122,6 +132,14 @@ class DockerPullTests(TestCase):
                     "aicage.docker.pull._report_progress"
                 ) as report_progress_mock,
             ):
-                run_pull("ghcr.io/aicage/aicage:latest", log_path)
+                run_pull(
+                    "ghcr.io/aicage/aicage:latest",
+                    log_path,
+                    reporter=reporter,
+                )
 
-        report_progress_mock.assert_not_called()
+        report_progress_mock.assert_called_once_with(
+            reporter,
+            mock.ANY,
+            {"status": "Pulling fs layer", "id": "layer-a", "progressDetail": {}},
+        )

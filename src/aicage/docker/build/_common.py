@@ -5,7 +5,7 @@ from typing import TextIO
 from aicage._execution_cleanup import register_process
 from aicage.config.run_config import RunConfig
 from aicage.docker.errors import DockerError
-from aicage.docker.reporting import OperationReporter
+from aicage.reporting import OperationReporter
 
 
 def build_context_dir(run_config: RunConfig, dockerfile_path: Path) -> Path:
