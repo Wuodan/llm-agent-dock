@@ -79,7 +79,6 @@ jobs:
           python-version: "3.11"
 
       - name: Set up Python (self-hosted runner)
-        if: ${{ runner.environment == 'self-hosted' }}
         run: |
           python3 -m venv .venv
           echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
