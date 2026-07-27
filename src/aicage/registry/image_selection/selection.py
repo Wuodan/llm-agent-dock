@@ -5,7 +5,6 @@ from ._fresh_selection import fresh_selection
 from ._metadata import require_agent_metadata, validate_base
 from .extensions.context import ExtensionSelectionContext
 from .extensions.handler import handle_extension_selection
-from .extensions.missing_extensions import ensure_extensions_exist
 from .extensions.refs import base_image_ref
 from .interaction import _SelectionInteraction
 from .models import ImageSelection
@@ -25,20 +24,6 @@ def select_agent_image(
         if base is None:
             return fresh_selection(agent, context, extensions, selection_interaction)
         validate_base(agent, base, context)
-        if agent_cfg.extensions:
-            updated = ensure_extensions_exist(context=context, agent=agent)
-            if updated and not agent_cfg.extensions:
-                return ImageSelection(
-                    image_ref=base_image_ref(agent_metadata, agent, base, context),
-                    base=base,
-                    extensions=[],
-                    base_image_ref=base_image_ref(
-                        agent_metadata,
-                        agent,
-                        base,
-                        context,
-                    ),
-                )
         return ImageSelection(
             image_ref=agent_cfg.image_ref,
             base=base,

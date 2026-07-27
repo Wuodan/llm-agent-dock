@@ -9,9 +9,6 @@ from aicage.config.extended_images import (
 from aicage.config.image_refs import default_extended_image_ref, extended_image_name
 from aicage.config.run_config_draft import RunConfigDraft
 from aicage.registry.errors import RegistryError
-from aicage.registry.image_selection.extensions.missing_extensions import (
-    ensure_extensions_exist,
-)
 from aicage.registry.image_selection.extensions.refs import base_image_ref
 from aicage.registry.image_selection.models import ImageSelection
 
@@ -30,8 +27,6 @@ def resolve_overview_selection(
         raise RegistryError(
             f"Base '{agent_cfg.base}' is not valid for agent '{draft.agent}'."
         )
-    if agent_cfg.extensions:
-        ensure_extensions_exist(draft.agent, context)
     if agent_cfg.extensions:
         _write_extended_image_ref(draft, context)
     else:

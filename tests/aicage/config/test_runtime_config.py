@@ -7,6 +7,8 @@ from aicage.cli_types import ParsedArgs
 from aicage.config.agent.models import AgentMetadata
 from aicage.config.base.models import BaseMetadata
 from aicage.config.config_store import SettingsStore
+from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.config.image_refs import default_extended_image_ref
 from aicage.config.project_config import AgentConfig, _AgentMounts
 from aicage.config.run_config_draft import RunConfigDraft
 from aicage.config.runtime_config import RunConfig, load_run_config
@@ -181,6 +183,96 @@ class RuntimeConfigTests(TestCase):
                 run_config = load_run_config("codex", self._interaction())
 
         self.assertEqual("ubuntu", run_config.selection.base)
+
+    def test_load_run_config_removes_missing_extensions_when_loading_project(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project_path = Path(tmp_dir) / "project"
+            project_path.mkdir()
+
+            store = SettingsStore()
+            project_cfg = store.load_project(project_path)
+            project_cfg.agents["codex"] = AgentConfig(
+                base="ubuntu",
+                image_ref="aicage:codex-ubuntu",
+                extensions=["gh", "missing"],
+                extension_mounts={"gh": True, "missing": True},
+            )
+            project_cfg.agents["claude"] = AgentConfig(
+                base="ubuntu",
+                image_ref="aicage:claude-ubuntu",
+                extensions=["missing"],
+                extension_mounts={"missing": True},
+            )
+            store.save_project(project_path, project_cfg)
+
+            def store_factory(*_args: object, **_kwargs: object) -> SettingsStore:
+                return SettingsStore()
+
+            def interaction_side_effect(
+                draft: RunConfigDraft,
+                _context: object,
+                _agent: str,
+            ) -> object:
+                expected_image_ref = default_extended_image_ref(
+                    "codex",
+                    "ubuntu",
+                    ["gh"],
+                    {"gh": self._extension("gh")},
+                )
+                self.assertEqual(["gh"], draft.agent_cfg.extensions)
+                self.assertEqual({"gh": True}, draft.agent_cfg.extension_mounts)
+                self.assertEqual(expected_image_ref, draft.agent_cfg.image_ref)
+                return self._selection_result()
+
+            with (
+                mock.patch(
+                    "aicage.config.runtime_config.SettingsStore", new=store_factory
+                ),
+                mock.patch(
+                    "aicage.config.runtime_config.Path.cwd", return_value=project_path
+                ),
+                mock.patch(
+                    "aicage.config.runtime_config.resolve_docker_args",
+                    return_value=([], []),
+                ),
+                mock.patch(
+                    "aicage.config.runtime_config.load_extensions",
+                    return_value={"gh": self._extension("gh")},
+                ),
+                mock.patch(
+                    "aicage.config.runtime_config.load_bases",
+                    return_value=self._get_bases(),
+                ),
+                mock.patch(
+                    "aicage.config.runtime_config.load_agents",
+                    return_value=self._get_agents(),
+                ),
+            ):
+                load_run_config(
+                    "codex",
+                    self._interaction(side_effect=interaction_side_effect),
+                )
+
+            updated_cfg = store.load_project(project_path)
+
+        self.assertEqual(["gh"], updated_cfg.agents["codex"].extensions)
+        self.assertEqual({"gh": True}, updated_cfg.agents["codex"].extension_mounts)
+        self.assertEqual(
+            default_extended_image_ref(
+                "codex",
+                "ubuntu",
+                ["gh"],
+                {"gh": self._extension("gh")},
+            ),
+            updated_cfg.agents["codex"].image_ref,
+        )
+        self.assertEqual(["missing"], updated_cfg.agents["claude"].extensions)
+        self.assertEqual(
+            {"missing": True}, updated_cfg.agents["claude"].extension_mounts
+        )
+        self.assertEqual("aicage:claude-ubuntu", updated_cfg.agents["claude"].image_ref)
 
     def test_load_run_config_persists_share_mounts(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -583,3 +675,15 @@ class RuntimeConfigTests(TestCase):
                 local_definition_dir=Path("/test-tmp/agent"),
             )
         }
+
+    @staticmethod
+    def _extension(extension_id: str) -> ExtensionMetadata:
+        return ExtensionMetadata(
+            extension_id=extension_id,
+            name=extension_id,
+            description="desc",
+            shares=[],
+            directory=Path("/test-tmp") / extension_id,
+            scripts_dir=Path("/test-tmp") / extension_id / "scripts",
+            dockerfile_path=None,
+        )

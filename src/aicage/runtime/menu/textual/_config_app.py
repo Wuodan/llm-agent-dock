@@ -9,9 +9,6 @@ from aicage.config.context import ConfigContext
 from aicage.config.extensions.order import canonical_extensions
 from aicage.config.overview_selection import resolve_overview_selection
 from aicage.config.run_config_draft import RunConfigDraft
-from aicage.registry.image_selection.extensions.missing_extensions import (
-    ensure_extensions_exist,
-)
 from aicage.registry.image_selection.interaction import ExtensionChoiceOption
 from aicage.runtime.docker_args.resolvers.clipboard import (
     clipboard_requires_confirmation,
@@ -74,8 +71,6 @@ class ConfigApp(TextualApp[ConfigSelectionResult | None]):
         accepted = await self._confirm_undecided_built_in_shares()
         if not accepted:
             return
-        if ensure_extensions_exist(self._draft.agent, self._config_context):
-            self._refresh_sections()
         self._finish(
             ConfigSelectionResult(
                 selection=resolve_overview_selection(

@@ -7,6 +7,7 @@ from aicage.config.agent.models import AgentMetadata
 from aicage.config.base.models import BaseMetadata
 from aicage.config.context import ConfigContext
 from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.config.image_refs import default_extended_image_ref
 from aicage.config.project_config import AgentConfig, _ProjectConfig
 from aicage.config.run_config_draft import _create_run_config_draft
 
@@ -102,10 +103,6 @@ class OverviewSelectionTests(TestCase):
         )
 
         with (
-            mock.patch(
-                "aicage.config.overview_selection.ensure_extensions_exist",
-                return_value=False,
-            ),
             mock.patch("aicage.config.overview_selection.write_extended_image_config"),
             mock.patch(
                 "aicage.config.overview_selection.base_image_ref",
@@ -114,73 +111,15 @@ class OverviewSelectionTests(TestCase):
         ):
             selection = overview_selection.resolve_overview_selection(draft, context)
 
-        self.assertEqual("aicage-extended:codex-ubuntu-alpha-zeta", selection.image_ref)
-
-    def test_resolve_overview_selection_uses_base_image_when_extensions_are_removed(
-        self,
-    ) -> None:
-        draft = _create_run_config_draft(
-            Path("/repo"),
-            "codex",
-            _ProjectConfig(
-                path="/repo",
-                agents={"codex": AgentConfig(base="ubuntu", extensions=["extra"])},
+        self.assertEqual(
+            default_extended_image_ref(
+                "codex",
+                "ubuntu",
+                ["zeta", "alpha"],
+                context.extensions,
             ),
-            ParsedArgs(False, "", "codex", [], False, [], None),
+            selection.image_ref,
         )
-        context = ConfigContext(
-            store=mock.Mock(),
-            project_cfg=draft.project_cfg,
-            agents={
-                "codex": AgentMetadata(
-                    agent_path_files=[],
-                    agent_path_directories=[],
-                    agent_full_name="Codex CLI",
-                    agent_homepage="https://example.com",
-                    build_local=False,
-                    valid_bases={"ubuntu": "repo:ubuntu"},
-                    local_definition_dir=Path("/test-tmp/agent"),
-                )
-            },
-            bases={
-                "ubuntu": BaseMetadata(
-                    from_image="ubuntu:latest",
-                    base_image_distro="Ubuntu",
-                    base_image_description="Default",
-                    architectures=["amd64", "arm64"],
-                    build_local=False,
-                    local_definition_dir=Path("/test-tmp/base"),
-                )
-            },
-            extensions={},
-        )
-
-        def _remove_extensions(*_args: object, **_kwargs: object) -> bool:
-            draft.agent_cfg.extensions = []
-            draft.agent_cfg.image_ref = None
-            return True
-
-        with (
-            mock.patch(
-                "aicage.config.overview_selection.ensure_extensions_exist",
-                side_effect=_remove_extensions,
-            ),
-            mock.patch(
-                "aicage.config.overview_selection.base_image_ref",
-                return_value="repo:ubuntu",
-            ) as base_image_ref_mock,
-            mock.patch(
-                "aicage.config.overview_selection.write_extended_image_config"
-            ) as write_extended_image_config_mock,
-        ):
-            selection = overview_selection.resolve_overview_selection(draft, context)
-
-        self.assertEqual([], draft.agent_cfg.extensions)
-        self.assertEqual("repo:ubuntu", selection.image_ref)
-        self.assertEqual([], selection.extensions)
-        self.assertEqual("repo:ubuntu", draft.agent_cfg.image_ref)
-        self.assertEqual(2, base_image_ref_mock.call_count)
-        write_extended_image_config_mock.assert_not_called()
 
 
 def _extension(extension_id: str, dockerfile: bool = False) -> ExtensionMetadata:

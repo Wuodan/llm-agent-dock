@@ -5,8 +5,9 @@ from unittest import TestCase, mock
 from aicage.config.config_store import SettingsStore
 from aicage.config.context import ConfigContext
 from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.config.image_refs import local_image_ref
 from aicage.config.project_config import AgentConfig, _ProjectConfig
-from aicage.constants import IMAGE_REGISTRY, IMAGE_REPOSITORY
+from aicage.constants import IMAGE_REGISTRY, IMAGE_REPOSITORY, LOCAL_IMAGE_REPOSITORY
 from aicage.registry._errors import RegistryError
 from aicage.registry.image_selection.models import ImageSelection
 from aicage.registry.image_selection.selection import select_agent_image
@@ -91,7 +92,10 @@ class ImageSelectionTests(TestCase):
             context.project_cfg.agents["claude"] = AgentConfig(base="ubuntu")
             selection = select_agent_image("claude", context, mock.Mock())
 
-            self.assertEqual("aicage:claude-ubuntu", selection.image_ref)
+            self.assertEqual(
+                local_image_ref(LOCAL_IMAGE_REPOSITORY, "claude", "ubuntu"),
+                selection.image_ref,
+            )
             store.save_project.assert_not_called()
 
     @staticmethod
@@ -114,35 +118,6 @@ class ImageSelectionTests(TestCase):
         ) as fresh_mock:
             select_agent_image("codex", context, mock.Mock())
         fresh_mock.assert_called_once()
-
-    def test_select_agent_image_keeps_available_extensions_on_missing_extensions(
-        self,
-    ) -> None:
-        context = build_context(
-            mock.Mock(spec=SettingsStore), Path("/test-tmp/project"), bases=["ubuntu"]
-        )
-        agent_cfg = AgentConfig(
-            base="ubuntu", image_ref="aicage:codex-ubuntu", extensions=["extra"]
-        )
-        context.project_cfg.agents["codex"] = agent_cfg
-
-        def _remove_missing(*_args: object, **_kwargs: object) -> bool:
-            agent_cfg.extensions = []
-            agent_cfg.image_ref = None
-            return True
-
-        with (
-            mock.patch(
-                "aicage.registry.image_selection.selection.ensure_extensions_exist",
-                side_effect=_remove_missing,
-            ),
-        ):
-            selection = select_agent_image("codex", context, mock.Mock())
-        self.assertEqual(
-            f"{IMAGE_REGISTRY}/{IMAGE_REPOSITORY}:codex-ubuntu",
-            selection.image_ref,
-        )
-        self.assertEqual([], selection.extensions)
 
     def test_select_agent_image_uses_stored_image_ref(self) -> None:
         context = build_context(
