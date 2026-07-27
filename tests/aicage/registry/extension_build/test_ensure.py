@@ -100,9 +100,9 @@ class EnsureExtendedImageTests(TestCase):
             ensure(run_config)
         run_mock.assert_called_once()
         cleanup_mock.assert_called_once_with(
-            "aicage-extended",
+            DEFAULT_EXTENDED_IMAGE_NAME,
             "sha256:old",
-            "aicage-extended:codex-ubuntu-ext",
+            f"{DEFAULT_EXTENDED_IMAGE_NAME}:codex-ubuntu-ext",
         )
         store.save.assert_called_once()
         record = store.save.call_args.args[0]

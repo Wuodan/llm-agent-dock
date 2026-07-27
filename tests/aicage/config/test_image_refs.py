@@ -7,6 +7,7 @@ from aicage.config.image_refs import (
     extended_image_name,
     local_image_ref,
 )
+from aicage.constants import DEFAULT_EXTENDED_IMAGE_NAME
 
 
 class ImageRefsTests(TestCase):
@@ -20,7 +21,7 @@ class ImageRefsTests(TestCase):
 
     def test_default_extended_image_ref_groups_scripts_before_dockerfiles(self) -> None:
         self.assertEqual(
-            "aicage-extended:codex-ubuntu-alpha-zeta",
+            f"{DEFAULT_EXTENDED_IMAGE_NAME}:codex-ubuntu-alpha-zeta",
             default_extended_image_ref(
                 "codex",
                 "ubuntu",

@@ -12,6 +12,8 @@ from aicage.config.agent.models import (
 )
 from aicage.config.base.models import BaseMetadata
 from aicage.config.errors import ConfigError
+from aicage.config.image_refs import local_image_ref
+from aicage.constants import LOCAL_IMAGE_REPOSITORY
 from aicage.paths import CUSTOM_AGENT_DEFINITION_FILES
 
 
@@ -61,7 +63,10 @@ class CustomAgentLoaderTests(TestCase):
 
         agent = custom_agents["custom"]
         self.assertEqual(custom_dir / "custom", agent.local_definition_dir)
-        self.assertEqual({"ubuntu": "aicage:custom-ubuntu"}, agent.valid_bases)
+        self.assertEqual(
+            {"ubuntu": local_image_ref(LOCAL_IMAGE_REPOSITORY, "custom", "ubuntu")},
+            agent.valid_bases,
+        )
 
     def test_load_custom_agents_requires_install_and_version(self) -> None:
         bases = self._bases(["ubuntu"])

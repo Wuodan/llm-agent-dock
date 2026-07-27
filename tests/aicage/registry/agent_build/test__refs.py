@@ -5,6 +5,7 @@ from aicage.config.base.models import BaseMetadata
 from aicage.constants import IMAGE_BASE_REPOSITORY, IMAGE_REGISTRY
 from aicage.paths import CUSTOM_BASES_DIR
 from aicage.registry.agent_build import _refs
+from aicage.registry.base_build.ensure import image_ref as base_build_image_ref
 
 
 class LocalBuildRefsTests(TestCase):
@@ -25,7 +26,7 @@ class LocalBuildRefsTests(TestCase):
         }
         ref = _refs.get_base_image_ref(run_config)
 
-        self.assertEqual("aicage-image-base:custom", ref)
+        self.assertEqual(base_build_image_ref("custom"), ref)
 
     def test_get_base_image_ref_uses_repository(self) -> None:
         run_config = mock.Mock()

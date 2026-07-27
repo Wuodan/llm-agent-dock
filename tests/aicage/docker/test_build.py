@@ -6,6 +6,7 @@ from subprocess import CompletedProcess
 from unittest import TestCase, mock
 
 from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.constants import DEFAULT_EXTENDED_IMAGE_NAME
 from aicage.docker import build
 from aicage.docker.errors import DockerError
 
@@ -267,13 +268,12 @@ class LocalBuildRunnerTests(TestCase):
         shell_build_mock.assert_called_once()
         run_mock.assert_called_once()
         command = run_mock.call_args.args[0]
+        shell_ref = f"{DEFAULT_EXTENDED_IMAGE_NAME}:tmp-codex-ubuntu-shell-extensions"
         self.assertIn(
-            "BASE_IMAGE=aicage-extended:tmp-codex-ubuntu-shell-extensions",
+            f"BASE_IMAGE={shell_ref}",
             command,
         )
-        cleanup_mock.assert_called_once_with(
-            ["aicage-extended:tmp-codex-ubuntu-shell-extensions"]
-        )
+        cleanup_mock.assert_called_once_with([shell_ref])
 
     def test_run_extended_build_raises_on_failure(self) -> None:
         run_config = build_extended_run_config()

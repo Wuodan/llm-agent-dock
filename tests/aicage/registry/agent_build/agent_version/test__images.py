@@ -10,6 +10,7 @@ class AgentVersionImagesTests(TestCase):
     @staticmethod
     def test_ensure_version_check_image_pulls_when_local_missing() -> None:
         image_ref = VERSION_CHECK_IMAGE
+        repository, _, _tag = image_ref.partition(":")
         reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
@@ -44,7 +45,7 @@ class AgentVersionImagesTests(TestCase):
         verify_mock.assert_called_once_with(image_ref, reporter=reporter)
         pull_mock.assert_called_once_with(image_ref, log_path, reporter=reporter)
         cleanup_mock.assert_called_once_with(
-            "ghcr.io/aicage/aicage-image-util",
+            repository,
             None,
             image_ref,
         )
@@ -52,6 +53,7 @@ class AgentVersionImagesTests(TestCase):
     @staticmethod
     def test_ensure_version_check_image_cleans_old_digest_after_pull() -> None:
         image_ref = VERSION_CHECK_IMAGE
+        repository, _, _tag = image_ref.partition(":")
         reporter = mock.Mock()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
@@ -84,7 +86,7 @@ class AgentVersionImagesTests(TestCase):
                 )
         pull_mock.assert_called_once_with(image_ref, log_path, reporter=reporter)
         cleanup_mock.assert_called_once_with(
-            "ghcr.io/aicage/aicage-image-util",
+            repository,
             "sha256:old",
             image_ref,
         )

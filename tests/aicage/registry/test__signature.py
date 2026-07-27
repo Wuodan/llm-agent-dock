@@ -164,7 +164,7 @@ class SignatureVerificationTests(TestCase):
             constants.COSIGN_IMAGE_REF, log_mock.return_value, reporter=reporter
         )
         cleanup_mock.assert_called_once_with(
-            "ghcr.io/sigstore/cosign/cosign",
+            constants.COSIGN_IMAGE_REF.partition("@")[0],
             None,
             constants.COSIGN_IMAGE_REF,
         )
