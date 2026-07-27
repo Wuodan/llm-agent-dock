@@ -6,6 +6,7 @@ from aicage.config import overview_selection
 from aicage.config.agent.models import AgentMetadata
 from aicage.config.base.models import BaseMetadata
 from aicage.config.context import ConfigContext
+from aicage.config.extensions.loader import ExtensionMetadata
 from aicage.config.project_config import AgentConfig, _ProjectConfig
 from aicage.config.run_config_draft import _create_run_config_draft
 
@@ -56,7 +57,7 @@ class OverviewSelectionTests(TestCase):
         self.assertEqual("ubuntu", selection.base)
         self.assertEqual("repo:ubuntu", selection.image_ref)
 
-    def test_resolve_overview_selection_uses_sorted_extensions_for_default_image_ref(
+    def test_resolve_overview_selection_uses_grouped_extensions_for_default_image_ref(
         self,
     ) -> None:
         draft = _create_run_config_draft(
@@ -94,7 +95,10 @@ class OverviewSelectionTests(TestCase):
                     local_definition_dir=Path("/test-tmp/base"),
                 )
             },
-            extensions={},
+            extensions={
+                "alpha": _extension("alpha"),
+                "zeta": _extension("zeta", dockerfile=True),
+            },
         )
 
         with (
@@ -177,3 +181,16 @@ class OverviewSelectionTests(TestCase):
         self.assertEqual("repo:ubuntu", draft.agent_cfg.image_ref)
         self.assertEqual(2, base_image_ref_mock.call_count)
         write_extended_image_config_mock.assert_not_called()
+
+
+def _extension(extension_id: str, dockerfile: bool = False) -> ExtensionMetadata:
+    base_dir = Path("/test-tmp") / extension_id
+    return ExtensionMetadata(
+        extension_id=extension_id,
+        name=extension_id,
+        description="desc",
+        shares=[],
+        directory=base_dir,
+        scripts_dir=base_dir / "scripts",
+        dockerfile_path=base_dir / "Dockerfile" if dockerfile else None,
+    )

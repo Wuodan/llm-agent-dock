@@ -9,6 +9,7 @@ from ._tty import ensure_tty_for_prompt
 class ExtensionOption:
     name: str
     description: str
+    has_dockerfile: bool = False
 
 
 def prompt_for_extensions(options: list[ExtensionOption]) -> list[str]:
@@ -18,7 +19,11 @@ def prompt_for_extensions(options: list[ExtensionOption]) -> list[str]:
     print(
         "Select extensions to add (comma-separated numbers or names, empty for none):"
     )
+    shown_dockerfile_heading = False
     for idx, option in enumerate(options, start=1):
+        if option.has_dockerfile and not shown_dockerfile_heading:
+            print("  Extensions with custom Dockerfiles:")
+            shown_dockerfile_heading = True
         print(f"  {idx}) {option.name}: {option.description}")
     response = input("Enter selection: ").strip()
     if not response:

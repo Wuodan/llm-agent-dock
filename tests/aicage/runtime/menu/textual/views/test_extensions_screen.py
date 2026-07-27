@@ -3,21 +3,13 @@ from unittest import TestCase, mock
 
 from textual.widgets import Button, Checkbox, Static, TextArea
 
-from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.registry.image_selection.interaction import ExtensionChoiceOption
 from aicage.runtime.menu.textual.views import extensions_screen as screen_module
 
 
 class ExtensionsScreenTests(TestCase):
     def test_compose_builds_screen_widgets(self) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], ["gh"])
 
         widgets = list(screen.compose())
@@ -25,30 +17,14 @@ class ExtensionsScreenTests(TestCase):
         self.assertEqual(1, len(widgets))
 
     def test_checkboxes_marks_selected_extensions(self) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
 
         checkboxes = screen_module.ExtensionsScreen([option], ["gh"])._checkboxes()
 
         self.assertEqual(1, len(checkboxes))
 
     def test_on_mount_focuses_first_checkbox(self) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], ["gh"])
 
         with mock.patch.object(screen, "_focus_checkbox") as focus_checkbox_mock:
@@ -83,6 +59,29 @@ class ExtensionsScreenTests(TestCase):
             command_box.text,
         )
 
+    def test_content_widgets_adds_heading_before_dockerfile_extensions(self) -> None:
+        widgets = screen_module.ExtensionsScreen(
+            [
+                _option("gh", "GitHub CLI", "Desc"),
+                _option(
+                    "marker-dockerfile",
+                    "Marker Dockerfile",
+                    "Desc",
+                    has_dockerfile=True,
+                ),
+            ],
+            [],
+        )._content_widgets()
+
+        self.assertEqual(3, len(widgets))
+        self.assertIsInstance(widgets[0], Checkbox)
+        self.assertIsInstance(widgets[1], Static)
+        self.assertIsInstance(widgets[2], Checkbox)
+        self.assertEqual(
+            "Extensions with custom Dockerfiles:",
+            widgets[1].render(),
+        )
+
     def test_action_buttons_without_options_uses_copy_command_instead_of_clear(
         self,
     ) -> None:
@@ -102,15 +101,7 @@ class ExtensionsScreenTests(TestCase):
         )
 
     def test_action_accept_saves_selected_extensions(self) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], [])
         checkbox = mock.Mock()
         checkbox.value = True
@@ -124,15 +115,7 @@ class ExtensionsScreenTests(TestCase):
         dismiss_mock.assert_called_once_with(["gh"])
 
     def test_on_button_pressed_dispatches_ok(self) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], [])
         event = mock.Mock()
         event.button.id = "ok"
@@ -219,24 +202,8 @@ class ExtensionsScreenTests(TestCase):
 
     def test_action_focus_next_option_moves_checkbox_focus(self) -> None:
         options = [
-            ExtensionMetadata(
-                extension_id="gh",
-                name="GitHub CLI",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
-            ExtensionMetadata(
-                extension_id="act",
-                name="act",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
+            _option("gh", "GitHub CLI", "Desc"),
+            _option("act", "act", "Desc"),
         ]
         screen = screen_module.ExtensionsScreen(options, [])
         screen.focused = mock.Mock(id="ext-gh")
@@ -249,24 +216,8 @@ class ExtensionsScreenTests(TestCase):
 
     def test_action_focus_previous_option_moves_checkbox_focus(self) -> None:
         options = [
-            ExtensionMetadata(
-                extension_id="gh",
-                name="GitHub CLI",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
-            ExtensionMetadata(
-                extension_id="act",
-                name="act",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
+            _option("gh", "GitHub CLI", "Desc"),
+            _option("act", "act", "Desc"),
         ]
         screen = screen_module.ExtensionsScreen(options, [])
 
@@ -276,15 +227,7 @@ class ExtensionsScreenTests(TestCase):
         move_focus_mock.assert_called_once_with(-1)
 
     def test_action_focus_next_field_moves_from_checkbox_to_buttons(self) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], [])
         screen.focused = mock.Mock(spec=Checkbox)
         cancel_button = mock.Mock(spec=Button)
@@ -297,15 +240,7 @@ class ExtensionsScreenTests(TestCase):
     def test_action_focus_next_field_uses_default_navigation_outside_checkbox(
         self,
     ) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], [])
 
         with mock.patch.object(screen, "focus_next") as focus_next_mock:
@@ -317,24 +252,8 @@ class ExtensionsScreenTests(TestCase):
         self,
     ) -> None:
         options = [
-            ExtensionMetadata(
-                extension_id="gh",
-                name="GitHub CLI",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
-            ExtensionMetadata(
-                extension_id="act",
-                name="act",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
+            _option("gh", "GitHub CLI", "Desc"),
+            _option("act", "act", "Desc"),
         ]
         screen = screen_module.ExtensionsScreen(options, [])
         screen.focused = mock.Mock(spec=Button)
@@ -347,15 +266,7 @@ class ExtensionsScreenTests(TestCase):
     def test_action_focus_previous_field_moves_from_checkbox_to_buttons(
         self,
     ) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], [])
         screen.focused = mock.Mock(spec=Checkbox)
         ok_button = mock.Mock(spec=Button)
@@ -367,24 +278,8 @@ class ExtensionsScreenTests(TestCase):
 
     def test_on_button_pressed_clear_unchecks_visible_checkboxes(self) -> None:
         options = [
-            ExtensionMetadata(
-                extension_id="gh",
-                name="GitHub CLI",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
-            ExtensionMetadata(
-                extension_id="act",
-                name="act",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
+            _option("gh", "GitHub CLI", "Desc"),
+            _option("act", "act", "Desc"),
         ]
         screen = screen_module.ExtensionsScreen(options, ["gh", "act"])
         event = mock.Mock()
@@ -403,24 +298,8 @@ class ExtensionsScreenTests(TestCase):
 
     def test_focused_checkbox_index_returns_matching_checkbox_index(self) -> None:
         options = [
-            ExtensionMetadata(
-                extension_id="gh",
-                name="GitHub CLI",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
-            ExtensionMetadata(
-                extension_id="act",
-                name="act",
-                description="Desc",
-                shares=[],
-                directory=mock.Mock(),
-                scripts_dir=mock.Mock(),
-                dockerfile_path=None,
-            ),
+            _option("gh", "GitHub CLI", "Desc"),
+            _option("act", "act", "Desc"),
         ]
         screen = screen_module.ExtensionsScreen(options, [])
         focused = mock.Mock(spec=Checkbox)
@@ -432,15 +311,7 @@ class ExtensionsScreenTests(TestCase):
         self.assertEqual(1, value)
 
     def test_focused_checkbox_index_returns_zero_for_unknown_checkbox_id(self) -> None:
-        option = ExtensionMetadata(
-            extension_id="gh",
-            name="GitHub CLI",
-            description="Desc",
-            shares=[],
-            directory=mock.Mock(),
-            scripts_dir=mock.Mock(),
-            dockerfile_path=None,
-        )
+        option = _option("gh", "GitHub CLI", "Desc")
         screen = screen_module.ExtensionsScreen([option], [])
         focused = mock.Mock(spec=Checkbox)
         focused.id = "ext-missing"
@@ -449,3 +320,17 @@ class ExtensionsScreenTests(TestCase):
         value = screen._focused_checkbox_index()
 
         self.assertEqual(0, value)
+
+
+def _option(
+    name: str,
+    label: str,
+    description: str,
+    *,
+    has_dockerfile: bool = False,
+) -> ExtensionChoiceOption:
+    return ExtensionChoiceOption(
+        name=name,
+        description=f"{label} - {description}",
+        has_dockerfile=has_dockerfile,
+    )

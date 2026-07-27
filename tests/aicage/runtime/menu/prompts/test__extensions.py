@@ -86,3 +86,33 @@ class PromptExtensionsTests(TestCase):
         ):
             with self.assertRaises(RuntimeExecutionError):
                 prompt_for_extensions(options)
+
+    def test_prompt_for_extensions_prints_heading_before_dockerfile_extensions(
+        self,
+    ) -> None:
+        options = [
+            ExtensionOption(name="one", description="First"),
+            ExtensionOption(
+                name="two",
+                description="Second",
+                has_dockerfile=True,
+            ),
+        ]
+        with (
+            mock.patch("aicage.runtime.menu.prompts._extensions.ensure_tty_for_prompt"),
+            mock.patch("builtins.input", return_value=""),
+            mock.patch("builtins.print") as print_mock,
+        ):
+            prompt_for_extensions(options)
+
+        self.assertEqual(
+            [
+                mock.call(
+                    "Select extensions to add (comma-separated numbers or names, empty for none):"
+                ),
+                mock.call("  1) one: First"),
+                mock.call("  Extensions with custom Dockerfiles:"),
+                mock.call("  2) two: Second"),
+            ],
+            print_mock.call_args_list,
+        )

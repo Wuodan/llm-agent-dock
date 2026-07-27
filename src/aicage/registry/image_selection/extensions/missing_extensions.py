@@ -44,6 +44,7 @@ def _remove_missing_extensions(
             agent,
             agent_cfg.base,
             remaining_extensions,
+            context.extensions,
         )
     else:
         agent_cfg.image_ref = None

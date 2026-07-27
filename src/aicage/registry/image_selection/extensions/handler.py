@@ -3,6 +3,7 @@ from aicage.config.extended_images import (
     extended_image_config_path,
     write_extended_image_config,
 )
+from aicage.config.extensions.order import canonical_extensions
 from aicage.config.image_refs import default_extended_image_ref, extended_image_name
 
 from ..interaction import ExtensionChoiceOption, _SelectionInteraction
@@ -21,10 +22,9 @@ def handle_extension_selection(
         ExtensionChoiceOption(
             name=ext.extension_id,
             description=f"{ext.name}: {ext.description}",
+            has_dockerfile=ext.dockerfile_path is not None,
         )
-        for ext in sorted(
-            selection.extensions.values(), key=lambda item: item.extension_id
-        )
+        for ext in canonical_extensions(list(selection.extensions.values()))
     ]
     selected_extensions = (
         selection_interaction.choose_extensions(extension_options)
@@ -34,7 +34,10 @@ def handle_extension_selection(
     if selected_extensions:
         image_ref = selection_interaction.choose_image_ref(
             default_extended_image_ref(
-                selection.agent, selection.base, selected_extensions
+                selection.agent,
+                selection.base,
+                selected_extensions,
+                selection.extensions,
             )
         )
         agent_cfg.extensions = list(selected_extensions)

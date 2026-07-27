@@ -456,6 +456,12 @@ def copy_marker_extension_sample(target_dir: Path) -> None:
         _make_executable(script)
 
 
+def copy_marker_dockerfile_extension_sample(target_dir: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[3]
+    source_dir = repo_root / "doc/sample/custom/extensions/marker-dockerfile"
+    copytree(source_dir, target_dir, dirs_exist_ok=True)
+
+
 def _make_executable(path: Path) -> None:
     current = path.stat().st_mode
     path.chmod(current | stat.S_IEXEC)

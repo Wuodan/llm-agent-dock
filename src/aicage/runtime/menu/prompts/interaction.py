@@ -93,6 +93,7 @@ class _SimpleSelectionInteraction:
                 ExtensionOption(
                     name=option.name,
                     description=option.description,
+                    has_dockerfile=option.has_dockerfile,
                 )
                 for option in options
             ]

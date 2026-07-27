@@ -72,8 +72,43 @@ class ExtensionHandlerTests(TestCase):
             write_mock.assert_called_once()
             save_project_mock.assert_not_called()
 
+    def test_handle_extension_selection_groups_script_extensions_before_dockerfiles(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            save_project_mock = mock.Mock()
+            context = self._context(tmp_dir, save_project_mock)
+            agent_cfg = AgentConfig()
+            selection = ExtensionSelectionContext(
+                agent="codex",
+                base="ubuntu",
+                agent_cfg=agent_cfg,
+                agent_metadata=self._agent_metadata(local=False),
+                extensions={
+                    "zeta": self._extension(tmp_dir, "zeta", dockerfile=True),
+                    "alpha": self._extension(tmp_dir, "alpha"),
+                },
+                context=context,
+            )
+            interaction = _selection_interaction(
+                ["alpha", "zeta"],
+                f"{DEFAULT_EXTENDED_IMAGE_NAME}:custom",
+            )
+
+            handle_extension_selection(selection, interaction)
+
+        self.assertEqual(["alpha", "zeta"], agent_cfg.extensions)
+        self.assertEqual(
+            ["alpha", "zeta"],
+            [option.name for option in interaction.choose_extensions.call_args.args[0]],
+        )
+
     @staticmethod
-    def _extension(tmp_dir: str, extension_id: str) -> ExtensionMetadata:
+    def _extension(
+        tmp_dir: str,
+        extension_id: str,
+        dockerfile: bool = False,
+    ) -> ExtensionMetadata:
         base = Path(tmp_dir)
         return ExtensionMetadata(
             extension_id=extension_id,
@@ -82,7 +117,7 @@ class ExtensionHandlerTests(TestCase):
             shares=[],
             directory=base,
             scripts_dir=base,
-            dockerfile_path=None,
+            dockerfile_path=base / "Dockerfile" if dockerfile else None,
         )
 
     @staticmethod

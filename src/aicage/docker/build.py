@@ -1,4 +1,7 @@
+import shutil
 import subprocess  # nosec B404 -- subprocess is required to stream docker build output incrementally.
+import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TextIO
 
@@ -11,6 +14,15 @@ from aicage.config.run_config import RunConfig
 from aicage.docker.cli import _run_docker_command
 from aicage.docker.errors import DockerError
 from aicage.docker.reporting import OperationReporter, _default_operation_reporter
+
+
+@dataclass(frozen=True)
+class _ShellExtensionsBuildContext:
+    dockerfile_builtin: Path
+    batch_script: Path
+    proxy_build_args: list[str]
+    log_handle: TextIO
+    operation_reporter: OperationReporter
 
 
 def run_build(
@@ -59,7 +71,7 @@ def run_build(
             "build", f"Local image build failed for {image_ref}", log_path
         )
         raise DockerError(
-            f"Local image build failed for {image_ref}. See log at {log_path}."
+            f"Local image build failed for {image_ref}. See log at: {log_path}"
         )
 
     operation_reporter.on_phase_finished(
@@ -90,14 +102,58 @@ def run_extended_build(
     )
 
     dockerfile_builtin = find_packaged_path("extension-build/Dockerfile")
+    batch_script = find_packaged_path(
+        "extension-build/helpers/run-selected-extensions.sh"
+    )
+    shell_extensions = [
+        extension for extension in extensions if extension.dockerfile_path is None
+    ]
+    dockerfile_extensions = [
+        extension for extension in extensions if extension.dockerfile_path is not None
+    ]
     current_image_ref = base_image_ref
     intermediate_refs: list[str] = []
     proxy_build_args = proxy_build_args_from_host()
     with log_path.open("w", encoding="utf-8") as log_handle:
-        for idx, extension in enumerate(extensions):
+        if shell_extensions:
             target_ref = (
                 run_config.selection.image_ref
-                if idx == len(extensions) - 1
+                if not dockerfile_extensions
+                else _shell_batch_image_ref(run_config)
+            )
+            if target_ref != run_config.selection.image_ref:
+                intermediate_refs.append(target_ref)
+            returncode = _run_shell_extensions_build(
+                base_image_ref=current_image_ref,
+                target_ref=target_ref,
+                shell_extensions=shell_extensions,
+                context=_ShellExtensionsBuildContext(
+                    dockerfile_builtin=dockerfile_builtin,
+                    batch_script=batch_script,
+                    proxy_build_args=proxy_build_args,
+                    log_handle=log_handle,
+                    operation_reporter=operation_reporter,
+                ),
+            )
+            if returncode != 0:
+                logger.error(
+                    "Extended image build failed for %s (logs: %s)",
+                    run_config.selection.image_ref,
+                    log_path,
+                )
+                operation_reporter.on_phase_failed(
+                    "build",
+                    f"Extended image build failed for {run_config.selection.image_ref}",
+                    log_path,
+                )
+                raise DockerError(
+                    f"Extended image build failed for {run_config.selection.image_ref}. See log at: {log_path}"
+                )
+            current_image_ref = target_ref
+        for idx, extension in enumerate(dockerfile_extensions):
+            target_ref = (
+                run_config.selection.image_ref
+                if idx == len(dockerfile_extensions) - 1
                 else _intermediate_image_ref(run_config, extension, idx)
             )
             if target_ref != run_config.selection.image_ref:
@@ -137,7 +193,7 @@ def run_extended_build(
                     log_path,
                 )
                 raise DockerError(
-                    f"Extended image build failed for {run_config.selection.image_ref}. See log at {log_path}."
+                    f"Extended image build failed for {run_config.selection.image_ref}. See log at: {log_path}"
                 )
             current_image_ref = target_ref
     _cleanup_intermediate_images(intermediate_refs)
@@ -193,7 +249,7 @@ def run_custom_base_build(
             log_path,
         )
         raise DockerError(
-            f"Custom base image build failed for {image_ref}. See log at {log_path}."
+            f"Custom base image build failed for {image_ref}. See log at: {log_path}"
         )
 
     operation_reporter.on_phase_finished(
@@ -208,6 +264,13 @@ def _build_context_dir(run_config: RunConfig, dockerfile_path: Path) -> Path:
     if local_definition_dir.is_relative_to(dockerfile_path.parent):
         return dockerfile_path.parent
     return local_definition_dir.parent.parent
+
+
+def _shell_batch_image_ref(run_config: RunConfig) -> str:
+    repository, _ = _parse_image_ref(run_config.selection.image_ref)
+    tag = f"tmp-{run_config.agent}-{run_config.selection.base}-shell-extensions"
+    tag = tag.lower().replace("/", "-")
+    return f"{repository}:{tag}"
 
 
 def _intermediate_image_ref(
@@ -237,6 +300,62 @@ def _cleanup_intermediate_images(intermediate_refs: list[str]) -> None:
         )
         if result.returncode != 0:
             logger.warning("Failed to remove intermediate image %s", image_ref)
+
+
+def _run_shell_extensions_build(
+    base_image_ref: str,
+    target_ref: str,
+    shell_extensions: list[ExtensionMetadata],
+    context: _ShellExtensionsBuildContext,
+) -> int:
+    with tempfile.TemporaryDirectory(prefix="aicage-extension-build-") as tmp_dir:
+        build_root = Path(tmp_dir)
+        _write_shell_extensions_build_context(
+            build_root,
+            shell_extensions,
+            context.dockerfile_builtin,
+            context.batch_script,
+        )
+        command = [
+            "docker",
+            "build",
+            "--no-cache",
+            "--file",
+            str(build_root / "Dockerfile"),
+            "--build-arg",
+            f"BASE_IMAGE={base_image_ref}",
+            "--build-arg",
+            "EXTENSIONS="
+            + " ".join(extension.extension_id for extension in shell_extensions),
+            "--tag",
+            target_ref,
+            str(build_root),
+        ]
+        command.extend(context.proxy_build_args)
+        return _run_build_command(
+            command,
+            context.log_handle,
+            context.operation_reporter,
+        )
+
+
+def _write_shell_extensions_build_context(
+    build_root: Path,
+    shell_extensions: list[ExtensionMetadata],
+    dockerfile_builtin: Path,
+    batch_script: Path,
+) -> None:
+    shutil.copy2(dockerfile_builtin, build_root / "Dockerfile")
+    helpers_root = build_root / "helpers"
+    helpers_root.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(batch_script, helpers_root / "run-selected-extensions.sh")
+    extensions_root = build_root / "extensions"
+    extensions_root.mkdir(parents=True, exist_ok=True)
+    for extension in shell_extensions:
+        shutil.copytree(
+            extension.directory,
+            extensions_root / extension.extension_id,
+        )
 
 
 def _run_build_command(

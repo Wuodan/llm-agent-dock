@@ -17,6 +17,7 @@ class BaseChoiceRequest:
 class ExtensionChoiceOption:
     name: str
     description: str
+    has_dockerfile: bool = False
 
 
 class _SelectionInteraction(Protocol):

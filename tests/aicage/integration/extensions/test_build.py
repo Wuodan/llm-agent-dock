@@ -2,7 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from aicage.constants import IMAGE_REGISTRY, IMAGE_REPOSITORY
+from aicage.config.config_store import SettingsStore
+from aicage.constants import (
+    DEFAULT_EXTENDED_IMAGE_NAME,
+    IMAGE_REGISTRY,
+    IMAGE_REPOSITORY,
+)
 from aicage.docker.query import local_image_exists
 from aicage.registry.extension_build._store import BuildStore
 
@@ -10,13 +15,48 @@ from .._helpers import (
     assert_marker_extension_ready,
     assert_old_image_replaced,
     assert_rootfs_layer_present,
+    copy_marker_dockerfile_extension_sample,
+    custom_extensions_dir,
     keep_pulled_image_last_rootfs_layer,
+    marker_shared_extension_dir,
     replace_with_dummy_image,
+    require_integration,
     resolve_remote_digest_ref,
     setup_marker_extension_workspace,
+    setup_workspace,
 )
 
 pytestmark = pytest.mark.integration
+
+
+def test_dockerfile_extension_builds_and_runs(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    require_integration()
+    workspace, env = setup_workspace(
+        monkeypatch,
+        tmp_path,
+        "codex",
+        docker_args="--env AICAGE_ENTRYPOINT_CMD=bash",
+    )
+    marker_shared_extension_dir(Path(env["HOME"])).mkdir(parents=True, exist_ok=True)
+    extension_dir = custom_extensions_dir() / "marker-dockerfile"
+    extension_dir.parent.mkdir(parents=True, exist_ok=True)
+    copy_marker_dockerfile_extension_sample(extension_dir)
+
+    store = SettingsStore()
+    project_cfg = store.load_project(workspace)
+    agent_cfg = project_cfg.agents["codex"]
+    agent_cfg.base = "ubuntu"
+    agent_cfg.docker_args = "--env AICAGE_ENTRYPOINT_CMD=bash"
+    agent_cfg.image_ref = (
+        f"{DEFAULT_EXTENDED_IMAGE_NAME}:codex-ubuntu-marker-dockerfile"
+    )
+    agent_cfg.extensions = ["marker-dockerfile"]
+    agent_cfg.extension_mounts["marker-dockerfile"] = True
+    store.save_project(workspace, project_cfg)
+
+    assert_marker_extension_ready(env, workspace, "codex")
 
 
 def test_extension_builds_and_runs(

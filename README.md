@@ -53,6 +53,7 @@ After `aicage <agent>` starts, you will see this setup overview:
 The overview brings the most common choices together in one place:
 
 - `Agent`: the built-in or custom agent you want to run.
+- `Bind Mounts`: extra host files and directories the container should be able to access.
 - `Base`: the base image used for the agent image. The suggested default is best for most users.
 - `Extensions`: optional local additions that install tools or request extra host shares.
 - `Docker Args`: extra `docker run` arguments such as `-e`, `-p`, or `--network`.
@@ -61,6 +62,10 @@ The overview brings the most common choices together in one place:
 - `OK`: saves the current project config for that agent and starts the container.
 
 ## Common next steps
+
+### Bind mounts
+
+Use `Bind Mounts` when the agent needs access to files or directories outside the project.
 
 ### Docker args
 

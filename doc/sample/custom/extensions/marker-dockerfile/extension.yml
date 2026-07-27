@@ -1,0 +1,4 @@
+name: "Marker Dockerfile extension"
+description: "Creates a marker file in the image with a Dockerfile and mounts a test share."
+shares:
+  - ~/.aicage-test-share

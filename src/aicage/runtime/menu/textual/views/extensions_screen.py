@@ -5,7 +5,7 @@ from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import Button, Checkbox, Header, Static, TextArea
 
-from aicage.config.extensions.loader import ExtensionMetadata
+from aicage.registry.image_selection.interaction import ExtensionChoiceOption
 
 from .. import _clipboard
 from ._cancelable_screen import CancelableScreen
@@ -23,7 +23,9 @@ class ExtensionsScreen(CancelableScreen[list[str] | None]):
         *CancelableScreen.BINDINGS,
     ]
 
-    def __init__(self, options: list[ExtensionMetadata], selected: list[str]) -> None:
+    def __init__(
+        self, options: list[ExtensionChoiceOption], selected: list[str]
+    ) -> None:
         super().__init__()
         self._options = options
         self._selected = set(selected)
@@ -52,9 +54,9 @@ class ExtensionsScreen(CancelableScreen[list[str] | None]):
             self.action_cancel()
             return
         selected = [
-            option.extension_id
+            option.name
             for option in self._options
-            if self.query_one(f"#ext-{option.extension_id}", Checkbox).value
+            if self.query_one(f"#ext-{option.name}", Checkbox).value
         ]
         self.dismiss(selected)
 
@@ -93,9 +95,9 @@ class ExtensionsScreen(CancelableScreen[list[str] | None]):
     def _checkboxes(self) -> list[Checkbox]:
         return [
             Checkbox(
-                f"{option.extension_id}: {option.name} - {option.description}",
-                value=option.extension_id in self._selected,
-                id=f"ext-{option.extension_id}",
+                f"{option.name}: {option.description}",
+                value=option.name in self._selected,
+                id=f"ext-{option.name}",
             )
             for option in self._options
         ]
@@ -115,7 +117,22 @@ class ExtensionsScreen(CancelableScreen[list[str] | None]):
                     classes="command_box",
                 ),
             ]
-        return self._checkboxes()
+        return self._extension_widgets()
+
+    def _extension_widgets(self) -> list[Checkbox | Static]:
+        widgets: list[Checkbox | Static] = []
+        shown_dockerfile_heading = False
+        for option, checkbox in zip(self._options, self._checkboxes(), strict=False):
+            if option.has_dockerfile and not shown_dockerfile_heading:
+                widgets.append(
+                    Static(
+                        "Extensions with custom Dockerfiles:",
+                        classes="screen_subtitle",
+                    )
+                )
+                shown_dockerfile_heading = True
+            widgets.append(checkbox)
+        return widgets
 
     def _action_buttons(self) -> list[Button]:
         if not self._options:
@@ -156,17 +173,17 @@ class ExtensionsScreen(CancelableScreen[list[str] | None]):
 
     def _clear_checkboxes(self) -> None:
         for option in self._options:
-            self.query_one(f"#ext-{option.extension_id}", Checkbox).value = False
+            self.query_one(f"#ext-{option.name}", Checkbox).value = False
 
     def _focused_checkbox_index(self) -> int:
         focused = self.focused
         if not isinstance(focused, Checkbox):
             return 0
         for index, option in enumerate(self._options):
-            if focused.id == f"ext-{option.extension_id}":
+            if focused.id == f"ext-{option.name}":
                 return index
         return 0
 
     def _focus_checkbox(self, index: int) -> None:
         option = self._options[index]
-        self.query_one(f"#ext-{option.extension_id}", Checkbox).focus()
+        self.query_one(f"#ext-{option.name}", Checkbox).focus()

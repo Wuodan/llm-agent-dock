@@ -33,7 +33,7 @@ def resolve_overview_selection(
     if agent_cfg.extensions:
         ensure_extensions_exist(draft.agent, context)
     if agent_cfg.extensions:
-        _write_extended_image_ref(draft)
+        _write_extended_image_ref(draft, context)
     else:
         agent_cfg.image_ref = base_image_ref(
             agent_metadata, draft.agent, agent_cfg.base, context
@@ -49,11 +49,12 @@ def resolve_overview_selection(
     )
 
 
-def _write_extended_image_ref(draft: RunConfigDraft) -> None:
+def _write_extended_image_ref(draft: RunConfigDraft, context: ConfigContext) -> None:
     image_ref = draft.agent_cfg.image_ref or default_extended_image_ref(
         draft.agent,
         draft.agent_cfg.base or "",
         draft.agent_cfg.extensions,
+        context.extensions,
     )
     draft.agent_cfg.image_ref = image_ref
     write_extended_image_config(

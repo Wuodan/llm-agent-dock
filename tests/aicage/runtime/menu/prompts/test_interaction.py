@@ -86,11 +86,25 @@ class SimpleSelectionInteractionTests(TestCase):
             return_value=["gh"],
         ) as prompt_mock:
             choice = interaction._SimpleSelectionInteraction().choose_extensions(
-                [ExtensionChoiceOption(name="gh", description="GitHub CLI")]
+                [
+                    ExtensionChoiceOption(
+                        name="gh",
+                        description="GitHub CLI",
+                        has_dockerfile=True,
+                    )
+                ]
             )
 
         self.assertEqual(["gh"], choice)
-        prompt_mock.assert_called_once()
+        prompt_mock.assert_called_once_with(
+            [
+                interaction.ExtensionOption(
+                    name="gh",
+                    description="GitHub CLI",
+                    has_dockerfile=True,
+                )
+            ]
+        )
 
     def test_choose_image_ref(self) -> None:
         with mock.patch(

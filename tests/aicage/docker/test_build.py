@@ -207,9 +207,37 @@ class LocalBuildRunnerTests(TestCase):
             "Custom base image build finished for aicage:base-sample",
         )
 
-    def test_run_extended_build_builds_all_extensions(self) -> None:
+    def test_run_extended_build_batches_shell_extensions(self) -> None:
         run_config = build_extended_run_config()
         extensions = [_extension("extra"), _extension("more")]
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            log_path = Path(tmp_dir) / "build.log"
+            with (
+                mock.patch(
+                    "aicage.docker.build._run_shell_extensions_build",
+                    return_value=0,
+                ) as shell_build_mock,
+                mock.patch(
+                    "aicage.docker.build._cleanup_intermediate_images"
+                ) as cleanup_mock,
+            ):
+                build.run_extended_build(
+                    run_config=run_config,
+                    base_image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                    extensions=extensions,
+                    log_path=log_path,
+                )
+        shell_build_mock.assert_called_once()
+        cleanup_mock.assert_called_once_with([])
+
+    def test_run_extended_build_builds_dockerfile_extensions_after_shell_batch(
+        self,
+    ) -> None:
+        run_config = build_extended_run_config()
+        extensions = [
+            _extension("extra"),
+            _extension("custom", dockerfile_path=Path("/test-tmp/custom/Dockerfile")),
+        ]
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "build.log"
             with (
@@ -217,6 +245,10 @@ class LocalBuildRunnerTests(TestCase):
                     "aicage.docker.build.find_packaged_path",
                     return_value=Path("/test-tmp/Dockerfile"),
                 ),
+                mock.patch(
+                    "aicage.docker.build._run_shell_extensions_build",
+                    return_value=0,
+                ) as shell_build_mock,
                 mock.patch(
                     "aicage.docker.build._run_build_command",
                     return_value=0,
@@ -231,8 +263,17 @@ class LocalBuildRunnerTests(TestCase):
                     extensions=extensions,
                     log_path=log_path,
                 )
-        self.assertEqual(2, run_mock.call_count)
-        cleanup_mock.assert_called_once()
+
+        shell_build_mock.assert_called_once()
+        run_mock.assert_called_once()
+        command = run_mock.call_args.args[0]
+        self.assertIn(
+            "BASE_IMAGE=aicage-extended:tmp-codex-ubuntu-shell-extensions",
+            command,
+        )
+        cleanup_mock.assert_called_once_with(
+            ["aicage-extended:tmp-codex-ubuntu-shell-extensions"]
+        )
 
     def test_run_extended_build_raises_on_failure(self) -> None:
         run_config = build_extended_run_config()
@@ -242,11 +283,7 @@ class LocalBuildRunnerTests(TestCase):
             reporter = mock.Mock()
             with (
                 mock.patch(
-                    "aicage.docker.build.find_packaged_path",
-                    return_value=Path("/test-tmp/Dockerfile"),
-                ),
-                mock.patch(
-                    "aicage.docker.build._run_build_command",
+                    "aicage.docker.build._run_shell_extensions_build",
                     return_value=1,
                 ),
             ):
@@ -263,6 +300,50 @@ class LocalBuildRunnerTests(TestCase):
             f"Extended image build failed for {run_config.selection.image_ref}",
             log_path,
         )
+
+    def test_run_shell_extensions_build_invokes_docker(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            extension_dir = Path(tmp_dir) / "extra"
+            (extension_dir / "scripts").mkdir(parents=True)
+            (extension_dir / "scripts" / "01-install.sh").write_text(
+                "#!/usr/bin/env bash\necho ok\n",
+                encoding="utf-8",
+            )
+            extension = ExtensionMetadata(
+                extension_id="extra",
+                name="extra",
+                description="desc",
+                shares=[],
+                directory=extension_dir,
+                scripts_dir=extension_dir / "scripts",
+                dockerfile_path=None,
+            )
+            dockerfile_builtin = Path(tmp_dir) / "Dockerfile"
+            dockerfile_builtin.write_text("FROM ubuntu:latest\n", encoding="utf-8")
+            batch_script = Path(tmp_dir) / "run-selected-extensions.sh"
+            batch_script.write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            with mock.patch(
+                "aicage.docker.build._run_build_command",
+                return_value=0,
+            ) as run_mock:
+                returncode = build._run_shell_extensions_build(
+                    base_image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                    target_ref="aicage-extended:codex-ubuntu-extra",
+                    shell_extensions=[extension],
+                    context=build._ShellExtensionsBuildContext(
+                        dockerfile_builtin=dockerfile_builtin,
+                        batch_script=batch_script,
+                        proxy_build_args=[],
+                        log_handle=mock.Mock(),
+                        operation_reporter=mock.Mock(),
+                    ),
+                )
+
+        self.assertEqual(0, returncode)
+        command = run_mock.call_args.args[0]
+        self.assertEqual("docker", command[0])
+        self.assertIn("BASE_IMAGE=ghcr.io/aicage/aicage:codex-ubuntu", command)
+        self.assertIn("EXTENSIONS=extra", command)
 
     def test_run_build_reports_started_and_finished(self) -> None:
         run_config = _build_run_config(
@@ -357,7 +438,10 @@ class LocalBuildRunnerTests(TestCase):
         logger.warning.assert_called_once()
 
 
-def _extension(extension_id: str) -> ExtensionMetadata:
+def _extension(
+    extension_id: str,
+    dockerfile_path: Path | None = None,
+) -> ExtensionMetadata:
     return ExtensionMetadata(
         extension_id=extension_id,
         name=extension_id,
@@ -365,5 +449,5 @@ def _extension(extension_id: str) -> ExtensionMetadata:
         shares=[],
         directory=Path("/test-tmp/ext"),
         scripts_dir=Path("/test-tmp/ext/scripts"),
-        dockerfile_path=None,
+        dockerfile_path=dockerfile_path,
     )
