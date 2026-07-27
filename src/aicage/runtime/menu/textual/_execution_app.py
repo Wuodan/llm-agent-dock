@@ -24,6 +24,7 @@ class ExecutionApp(TextualApp[BaseException | None]):
         self._run_execution()
 
     def action_cancel(self) -> None:
+        self.query_one(ExecutionScreen).mark_cancelled()
         cancel_current_execution_cleanup()
         self.exit(KeyboardInterrupt())
 

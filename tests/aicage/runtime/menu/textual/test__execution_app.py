@@ -36,8 +36,10 @@ class ExecutionAppTests(TestCase):
 
     def test_action_cancel_cancels_current_execution_cleanup_and_exits(self) -> None:
         app = _execution_app.ExecutionApp(mock.Mock())
+        screen = mock.Mock()
 
         with (
+            mock.patch.object(app, "query_one", return_value=screen) as query_mock,
             mock.patch(
                 "aicage.runtime.menu.textual._execution_app.cancel_current_execution_cleanup"
             ) as cancel_mock,
@@ -45,6 +47,8 @@ class ExecutionAppTests(TestCase):
         ):
             app.action_cancel()
 
+        query_mock.assert_called_once_with(_execution_app.ExecutionScreen)
+        screen.mark_cancelled.assert_called_once_with()
         cancel_mock.assert_called_once_with()
         exit_mock.assert_called_once()
         self.assertIsInstance(exit_mock.call_args.args[0], KeyboardInterrupt)

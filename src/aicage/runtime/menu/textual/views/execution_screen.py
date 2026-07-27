@@ -10,6 +10,7 @@ from .. import _clipboard
 class ExecutionScreen(Container):
     def __init__(self) -> None:
         super().__init__(id="execution_root")
+        self._cancelled = False
         self._pull_status = ""
         self._build_log_path = ""
 
@@ -54,6 +55,8 @@ class ExecutionScreen(Container):
         )
 
     def show_phase_started(self, phase: str, message: str, log_path: Path) -> None:
+        if self._cancelled:
+            return
         if phase == "pull":
             self._pull_status = message
             self._status().update(self._pull_status)
@@ -81,6 +84,8 @@ class ExecutionScreen(Container):
         current: int | None,
         total: int | None,
     ) -> None:
+        if self._cancelled:
+            return
         if phase == "pull":
             self._status().update(self._pull_status)
             self._details().update(status)
@@ -95,9 +100,13 @@ class ExecutionScreen(Container):
         self._progress().update(total=total, progress=current or 0)
 
     def show_phase_log(self, phase: str, line: str) -> None:
+        if self._cancelled:
+            return
         self._write_log(phase, line)
 
     def show_phase_finished(self, phase: str, message: str) -> None:
+        if self._cancelled:
+            return
         self._status().update(f"{_phase_label(phase)}: {message}")
         if phase == "pull":
             self._progress().update(total=1, progress=1)
@@ -105,6 +114,8 @@ class ExecutionScreen(Container):
         self._write_log(phase, message)
 
     def show_phase_failed(self, phase: str, message: str, log_path: Path) -> None:
+        if self._cancelled:
+            return
         if phase == "pull":
             self._status().update(
                 f"{_phase_label(phase)}: {message} (logs: {log_path})"
@@ -122,6 +133,9 @@ class ExecutionScreen(Container):
         if event.button.id != "copy_log_path" or not self._build_log_path:
             return
         _clipboard.copy_to_clipboard(self._build_log_path, self.app.copy_to_clipboard)
+
+    def mark_cancelled(self) -> None:
+        self._cancelled = True
 
     def _status(self) -> Static:
         return self.query_one("#execution_status", Static)

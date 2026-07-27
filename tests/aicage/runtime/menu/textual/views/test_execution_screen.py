@@ -205,3 +205,19 @@ class ExecutionScreenTests(TestCase):
 
         event.stop.assert_called_once_with()
         copy_mock.assert_called_once_with("/test-tmp/build.log", app.copy_to_clipboard)
+
+    def test_show_phase_progress_skips_updates_after_cancel(self) -> None:
+        screen = execution_screen.ExecutionScreen()
+        screen.mark_cancelled()
+
+        with mock.patch.object(screen, "query_one") as query_mock:
+            screen.show_phase_progress("pull", "Downloading", 1, 2)
+
+        query_mock.assert_not_called()
+
+    def test_mark_cancelled_sets_cancelled_flag(self) -> None:
+        screen = execution_screen.ExecutionScreen()
+
+        screen.mark_cancelled()
+
+        self.assertTrue(screen._cancelled)
