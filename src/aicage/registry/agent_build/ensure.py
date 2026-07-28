@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
@@ -32,15 +31,10 @@ from ._store import BuildRecord, BuildStore
 from .agent_version.checker import AgentVersionChecker
 
 
-class _AgentBuildSetupAction(Enum):
+class AgentBuildSetupAction(Enum):
     USE_LOCAL = "use_local"
     BUILD = "build"
     CONFIRM_UPDATE = "confirm_update"
-
-
-@dataclass(frozen=True)
-class _AgentBuildSetupPlan:
-    action: _AgentBuildSetupAction
 
 
 def ensure(
@@ -113,7 +107,7 @@ def ensure(
 def setup_plan(
     run_config: RunConfig,
     reporter: OperationReporter,
-) -> _AgentBuildSetupPlan:
+) -> AgentBuildSetupAction:
     agent_metadata = run_config.context.agents[run_config.agent]
     definition_dir = agent_metadata.local_definition_dir
     base_metadata = run_config.context.bases[run_config.selection.base]
@@ -126,7 +120,7 @@ def setup_plan(
             base_metadata,
             base_image,
         ):
-            return _AgentBuildSetupPlan(action=_AgentBuildSetupAction.BUILD)
+            return AgentBuildSetupAction.BUILD
     base_repo = base_repository(run_config)
     if not custom_base:
         try:
@@ -136,13 +130,13 @@ def setup_plan(
             )
         except RegistryError:
             action = (
-                _AgentBuildSetupAction.BUILD
+                AgentBuildSetupAction.BUILD
                 if not local_image_exists(image_ref)
-                else _AgentBuildSetupAction.USE_LOCAL
+                else AgentBuildSetupAction.USE_LOCAL
             )
-            return _AgentBuildSetupPlan(action=action)
+            return action
         if refresh_plan.action is _BaseRefreshAction.CONFIRM_PULL:
-            return _AgentBuildSetupPlan(action=_AgentBuildSetupAction.CONFIRM_UPDATE)
+            return AgentBuildSetupAction.CONFIRM_UPDATE
         base_image = refresh_plan.image_ref
 
     store = BuildStore()
@@ -153,16 +147,16 @@ def setup_plan(
         reporter,
     )
     action = (
-        _AgentBuildSetupAction.BUILD
+        AgentBuildSetupAction.BUILD
         if should_rebuild(
             run_config=run_config,
             record=store.load(run_config.agent, run_config.selection.base),
             agent_version=agent_version,
             base_image_ref=base_image,
         )
-        else _AgentBuildSetupAction.USE_LOCAL
+        else AgentBuildSetupAction.USE_LOCAL
     )
-    return _AgentBuildSetupPlan(action=action)
+    return action
 
 
 def _get_agent_version(

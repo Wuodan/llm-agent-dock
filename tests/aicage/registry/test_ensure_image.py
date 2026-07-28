@@ -6,7 +6,7 @@ from aicage.config.base.models import BaseMetadata
 from aicage.config.runtime_config import RunConfig
 from aicage.paths import CUSTOM_BASES_DIR
 from aicage.registry._pull_decision import _PullDecisionAction
-from aicage.registry.agent_build.ensure import _AgentBuildSetupAction
+from aicage.registry.agent_build.ensure import AgentBuildSetupAction
 from aicage.registry.ensure_image import (
     ImageSetupAction,
     ensure_image,
@@ -131,7 +131,7 @@ class EnsureImageTests(TestCase):
 
         with mock.patch(
             "aicage.registry.ensure_image.agent_build_setup_plan",
-            return_value=mock.Mock(action=_AgentBuildSetupAction.BUILD),
+            return_value=AgentBuildSetupAction.BUILD,
         ) as setup_plan_mock:
             assert (
                 image_setup_plan(run_config, reporter).action is ImageSetupAction.SETUP
@@ -158,7 +158,7 @@ class EnsureImageTests(TestCase):
 
         with mock.patch(
             "aicage.registry.ensure_image.agent_build_setup_plan",
-            return_value=mock.Mock(action=_AgentBuildSetupAction.USE_LOCAL),
+            return_value=AgentBuildSetupAction.USE_LOCAL,
         ) as setup_plan_mock:
             plan = image_setup_plan(run_config, reporter)
 
@@ -172,7 +172,7 @@ class EnsureImageTests(TestCase):
 
         with mock.patch(
             "aicage.registry.ensure_image.agent_build_setup_plan",
-            return_value=mock.Mock(action=_AgentBuildSetupAction.CONFIRM_UPDATE),
+            return_value=AgentBuildSetupAction.CONFIRM_UPDATE,
         ) as setup_plan_mock:
             plan = image_setup_plan(run_config, reporter)
 

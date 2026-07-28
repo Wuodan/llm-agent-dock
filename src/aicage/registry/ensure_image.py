@@ -5,7 +5,7 @@ from aicage.config.run_config import RunConfig
 from aicage.paths import CUSTOM_BASES_DIR
 from aicage.registry._image_pull import pull_image
 from aicage.registry._pull_decision import _PullDecisionAction, pull_decision_plan
-from aicage.registry.agent_build.ensure import _AgentBuildSetupAction
+from aicage.registry.agent_build.ensure import AgentBuildSetupAction
 from aicage.registry.agent_build.ensure import ensure as ensure_agent_image
 from aicage.registry.agent_build.ensure import setup_plan as agent_build_setup_plan
 from aicage.registry.extension_build.ensure import (
@@ -69,13 +69,13 @@ def image_setup_plan(
             case _PullDecisionAction.CONFIRM_PULL:
                 action = ImageSetupAction.CONFIRM_UPDATE
     else:
-        agent_plan = agent_build_setup_plan(run_config, reporter)
-        match agent_plan.action:
-            case _AgentBuildSetupAction.USE_LOCAL:
+        agent_action = agent_build_setup_plan(run_config, reporter)
+        match agent_action:
+            case AgentBuildSetupAction.USE_LOCAL:
                 action = ImageSetupAction.SKIP
-            case _AgentBuildSetupAction.BUILD:
+            case AgentBuildSetupAction.BUILD:
                 action = ImageSetupAction.SETUP
-            case _AgentBuildSetupAction.CONFIRM_UPDATE:
+            case AgentBuildSetupAction.CONFIRM_UPDATE:
                 action = ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
     if run_config.selection.extensions and extension_build_needed(run_config):
         action = ImageSetupAction.SETUP

@@ -18,7 +18,7 @@ from aicage.registry.agent_build._store import (
     _BUILT_AT_KEY,
     _IMAGE_REF_KEY,
 )
-from aicage.registry.agent_build.ensure import _AgentBuildSetupAction
+from aicage.registry.agent_build.ensure import AgentBuildSetupAction
 from aicage.registry.image_selection.models import ImageSelection
 
 from ..._run_config_fixtures import build_custom_run_config, build_run_config
@@ -289,4 +289,4 @@ class EnsureLocalImageTests(TestCase):
         ):
             plan = ensure_module.setup_plan(run_config, reporter)
 
-        assert plan.action is _AgentBuildSetupAction.CONFIRM_UPDATE
+        assert plan is AgentBuildSetupAction.CONFIRM_UPDATE
