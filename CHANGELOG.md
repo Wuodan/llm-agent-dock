@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.11] - 2026-07-28
+
+### Changed
+
+- Image setup now routes pull, verification, and local-build preparation through a shared reporting path so setup
+  progress is surfaced more consistently across the UI and non-UI flows.
+
+### Internal
+
+- Refactored Docker support modules and setup reporting internals, and cleaned up test package scaffolding.
+- Simplified the internal agent-image setup planning API.
+
 ## [1.4.10] - 2026-07-27
 
 ### Fixed
