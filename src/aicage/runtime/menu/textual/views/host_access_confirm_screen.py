@@ -127,7 +127,7 @@ class HostAccessConfirmScreen(CancelableScreen[HostAccessConfirmValues | None]):
         return [
             Static("Host integration", classes="screen_subtitle"),
             Static(
-                "Persists container access to host services such as Docker and the clipboard.",
+                "Persists container access to host services such as Docker.",
                 classes="screen_hint confirm_hint",
             ),
             Vertical(

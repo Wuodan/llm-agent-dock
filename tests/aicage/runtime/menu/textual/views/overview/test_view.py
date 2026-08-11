@@ -157,18 +157,17 @@ class OverviewTests(TestCase):
         parent_on_focus_mock.assert_called_once_with(focus_event)
         self.assertEqual(0, selection_list.highlighted)
 
-    def test_on_selection_list_selected_changed_updates_clipboard_state(self) -> None:
-        state = OverviewState(None, [], [], False, True)
+    def test_on_selection_list_selected_changed_updates_docker_state(self) -> None:
+        state = OverviewState(None, [], [], False)
         overview = Overview("codex", "/test-tmp/project", state)
         event = mock.Mock()
         event.selection_list.id = "docker_overview_list"
-        event.selection_list.selected = ["docker:clipboard"]
+        event.selection_list.selected = ["docker:socket"]
 
         with mock.patch.object(overview, "apply_shell_width"):
             overview.on_selection_list_selected_changed(event)
 
-        self.assertFalse(state.docker_socket_enabled)
-        self.assertTrue(state.clipboard_enabled)
+        self.assertTrue(state.docker_socket_enabled)
 
     def test_refresh_from_updates_overview_widgets(self) -> None:
         overview = Overview(
@@ -335,16 +334,16 @@ class OverviewTests(TestCase):
 
     def test_current_host_options_returns_selected_state(self) -> None:
         overview = Overview(
-            "codex", "/test-tmp/project", OverviewState(None, [], [], False, True)
+            "codex", "/test-tmp/project", OverviewState(None, [], [], False)
         )
         selection_list = mock.Mock(spec=SelectionList)
-        selection_list.selected = ["docker:socket", "docker:clipboard"]
+        selection_list.selected = ["docker:socket"]
 
         with mock.patch.object(overview, "query_one", return_value=selection_list):
-            values = overview.current_host_options(False, None)
+            values = overview.current_host_options(False)
 
-        self.assertEqual(["docker", "clipboard"], [item.key for item in values])
-        self.assertEqual([True, True], [item.enabled for item in values])
+        self.assertEqual(["docker"], [item.key for item in values])
+        self.assertEqual([True], [item.enabled for item in values])
 
 
 class OverviewAsyncTests(IsolatedAsyncioTestCase):

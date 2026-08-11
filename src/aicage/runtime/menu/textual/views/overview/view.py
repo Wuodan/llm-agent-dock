@@ -19,7 +19,6 @@ from ..._state import OverviewState
 from ...services.host_access import (
     built_in_group_selection_values,
     current_built_in_shares,
-    current_clipboard_option,
     current_docker_option,
 )
 from ...services.summary import (
@@ -118,9 +117,6 @@ class Overview(Container):
             self._state.docker_socket_enabled = (
                 docker_selection_key("socket") in event.selection_list.selected
             )
-            self._state.clipboard_enabled = (
-                docker_selection_key("clipboard") in event.selection_list.selected
-            )
             self.apply_shell_width(self.size.width)
 
     def on_selection_list_selection_toggled(
@@ -196,20 +192,9 @@ class Overview(Container):
     def current_host_options(
         self,
         docker_socket_value: bool | None,
-        clipboard_value: bool | None,
     ) -> list[DockerOptionValue]:
         selected = set(self.query_one("#docker_overview_list", SelectionList).selected)
-        options = [current_docker_option(selected, docker_socket_value)]
-        if self._state.show_clipboard:
-            options.append(
-                current_clipboard_option(
-                    selected,
-                    clipboard_value,
-                    self._state.clipboard_description,
-                    self._state.clipboard_requires_confirmation,
-                )
-            )
-        return options
+        return [current_docker_option(selected, docker_socket_value)]
 
     def _section_button(self, section_id: str) -> Button:
         return self.query_one(f"#{section_id}", Button)
@@ -238,14 +223,6 @@ class Overview(Container):
                 self._state.docker_socket_enabled,
             )
         ]
-        if self._state.show_clipboard:
-            selections.append(
-                Selection(
-                    "Clipboard integration",
-                    docker_selection_key("clipboard"),
-                    self._state.clipboard_enabled,
-                )
-            )
         return [
             Static("Host Integration", id="docker_overview_title"),
             _OverviewSelectionList(
@@ -266,14 +243,6 @@ class Overview(Container):
                 self._state.docker_socket_enabled,
             )
         ]
-        if self._state.show_clipboard:
-            options.append(
-                Selection(
-                    "Clipboard integration",
-                    docker_selection_key("clipboard"),
-                    self._state.clipboard_enabled,
-                )
-            )
         selection_list.add_options(options)
 
     def _section_label(self, title: str, summary: str) -> str:

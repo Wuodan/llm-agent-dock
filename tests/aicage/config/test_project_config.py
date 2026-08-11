@@ -4,14 +4,11 @@ from unittest import TestCase
 from aicage.config.project_config import (
     _AGENT_BASE_KEY,
     _AGENT_EXTENSION_MOUNTS_KEY,
-    _AGENT_MOUNTS_KEY,
     _AGENT_SHARES_KEY,
     _DOCKER_ARGS_KEY,
-    _MOUNT_CLIPBOARD_KEY,
     _PROJECT_AGENTS_KEY,
     _PROJECT_PATH_KEY,
     AgentConfig,
-    _AgentMounts,
     _ProjectConfig,
 )
 
@@ -70,26 +67,6 @@ class _ProjectConfigTests(TestCase):
                     "codex": {
                         _AGENT_BASE_KEY: "ubuntu",
                         _AGENT_EXTENSION_MOUNTS_KEY: {"gh": True, "maven": False},
-                    }
-                },
-            },
-            cfg.to_mapping(),
-        )
-
-    def test_to_mapping_includes_clipboard_mount(self) -> None:
-        cfg = _ProjectConfig(
-            path="/repo",
-            agents={
-                "codex": AgentConfig(base="ubuntu", mounts=_AgentMounts(clipboard=True))
-            },
-        )
-        self.assertEqual(
-            {
-                _PROJECT_PATH_KEY: "/repo",
-                _PROJECT_AGENTS_KEY: {
-                    "codex": {
-                        _AGENT_BASE_KEY: "ubuntu",
-                        _AGENT_MOUNTS_KEY: {_MOUNT_CLIPBOARD_KEY: True},
                     }
                 },
             },

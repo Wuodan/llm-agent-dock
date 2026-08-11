@@ -104,26 +104,6 @@ class HostAccessTests(TestCase):
             DockerOptionValue("docker", "Docker socket", None, None, True), value
         )
 
-    def test_current_clipboard_option_updates_enabled_state(self) -> None:
-        value = host_access.current_clipboard_option(
-            {"docker:clipboard"},
-            None,
-            "Wayland socket /run/user/1000/wayland-0",
-            True,
-        )
-
-        self.assertEqual(
-            DockerOptionValue(
-                "clipboard",
-                "Clipboard integration",
-                "Wayland socket /run/user/1000/wayland-0",
-                None,
-                True,
-                True,
-            ),
-            value,
-        )
-
     def test_built_in_group_selection_values_returns_extension_group_rows(self) -> None:
         values = host_access.built_in_group_selection_values(
             "builtin:extension:gcloud:/test-tmp/gcloud",
@@ -168,37 +148,15 @@ class HostAccessTests(TestCase):
         ]
         docker_options = [
             DockerOptionValue("docker", "Docker socket", None, True, True),
-            DockerOptionValue(
-                "clipboard", "Clipboard integration", "Wayland socket", None, True
-            ),
         ]
 
         values = host_access._build_confirmation_request(
             built_in_shares, docker_options
         )
 
-        self.assertEqual([docker_options[1]], values.docker_options)
+        self.assertEqual([], values.docker_options)
         self.assertEqual([built_in_shares[0]], values.git_support_shares)
         self.assertEqual([built_in_shares[1]], values.extension_shares)
-
-    def test_build_confirmation_request_skips_non_sensitive_clipboard_option(
-        self,
-    ) -> None:
-        values = host_access._build_confirmation_request(
-            [],
-            [
-                DockerOptionValue(
-                    "clipboard",
-                    "Clipboard integration",
-                    "OSC 52 terminal clipboard fallback; no host mounts",
-                    None,
-                    True,
-                    False,
-                )
-            ],
-        )
-
-        self.assertEqual([], values.docker_options)
 
     def test_merge_confirmed_host_access_applies_confirmed_values(self) -> None:
         built_in_shares = [
@@ -206,16 +164,10 @@ class HostAccessTests(TestCase):
         ]
         docker_options = [
             DockerOptionValue("docker", "Docker socket", None, None, True),
-            DockerOptionValue(
-                "clipboard", "Clipboard integration", "Wayland socket", None, True
-            ),
         ]
         confirmed = HostAccessConfirmValues(
             docker_options=[
                 DockerOptionValue("docker", "Docker socket", None, None, False),
-                DockerOptionValue(
-                    "clipboard", "Clipboard integration", "Wayland socket", None, False
-                ),
             ],
             git_support_shares=[
                 BuiltInShareValue(
@@ -242,9 +194,6 @@ class HostAccessTests(TestCase):
         self.assertEqual(
             [
                 DockerOptionValue("docker", "Docker socket", None, None, False),
-                DockerOptionValue(
-                    "clipboard", "Clipboard integration", "Wayland socket", None, False
-                ),
             ],
             merged_docker,
         )
@@ -273,9 +222,6 @@ class HostAccessTests(TestCase):
             [CustomShareValue("/test-tmp/logs")],
             [
                 DockerOptionValue("docker", "Docker socket", None, None, True),
-                DockerOptionValue(
-                    "clipboard", "Clipboard integration", "Wayland socket", None, True
-                ),
             ],
         )
 
@@ -283,4 +229,3 @@ class HostAccessTests(TestCase):
         self.assertTrue(draft.agent_cfg.mounts.ssh)
         self.assertEqual({"gh": False}, draft.agent_cfg.extension_mounts)
         self.assertTrue(draft.agent_cfg.mounts.docker)
-        self.assertTrue(draft.agent_cfg.mounts.clipboard)

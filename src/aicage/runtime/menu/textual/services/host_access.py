@@ -70,22 +70,6 @@ def current_docker_option(
     )
 
 
-def current_clipboard_option(
-    selected: set[str],
-    persisted: bool | None,
-    description: str | None,
-    requires_confirmation: bool,
-) -> DockerOptionValue:
-    return DockerOptionValue(
-        key="clipboard",
-        label="Clipboard integration",
-        description=description,
-        persisted=persisted,
-        enabled=docker_selection_key("clipboard") in selected,
-        requires_confirmation=requires_confirmation,
-    )
-
-
 def _build_confirmation_request(
     built_in_shares: list[BuiltInShareValue],
     docker_options: list[DockerOptionValue],
@@ -177,5 +161,3 @@ def _apply_confirmed_host_access(
     for option in docker_options:
         if option.key == "docker":
             draft.agent_cfg.mounts.docker = option.enabled
-        elif option.key == "clipboard":
-            draft.agent_cfg.mounts.clipboard = option.enabled

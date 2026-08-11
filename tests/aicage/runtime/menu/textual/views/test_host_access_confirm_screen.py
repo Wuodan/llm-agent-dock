@@ -73,7 +73,7 @@ class BuiltInShareConfirmScreenTests(TestCase):
 
     def test_action_accept_dismisses_selected_host_access_values(self) -> None:
         screen = host_access_confirm_screen.HostAccessConfirmScreen(
-            [_docker_option(), _clipboard_option()],
+            [_docker_option()],
             [
                 _share(),
                 BuiltInShareValue(
@@ -88,7 +88,7 @@ class BuiltInShareConfirmScreenTests(TestCase):
             [_extension_share()],
         )
         docker_selection_list = mock.Mock()
-        docker_selection_list.selected = ["docker", "clipboard"]
+        docker_selection_list.selected = ["docker"]
         git_support_selection_list = mock.Mock()
         git_support_selection_list.selected = ["builtin:git_support:ssh"]
         extension_selection_list = mock.Mock()
@@ -113,13 +113,6 @@ class BuiltInShareConfirmScreenTests(TestCase):
             HostAccessConfirmValues(
                 docker_options=[
                     DockerOptionValue("docker", "Docker socket", None, None, True),
-                    DockerOptionValue(
-                        "clipboard",
-                        "Clipboard integration",
-                        "Wayland socket /run/user/1000/wayland-0",
-                        None,
-                        True,
-                    ),
                 ],
                 git_support_shares=[
                     BuiltInShareValue(
@@ -184,9 +177,9 @@ class BuiltInShareConfirmScreenTests(TestCase):
             "Extension gh: Read-only: /home/user/.config/gh", extension_rows[0].prompt
         )
 
-    def test_docker_selection_list_includes_clipboard_details(self) -> None:
+    def test_docker_selection_list_includes_docker_option(self) -> None:
         screen = host_access_confirm_screen.HostAccessConfirmScreen(
-            [_clipboard_option()],
+            [_docker_option()],
             [],
             [],
         )
@@ -195,14 +188,10 @@ class BuiltInShareConfirmScreenTests(TestCase):
         details = screen._docker_option_details()
 
         self.assertEqual(
-            "Clipboard integration",
+            "Docker socket",
             rows[0].prompt,
         )
-        self.assertEqual(1, len(details))
-        self.assertIn(
-            "Wayland socket /run/user/1000/wayland-0",
-            str(details[0].render()),
-        )
+        self.assertEqual([], details)
 
     def test_on_selection_list_selection_toggled_syncs_extension_group_rows(
         self,
@@ -273,13 +262,3 @@ def _extension_share() -> BuiltInShareValue:
 
 def _docker_option() -> DockerOptionValue:
     return DockerOptionValue("docker", "Docker socket", None, None, True)
-
-
-def _clipboard_option() -> DockerOptionValue:
-    return DockerOptionValue(
-        "clipboard",
-        "Clipboard integration",
-        "Wayland socket /run/user/1000/wayland-0",
-        None,
-        True,
-    )

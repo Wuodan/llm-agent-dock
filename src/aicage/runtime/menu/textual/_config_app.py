@@ -10,10 +10,6 @@ from aicage.config.extensions.order import canonical_extensions
 from aicage.config.overview_selection import resolve_overview_selection
 from aicage.config.run_config_draft import RunConfigDraft
 from aicage.registry.image_selection.interaction import ExtensionChoiceOption
-from aicage.runtime.docker_args.resolvers.clipboard import (
-    clipboard_requires_confirmation,
-    describe_host_clipboard_access,
-)
 from aicage.runtime.menu._interaction_types import ConfigSelectionResult
 
 from ._ids import ROW_BASE, ROW_EXTENSIONS, ROW_EXTRAS
@@ -208,7 +204,6 @@ class ConfigApp(TextualApp[ConfigSelectionResult | None]):
             self._state.custom_shares,
             overview.current_host_options(
                 self._draft.agent_cfg.mounts.docker,
-                self._draft.agent_cfg.mounts.clipboard,
             ),
             self._confirm_host_access,
         )
@@ -239,8 +234,4 @@ class ConfigApp(TextualApp[ConfigSelectionResult | None]):
                 CustomShareValue(share) for share in self._draft.agent_cfg.shares
             ],
             docker_socket_enabled=bool(self._draft.agent_cfg.mounts.docker),
-            show_clipboard=True,
-            clipboard_enabled=bool(self._draft.agent_cfg.mounts.clipboard),
-            clipboard_description=describe_host_clipboard_access(),
-            clipboard_requires_confirmation=clipboard_requires_confirmation(),
         )

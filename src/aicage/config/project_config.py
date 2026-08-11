@@ -20,7 +20,6 @@ MOUNT_GITROOT_KEY: str = "gitroot"
 MOUNT_GNUPG_KEY: str = "gnupg"
 MOUNT_SSH_KEY: str = "ssh"
 MOUNT_DOCKER_KEY: str = "docker"
-_MOUNT_CLIPBOARD_KEY: str = "clipboard"
 
 
 @dataclass
@@ -30,7 +29,6 @@ class _AgentMounts:
     gnupg: bool | None = None
     ssh: bool | None = None
     docker: bool | None = None
-    clipboard: bool | None = None
 
     @classmethod
     def from_mapping(cls, data: dict[str, Any]) -> "_AgentMounts":
@@ -40,7 +38,6 @@ class _AgentMounts:
             gnupg=data.get(MOUNT_GNUPG_KEY),
             ssh=data.get(MOUNT_SSH_KEY),
             docker=data.get(MOUNT_DOCKER_KEY),
-            clipboard=data.get(_MOUNT_CLIPBOARD_KEY),
         )
 
     def to_mapping(self) -> dict[str, bool]:
@@ -55,8 +52,6 @@ class _AgentMounts:
             payload[MOUNT_SSH_KEY] = self.ssh
         if self.docker is not None:
             payload[MOUNT_DOCKER_KEY] = self.docker
-        if self.clipboard is not None:
-            payload[_MOUNT_CLIPBOARD_KEY] = self.clipboard
         return payload
 
 
