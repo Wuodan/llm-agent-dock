@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.12] - 2026-08-11
+
+### Changed
+
+- Removed agent clipboard sharing. Agents that write to the clipboard generally support OSC 52 directly, which is the
+  preferred path instead.
+
 ## [1.4.11] - 2026-07-28
 
 ### Changed
