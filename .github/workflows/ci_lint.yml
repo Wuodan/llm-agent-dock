@@ -68,7 +68,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
-          token: ${{ secrets.PAT || github.token }}
+          token: ${{ github.token }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -133,7 +133,8 @@ jobs:
           steps.ml.outputs.has_updated_sources == 1 &&
           env.FIX_MODE == 'pull_request'
         with:
-          token: ${{ secrets.PAT || github.token }}
+          token: ${{ github.token }}
+          sign-commits: true
           commit-message: "[MegaLinter] Apply linters automatic fixes"
           title: "[MegaLinter] Apply linters automatic fixes"
           body-path: ${{ runner.temp }}/megalinter-reports/megalinter-report.md
