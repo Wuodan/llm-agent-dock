@@ -12,7 +12,7 @@ authors = [{ name = "Stefan Kuhn" }]
 dependencies = [
   "docker>=7.1.0,<8",
   "jsonschema>=4.25.1,<5",
-  "portalocker>=3.2.0,<4",
+  "portalocker>=3.2.0,<5",
   "PyYAML>=6.0.3,<7",
   "textual>=8.2.8,<9",
 ]

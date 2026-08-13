@@ -10,7 +10,7 @@ pymarkdownlnt>=0.9.39,<1
 pytest>=9.1.1,<10
 pytest-cov>=7.1.0,<8
 pywinpty>=3.0.0,<4; platform_system == "Windows"
-ruff>=0.16.0,<1
+ruff>=0.16.1,<1
 yamllint>=1.38.0,<2
 yq>=4.1.2,<5
 # types
