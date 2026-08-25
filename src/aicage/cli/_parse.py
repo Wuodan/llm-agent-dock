@@ -10,8 +10,9 @@ from aicage.config.agent.loader import load_agents
 from aicage.config.base.loader import load_bases
 from aicage.config.errors import ConfigError
 
-_MIN_REMAINING_WITH_AGENT = 2
 _MAX_CONFIG_TOKENS = 2
+_OPTIONS_WITH_VALUES: set[str] = {"--menu", "--share"}
+_CONFIG_OPTION = "--" + "config"
 _CONFIG_ACTION_ALIASES: dict[str, str] = {
     "print": "info",
 }
@@ -52,7 +53,7 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
         help="Mount a host directory into the container (repeatable).",
     )
     parser.add_argument(
-        "--config",
+        _CONFIG_OPTION,
         nargs="*",
         help="Perform config actions such as the default info or 'remove [agent]'.",
     )
@@ -68,7 +69,9 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
         get_logger().info("Displayed CLI version.")
         sys.exit(0)
 
-    opts, remaining = parser.parse_known_args(pre_argv)
+    option_argv, agent_argv = _split_before_agent_args(pre_argv, post_argv)
+    opts, remaining = parser.parse_known_args(option_argv)
+    remaining.extend(agent_argv)
 
     if opts.help:
         usage: str = (
@@ -96,6 +99,7 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "  - '--menu simple' uses the line-based setup prompts.\n"
             "  - '--menu none' skips menus and uses defaults.\n"
             "  - '--stdio' uses 'docker run -i' instead of 'docker run -it'.\n"
+            "  - aicage options are parsed only before <agent>.\n"
             "  - <docker-args> are forwarded verbatim to docker run.\n"
             "  - If docker args are present, use '--' before <agent>.\n"
             "  - <agent-args> are forwarded verbatim to the agent.\n"
@@ -148,6 +152,30 @@ def _split_argv(argv: Sequence[str]) -> tuple[list[str], list[str] | None]:
     pre_argv = list(argv[:sep_index])
     post_argv = list(argv[sep_index + 1 :])
     return pre_argv, post_argv
+
+
+def _split_before_agent_args(
+    argv: list[str],
+    post_argv: list[str] | None,
+) -> tuple[list[str], list[str]]:
+    if post_argv is not None:
+        return argv, []
+    index = 0
+    while index < len(argv):
+        token = argv[index]
+        if token == _CONFIG_OPTION:
+            return argv, []
+        if token in _OPTIONS_WITH_VALUES:
+            index += 2
+            continue
+        if _is_agent_token(token):
+            return argv[:index], argv[index:]
+        index += 1
+    return argv, []
+
+
+def _is_agent_token(token: str) -> bool:
+    return not token.startswith("-") and "=" not in token
 
 
 def _normalize_config_action(action: str) -> str:

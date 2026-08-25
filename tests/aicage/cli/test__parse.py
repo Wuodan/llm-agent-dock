@@ -55,6 +55,44 @@ class ParseCliTests(TestCase):
         self.assertEqual([], parsed.shares)
         self.assertIsNone(parsed.config_action)
 
+    def test_parse_cli_agent_config_flag_after_agent(self) -> None:
+        parsed = parse_cli(
+            [
+                "--stdio",
+                "--menu",
+                "none",
+                "codex",
+                "exec",
+                "--config",
+                "model_supports_reasoning_summaries=true",
+            ]
+        )
+        self.assertTrue(parsed.stdio)
+        self.assertEqual("none", parsed.menu)
+        self.assertEqual("codex", parsed.agent)
+        self.assertEqual(
+            [
+                "exec",
+                "--config",
+                "model_supports_reasoning_summaries=true",
+            ],
+            parsed.agent_args,
+        )
+        self.assertIsNone(parsed.config_action)
+
+    def test_parse_cli_aicage_flags_after_agent_are_agent_args(self) -> None:
+        parsed = parse_cli(["codex", "--stdio", "--menu", "none"])
+        self.assertFalse(parsed.stdio)
+        self.assertEqual("ui", parsed.menu)
+        self.assertEqual("codex", parsed.agent)
+        self.assertEqual(["--stdio", "--menu", "none"], parsed.agent_args)
+
+    def test_parse_cli_unknown_agent_preserves_config_flag_after_agent(self) -> None:
+        parsed = parse_cli(["forge", "exec", "--config", "custom=true"])
+        self.assertEqual("forge", parsed.agent)
+        self.assertEqual(["exec", "--config", "custom=true"], parsed.agent_args)
+        self.assertIsNone(parsed.config_action)
+
     def test_parse_cli_help_exits(self) -> None:
         with mock.patch("sys.stdout", new_callable=io.StringIO) as stdout:
             with self.assertRaises(SystemExit) as ctx:
