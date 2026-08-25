@@ -12,13 +12,14 @@ Each extension lives in its own directory:
 ~/.aicage-custom/extensions/<EXTENSION>/
 ├─ extension.yml (or extension.yaml)
 ├─ Dockerfile        # optional
-└─ scripts/
+└─ scripts/          # optional
    ├─ 01-setup.sh
    └─ 02-install.sh
 ```
 
 Only scripts in the `scripts/` directory are executed. Scripts run in alphabetical order.
 The extension id is the directory name and is used when selecting extensions.
+Define at least one of `scripts/` or `shares`.
 
 ## extension.yml
 
@@ -27,7 +28,13 @@ The extension id is the directory name and is used when selecting extensions.
 ```yaml
 name: "Display name"
 description: "Short description of what the extension adds."
+shares: # optional
+  - ~/.config/my-tool
+  - ~/.cache/my-tool:ro
 ```
+
+`shares` can be used to define host mounts. Each entry uses the same syntax as `--share`: `HOST`
+or `HOST:ro`. The host path must already exist.
 
 No additional keys are supported.
 
