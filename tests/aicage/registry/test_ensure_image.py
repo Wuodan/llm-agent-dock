@@ -165,9 +165,7 @@ class EnsureImageTests(TestCase):
             plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.SKIP
-        assert (
-            plan.image_ref == f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}:ubuntu"
-        )
+        assert plan.image_ref == f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}:ubuntu"
         setup_plan_mock.assert_called_once_with(run_config, reporter)
 
     @staticmethod
@@ -182,9 +180,7 @@ class EnsureImageTests(TestCase):
             plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
-        assert (
-            plan.image_ref == f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}:ubuntu"
-        )
+        assert plan.image_ref == f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}:ubuntu"
         setup_plan_mock.assert_called_once_with(run_config, reporter)
 
 
