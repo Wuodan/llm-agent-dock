@@ -27,4 +27,4 @@ def _resolve_update_approval(
         ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP,
     ):
         return False
-    return interaction.confirm_image_update(run_config.selection.base_image_ref)
+    return interaction.confirm_image_update(setup_plan.image_ref)

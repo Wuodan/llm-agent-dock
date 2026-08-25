@@ -12,7 +12,10 @@ class PrepareImageTests(TestCase):
         with (
             mock.patch(
                 "aicage.runtime.image_setup.image_setup_plan",
-                return_value=ImageSetupPlan(action=ImageSetupAction.SKIP),
+                return_value=ImageSetupPlan(
+                    action=ImageSetupAction.SKIP,
+                    image_ref="repo:tag",
+                ),
             ),
         ):
             image_setup.prepare_image(run_config, interaction)
@@ -26,7 +29,10 @@ class PrepareImageTests(TestCase):
         with (
             mock.patch(
                 "aicage.runtime.image_setup.image_setup_plan",
-                return_value=ImageSetupPlan(action=ImageSetupAction.SETUP),
+                return_value=ImageSetupPlan(
+                    action=ImageSetupAction.SETUP,
+                    image_ref="repo:tag",
+                ),
             ),
         ):
             image_setup.prepare_image(run_config, interaction)
@@ -35,14 +41,15 @@ class PrepareImageTests(TestCase):
 
     def test_prepare_image_confirms_update_through_interaction(self) -> None:
         run_config = mock.Mock()
-        run_config.selection.base_image_ref = "repo:tag"
+        run_config.selection.base_image_ref = "wrong-repo:tag"
         interaction = mock.Mock(confirm_image_update=mock.Mock(return_value=True))
 
         with (
             mock.patch(
                 "aicage.runtime.image_setup.image_setup_plan",
                 return_value=ImageSetupPlan(
-                    action=ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
+                    action=ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP,
+                    image_ref="repo:tag",
                 ),
             ),
         ):
@@ -60,7 +67,8 @@ class PrepareImageTests(TestCase):
             mock.patch(
                 "aicage.runtime.image_setup.image_setup_plan",
                 return_value=ImageSetupPlan(
-                    action=ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
+                    action=ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP,
+                    image_ref="repo:tag",
                 ),
             ),
         ):
@@ -79,7 +87,10 @@ class PrepareImageTests(TestCase):
         with (
             mock.patch(
                 "aicage.runtime.image_setup.image_setup_plan",
-                return_value=ImageSetupPlan(action=ImageSetupAction.CONFIRM_UPDATE),
+                return_value=ImageSetupPlan(
+                    action=ImageSetupAction.CONFIRM_UPDATE,
+                    image_ref="repo:tag",
+                ),
             ),
         ):
             image_setup.prepare_image(run_config, interaction)

@@ -4,6 +4,7 @@ from unittest import TestCase, mock
 from aicage.config.agent.models import AgentMetadata
 from aicage.config.base.models import BaseMetadata
 from aicage.config.runtime_config import RunConfig
+from aicage.constants import IMAGE_BASE_REPOSITORY, IMAGE_REGISTRY
 from aicage.paths import CUSTOM_BASES_DIR
 from aicage.registry._pull_decision import _PullDecisionAction
 from aicage.registry.agent_build.ensure import AgentBuildSetupAction
@@ -150,6 +151,7 @@ class EnsureImageTests(TestCase):
             plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.CONFIRM_UPDATE
+        assert plan.image_ref == run_config.selection.base_image_ref
 
     @staticmethod
     def test_image_setup_plan_skips_when_local_build_is_current() -> None:
@@ -163,6 +165,9 @@ class EnsureImageTests(TestCase):
             plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.SKIP
+        assert (
+            plan.image_ref == f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}:ubuntu"
+        )
         setup_plan_mock.assert_called_once_with(run_config, reporter)
 
     @staticmethod
@@ -177,6 +182,9 @@ class EnsureImageTests(TestCase):
             plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.CONFIRM_UPDATE_AND_DO_SETUP
+        assert (
+            plan.image_ref == f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}:ubuntu"
+        )
         setup_plan_mock.assert_called_once_with(run_config, reporter)
 
 

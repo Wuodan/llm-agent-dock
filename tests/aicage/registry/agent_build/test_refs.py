@@ -4,7 +4,7 @@ from unittest import TestCase, mock
 from aicage.config.base.models import BaseMetadata
 from aicage.constants import IMAGE_BASE_REPOSITORY, IMAGE_REGISTRY
 from aicage.paths import CUSTOM_BASES_DIR
-from aicage.registry.agent_build import _refs
+from aicage.registry.agent_build import refs
 from aicage.registry.base_build.ensure import image_ref as base_build_image_ref
 
 
@@ -24,7 +24,7 @@ class LocalBuildRefsTests(TestCase):
                 local_definition_dir=CUSTOM_BASES_DIR / "custom",
             )
         }
-        ref = _refs.get_base_image_ref(run_config)
+        ref = refs.get_base_image_ref(run_config)
 
         self.assertEqual(base_build_image_ref("custom"), ref)
 
@@ -43,13 +43,13 @@ class LocalBuildRefsTests(TestCase):
                 local_definition_dir=Path("/test-tmp/ubuntu"),
             )
         }
-        ref = _refs.get_base_image_ref(run_config)
+        ref = refs.get_base_image_ref(run_config)
 
         self.assertEqual(f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}:ubuntu", ref)
 
-    def test_base_repository_includes_registry(self) -> None:
+    def test__base_repository_includes_registry(self) -> None:
         run_config = mock.Mock()
 
-        repository = _refs.base_repository(run_config)
+        repository = refs._base_repository(run_config)
 
         self.assertEqual(f"{IMAGE_REGISTRY}/{IMAGE_BASE_REPOSITORY}", repository)

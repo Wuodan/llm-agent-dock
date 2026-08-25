@@ -26,9 +26,9 @@ from ._refresh import (
     refresh_base_image,
     refresh_base_image_plan,
 )
-from ._refs import base_repository, get_base_image_ref
 from ._store import BuildRecord, BuildStore
 from .agent_version.checker import AgentVersionChecker
+from .refs import _base_repository, get_base_image_ref
 
 
 class AgentBuildSetupAction(Enum):
@@ -57,7 +57,7 @@ def ensure(
             reporter=reporter,
         )
     else:
-        base_repo = base_repository(run_config)
+        base_repo = _base_repository(run_config)
         try:
             base_image = refresh_base_image(
                 base_image_ref=base_image,
@@ -121,7 +121,7 @@ def setup_plan(
             base_image,
         ):
             return AgentBuildSetupAction.BUILD
-    base_repo = base_repository(run_config)
+    base_repo = _base_repository(run_config)
     if not custom_base:
         try:
             refresh_plan = refresh_base_image_plan(
