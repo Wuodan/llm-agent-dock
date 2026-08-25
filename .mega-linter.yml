@@ -5,20 +5,23 @@ DISABLE_LINTERS:
   - PYTHON_PYLINT
   - REPOSITORY_DEVSKIM
 
-# jscpd
-COPYPASTE_JSCPD_ARGUMENTS: "--threshold 10"
-
-# shfmt
-BASH_SHFMT_ARGUMENTS: "--indent 2 -case-indent"
-
 # flake8
 PYTHON_FLAKE8_ARGUMENTS: "--max-line-length 120"
+
+# jscpd
+COPYPASTE_JSCPD_ARGUMENTS: "--threshold 10"
 
 # kingfisher
 REPOSITORY_KINGFISHER_ARGUMENTS: "--exclude .venv"
 
+# shfmt
+BASH_SHFMT_ARGUMENTS: "--indent 2 -case-indent"
+
 # trivy
 REPOSITORY_TRIVY_ARGUMENTS: "--ignorefile ./.trivyignore.yaml"
+
+# trufflehog
+REPOSITORY_TRUFFLEHOG_ARGUMENTS: "--exclude-detectors=Lob"
 
 # zizmor
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
