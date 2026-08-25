@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.14] - 2026-08-25
+
+### Fixed
+
+- Local agent image update prompts now name the remote base image that will be pulled instead of the locally built
+  agent image.
+
+### Internal
+
+- Renamed the internal selected agent image reference field to avoid confusing it with `aicage-image-base` images.
+
 ## [1.4.13] - 2026-08-25
 
 ### Fixed
