@@ -40,7 +40,7 @@ def _build_run_config(project_path: Path, image_ref: str) -> RunConfig:
             image_ref=image_ref,
             base="ubuntu",
             extensions=[],
-            base_image_ref=image_ref,
+            agent_image_ref=image_ref,
         ),
         project_docker_args="--project",
         mounts=[],

@@ -107,7 +107,7 @@ class EditDraftWithTextualAppTests(TestCase):
                 image_ref="repo:ubuntu",
                 base="ubuntu",
                 extensions=[],
-                base_image_ref="repo:ubuntu",
+                agent_image_ref="repo:ubuntu",
             ),
             project_docker_args="--new",
         )

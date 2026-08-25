@@ -34,7 +34,7 @@ class EnsureImageTests(TestCase):
             "update_approved": False,
             "reporter": reporter,
         }
-        assert run_config.selection.base_image_ref == pull_mock.call_args.args[0]
+        assert run_config.selection.agent_image_ref == pull_mock.call_args.args[0]
         local_mock.assert_not_called()
         extended_mock.assert_not_called()
 
@@ -151,7 +151,7 @@ class EnsureImageTests(TestCase):
             plan = image_setup_plan(run_config, reporter)
 
         assert plan.action is ImageSetupAction.CONFIRM_UPDATE
-        assert plan.image_ref == run_config.selection.base_image_ref
+        assert plan.image_ref == run_config.selection.agent_image_ref
 
     @staticmethod
     def test_image_setup_plan_skips_when_local_build_is_current() -> None:
@@ -200,7 +200,7 @@ def _run_config(
     run_config.agent = "codex"
     run_config.selection = mock.Mock()
     run_config.selection.base = base
-    run_config.selection.base_image_ref = "ghcr.io/aicage/aicage:codex-ubuntu"
+    run_config.selection.agent_image_ref = "ghcr.io/aicage/aicage:codex-ubuntu"
     run_config.selection.extensions = extensions
     run_config.context = mock.Mock()
     run_config.context.bases = {

@@ -129,7 +129,7 @@ class EnsureLocalImageTests(TestCase):
                 image_ref="aicage:claude-custom",
                 base="custom",
                 extensions=[],
-                base_image_ref="aicage:claude-custom",
+                agent_image_ref="aicage:claude-custom",
             ),
             project_docker_args=run_config.project_docker_args,
             mounts=run_config.mounts,

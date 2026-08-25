@@ -6,4 +6,4 @@ class ImageSelection:
     image_ref: str
     base: str
     extensions: list[str]
-    base_image_ref: str
+    agent_image_ref: str

@@ -41,7 +41,7 @@ class PrepareImageTests(TestCase):
 
     def test_prepare_image_confirms_update_through_interaction(self) -> None:
         run_config = mock.Mock()
-        run_config.selection.base_image_ref = "wrong-repo:tag"
+        run_config.selection.agent_image_ref = "wrong-repo:tag"
         interaction = mock.Mock(confirm_image_update=mock.Mock(return_value=True))
 
         with (
@@ -60,7 +60,7 @@ class PrepareImageTests(TestCase):
 
     def test_prepare_image_passes_rejected_update_to_ensure_image(self) -> None:
         run_config = mock.Mock()
-        run_config.selection.base_image_ref = "repo:tag"
+        run_config.selection.agent_image_ref = "repo:tag"
         interaction = mock.Mock(confirm_image_update=mock.Mock(return_value=False))
 
         with (
@@ -81,7 +81,7 @@ class PrepareImageTests(TestCase):
         self,
     ) -> None:
         run_config = mock.Mock()
-        run_config.selection.base_image_ref = "repo:tag"
+        run_config.selection.agent_image_ref = "repo:tag"
         interaction = mock.Mock(confirm_image_update=mock.Mock(return_value=False))
 
         with (

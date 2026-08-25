@@ -186,7 +186,7 @@ class EnsureExtendedImageTests(TestCase):
                 image_ref=f"{DEFAULT_EXTENDED_IMAGE_NAME}:codex-ubuntu-ext",
                 base="ubuntu",
                 extensions=extensions,
-                base_image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                agent_image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
             ),
             project_docker_args="",
             mounts=[],

@@ -13,7 +13,7 @@ from aicage.config.run_config_draft import _create_run_config_draft
 
 
 class OverviewSelectionTests(TestCase):
-    def test_resolve_overview_selection_returns_base_image_ref_without_extensions(
+    def test_resolve_overview_selection_returns_agent_image_ref_without_extensions(
         self,
     ) -> None:
         draft = _create_run_config_draft(
@@ -50,7 +50,7 @@ class OverviewSelectionTests(TestCase):
         )
 
         with mock.patch(
-            "aicage.config.overview_selection.base_image_ref",
+            "aicage.config.overview_selection.agent_image_ref",
             return_value="repo:ubuntu",
         ):
             selection = overview_selection.resolve_overview_selection(draft, context)
@@ -105,7 +105,7 @@ class OverviewSelectionTests(TestCase):
         with (
             mock.patch("aicage.config.overview_selection.write_extended_image_config"),
             mock.patch(
-                "aicage.config.overview_selection.base_image_ref",
+                "aicage.config.overview_selection.agent_image_ref",
                 return_value="repo:ubuntu",
             ),
         ):

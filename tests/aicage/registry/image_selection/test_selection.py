@@ -113,7 +113,7 @@ class ImageSelectionTests(TestCase):
                 image_ref="aicage:codex-ubuntu",
                 base="ubuntu",
                 extensions=[],
-                base_image_ref=f"{IMAGE_REGISTRY}/{IMAGE_REPOSITORY}:codex-ubuntu",
+                agent_image_ref=f"{IMAGE_REGISTRY}/{IMAGE_REPOSITORY}:codex-ubuntu",
             ),
         ) as fresh_mock:
             select_agent_image("codex", context, mock.Mock())

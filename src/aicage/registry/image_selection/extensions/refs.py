@@ -5,7 +5,7 @@ from aicage.constants import IMAGE_REGISTRY, IMAGE_REPOSITORY, LOCAL_IMAGE_REPOS
 from aicage.paths import CUSTOM_BASES_DIR
 
 
-def base_image_ref(
+def agent_image_ref(
     agent_metadata: AgentMetadata,
     agent: str,
     base: str,

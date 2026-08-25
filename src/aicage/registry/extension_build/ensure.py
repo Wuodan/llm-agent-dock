@@ -33,7 +33,7 @@ def ensure(run_config: RunConfig, reporter: OperationReporter) -> None:
         should_rebuild=lambda record: should_rebuild(
             run_config=run_config,
             record=record,
-            base_image_ref=run_config.selection.base_image_ref,
+            agent_image_ref=run_config.selection.agent_image_ref,
             extension_hash=combined_hash,
         ),
         run_build=lambda: _run_build(run_config, resolved, reporter),
@@ -44,7 +44,7 @@ def ensure(run_config: RunConfig, reporter: OperationReporter) -> None:
                 image_ref=image_ref,
                 extensions=list(run_config.selection.extensions),
                 extension_hash=combined_hash,
-                base_image=run_config.selection.base_image_ref,
+                base_image=run_config.selection.agent_image_ref,
                 built_at=now_iso(),
             )
         ),
@@ -60,7 +60,7 @@ def build_needed(run_config: RunConfig) -> bool:
     return should_rebuild(
         run_config=run_config,
         record=store.load(run_config.selection.image_ref),
-        base_image_ref=run_config.selection.base_image_ref,
+        agent_image_ref=run_config.selection.agent_image_ref,
         extension_hash=combined_hash,
     )
 
@@ -76,7 +76,7 @@ def _run_build(
     log_path = build_log_path(image_ref)
     run(
         run_config=run_config,
-        base_image_ref=run_config.selection.base_image_ref,
+        base_image_ref=run_config.selection.agent_image_ref,
         extensions=resolved,
         log_path=log_path,
         reporter=reporter,

@@ -39,7 +39,7 @@ def ensure_image(
     custom_base = base_metadata.local_definition_dir.is_relative_to(CUSTOM_BASES_DIR)
     if not agent_metadata.build_local and not custom_base:
         pull_image(
-            run_config.selection.base_image_ref,
+            run_config.selection.agent_image_ref,
             update_approved=update_approved,
             reporter=reporter,
         )
@@ -61,7 +61,7 @@ def image_setup_plan(
     agent_metadata = run_config.context.agents[run_config.agent]
     base_metadata = run_config.context.bases[run_config.selection.base]
     custom_base = base_metadata.local_definition_dir.is_relative_to(CUSTOM_BASES_DIR)
-    image_ref = run_config.selection.base_image_ref
+    image_ref = run_config.selection.agent_image_ref
     if not agent_metadata.build_local and not custom_base:
         pull_plan = pull_decision_plan(image_ref)
         match pull_plan.action:

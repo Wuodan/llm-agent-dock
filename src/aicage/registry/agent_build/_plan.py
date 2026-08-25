@@ -11,7 +11,7 @@ def should_rebuild(
     agent_version: str,
     base_image_ref: str,
 ) -> bool:
-    image_ref = run_config.selection.base_image_ref
+    image_ref = run_config.selection.agent_image_ref
     if not local_image_exists(image_ref):
         return True
     if record is None:

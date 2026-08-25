@@ -9,7 +9,7 @@ from aicage.config.extended_images import (
 from aicage.config.image_refs import default_extended_image_ref, extended_image_name
 from aicage.config.run_config_draft import RunConfigDraft
 from aicage.registry.errors import RegistryError
-from aicage.registry.image_selection.extensions.refs import base_image_ref
+from aicage.registry.image_selection.extensions.refs import agent_image_ref
 from aicage.registry.image_selection.models import ImageSelection
 
 
@@ -30,7 +30,7 @@ def resolve_overview_selection(
     if agent_cfg.extensions:
         _write_extended_image_ref(draft, context)
     else:
-        agent_cfg.image_ref = base_image_ref(
+        agent_cfg.image_ref = agent_image_ref(
             agent_metadata, draft.agent, agent_cfg.base, context
         )
 
@@ -38,7 +38,7 @@ def resolve_overview_selection(
         image_ref=agent_cfg.image_ref or "",
         base=agent_cfg.base,
         extensions=list(agent_cfg.extensions),
-        base_image_ref=base_image_ref(
+        agent_image_ref=agent_image_ref(
             agent_metadata, draft.agent, agent_cfg.base, context
         ),
     )

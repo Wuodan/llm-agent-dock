@@ -9,7 +9,7 @@ from aicage.config.image_refs import default_extended_image_ref, extended_image_
 from ..interaction import ExtensionChoiceOption, _SelectionInteraction
 from ..models import ImageSelection
 from .context import ExtensionSelectionContext
-from .refs import base_image_ref
+from .refs import agent_image_ref
 
 
 def handle_extension_selection(
@@ -54,7 +54,7 @@ def handle_extension_selection(
         )
     else:
         agent_cfg.extensions = []
-        agent_cfg.image_ref = base_image_ref(
+        agent_cfg.image_ref = agent_image_ref(
             selection.agent_metadata,
             selection.agent,
             selection.base,
@@ -64,7 +64,7 @@ def handle_extension_selection(
         image_ref=agent_cfg.image_ref or "",
         base=selection.base,
         extensions=list(agent_cfg.extensions),
-        base_image_ref=base_image_ref(
+        agent_image_ref=agent_image_ref(
             selection.agent_metadata,
             selection.agent,
             selection.base,

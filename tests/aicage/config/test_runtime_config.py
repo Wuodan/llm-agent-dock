@@ -129,7 +129,7 @@ class RuntimeConfigTests(TestCase):
                         image_ref="ref",
                         base="ubuntu",
                         extensions=[],
-                        base_image_ref="ref",
+                        agent_image_ref="ref",
                     ),
                 ),
                 mock.patch(
@@ -328,7 +328,7 @@ class RuntimeConfigTests(TestCase):
                             image_ref="ref",
                             base="ubuntu",
                             extensions=[],
-                            base_image_ref="ref",
+                            agent_image_ref="ref",
                         ),
                     ),
                     mock.patch(
@@ -410,7 +410,7 @@ class RuntimeConfigTests(TestCase):
                             image_ref="ref",
                             base="ubuntu",
                             extensions=[],
-                            base_image_ref="ref",
+                            agent_image_ref="ref",
                         ),
                     ),
                     mock.patch(
@@ -476,7 +476,7 @@ class RuntimeConfigTests(TestCase):
                         image_ref="ref",
                         base="ubuntu",
                         extensions=[],
-                        base_image_ref="ref",
+                        agent_image_ref="ref",
                     ),
                     project_docker_args="--new",
                 )
@@ -633,7 +633,7 @@ class RuntimeConfigTests(TestCase):
                 image_ref="ref",
                 base="ubuntu",
                 extensions=[],
-                base_image_ref="ref",
+                agent_image_ref="ref",
             ),
             project_docker_args="--project",
         )

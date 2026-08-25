@@ -5,7 +5,7 @@ from ._fresh_selection import fresh_selection
 from ._metadata import require_agent_metadata, validate_base
 from .extensions.context import ExtensionSelectionContext
 from .extensions.handler import handle_extension_selection
-from .extensions.refs import base_image_ref
+from .extensions.refs import agent_image_ref
 from .interaction import _SelectionInteraction
 from .models import ImageSelection
 
@@ -28,7 +28,7 @@ def select_agent_image(
             image_ref=agent_cfg.image_ref,
             base=base,
             extensions=list(agent_cfg.extensions),
-            base_image_ref=base_image_ref(agent_metadata, agent, base, context),
+            agent_image_ref=agent_image_ref(agent_metadata, agent, base, context),
         )
 
     if not base:

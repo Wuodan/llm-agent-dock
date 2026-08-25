@@ -19,7 +19,7 @@ class ExtendedPlanTests(TestCase):
                 should_rebuild(
                     run_config=run_config,
                     record=record,
-                    base_image_ref=run_config.selection.base_image_ref,
+                    agent_image_ref=run_config.selection.agent_image_ref,
                     extension_hash=record.extension_hash,
                 )
             )
@@ -41,7 +41,7 @@ class ExtendedPlanTests(TestCase):
                 should_rebuild(
                     run_config=run_config,
                     record=record,
-                    base_image_ref=run_config.selection.base_image_ref,
+                    agent_image_ref=run_config.selection.agent_image_ref,
                     extension_hash=record.extension_hash,
                 )
             )
@@ -63,7 +63,7 @@ class ExtendedPlanTests(TestCase):
                 should_rebuild(
                     run_config=run_config,
                     record=record,
-                    base_image_ref=run_config.selection.base_image_ref,
+                    agent_image_ref=run_config.selection.agent_image_ref,
                     extension_hash=record.extension_hash,
                 )
             )
@@ -85,7 +85,7 @@ class ExtendedPlanTests(TestCase):
                 should_rebuild(
                     run_config=run_config,
                     record=record,
-                    base_image_ref=run_config.selection.base_image_ref,
+                    agent_image_ref=run_config.selection.agent_image_ref,
                     extension_hash=record.extension_hash,
                 )
             )
@@ -102,6 +102,6 @@ class ExtendedPlanTests(TestCase):
             image_ref=run_config.selection.image_ref,
             extensions=list(run_config.selection.extensions),
             extension_hash="hash",
-            base_image=run_config.selection.base_image_ref,
+            base_image=run_config.selection.agent_image_ref,
             built_at="2024-01-01T00:00:00+00:00",
         )

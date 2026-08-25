@@ -21,7 +21,7 @@ class ImageSelectionFreshTests(TestCase):
                     image_ref="aicage:codex-ubuntu",
                     base="ubuntu",
                     extensions=[],
-                    base_image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                    agent_image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
                 ),
             ) as handle_mock,
         ):

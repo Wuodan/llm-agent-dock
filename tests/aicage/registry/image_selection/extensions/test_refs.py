@@ -7,11 +7,11 @@ from aicage.config.context import ConfigContext
 from aicage.config.project_config import _ProjectConfig
 from aicage.constants import IMAGE_REGISTRY, IMAGE_REPOSITORY, LOCAL_IMAGE_REPOSITORY
 from aicage.paths import CUSTOM_BASES_DIR
-from aicage.registry.image_selection.extensions.refs import base_image_ref
+from aicage.registry.image_selection.extensions.refs import agent_image_ref
 
 
 class ExtensionRefsTests(TestCase):
-    def test_base_image_ref_uses_local_repo_for_custom_agent(self) -> None:
+    def test_agent_image_ref_uses_local_repo_for_custom_agent(self) -> None:
         context = self._context()
         agent_metadata = AgentMetadata(
             agent_path_files=[],
@@ -23,11 +23,11 @@ class ExtensionRefsTests(TestCase):
             local_definition_dir=Path("/test-tmp/def"),
         )
 
-        result = base_image_ref(agent_metadata, "codex", "ubuntu", context)
+        result = agent_image_ref(agent_metadata, "codex", "ubuntu", context)
 
         self.assertEqual(f"{LOCAL_IMAGE_REPOSITORY}:codex-ubuntu", result)
 
-    def test_base_image_ref_uses_remote_for_builtin_agent(self) -> None:
+    def test_agent_image_ref_uses_remote_for_builtin_agent(self) -> None:
         context = self._context()
         agent_metadata = AgentMetadata(
             agent_path_files=[],
@@ -39,11 +39,11 @@ class ExtensionRefsTests(TestCase):
             local_definition_dir=Path("/test-tmp/def"),
         )
 
-        result = base_image_ref(agent_metadata, "codex", "ubuntu", context)
+        result = agent_image_ref(agent_metadata, "codex", "ubuntu", context)
 
         self.assertEqual(f"{IMAGE_REGISTRY}/{IMAGE_REPOSITORY}:codex-ubuntu", result)
 
-    def test_base_image_ref_uses_local_for_custom_base(self) -> None:
+    def test_agent_image_ref_uses_local_for_custom_base(self) -> None:
         context = self._context()
         agent_metadata = AgentMetadata(
             agent_path_files=[],
@@ -62,7 +62,7 @@ class ExtensionRefsTests(TestCase):
             build_local=True,
             local_definition_dir=CUSTOM_BASES_DIR / "custom",
         )
-        result = base_image_ref(agent_metadata, "codex", "custom", context)
+        result = agent_image_ref(agent_metadata, "codex", "custom", context)
 
         self.assertEqual(f"{LOCAL_IMAGE_REPOSITORY}:codex-custom", result)
 

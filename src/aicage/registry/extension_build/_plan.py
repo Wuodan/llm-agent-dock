@@ -8,7 +8,7 @@ from ._store import BuildRecord
 def should_rebuild(
     run_config: RunConfig,
     record: BuildRecord | None,
-    base_image_ref: str,
+    agent_image_ref: str,
     extension_hash: str,
 ) -> bool:
     needs_rebuild = (
@@ -17,8 +17,8 @@ def should_rebuild(
         or record.image_ref != run_config.selection.image_ref
         or record.extensions != run_config.selection.extensions
         or record.extension_hash != extension_hash
-        or record.base_image != base_image_ref
+        or record.base_image != agent_image_ref
     )
     if needs_rebuild:
         return True
-    return base_layer_missing(base_image_ref, run_config.selection.image_ref)
+    return base_layer_missing(agent_image_ref, run_config.selection.image_ref)

@@ -48,7 +48,7 @@ def ensure(
     base_metadata = run_config.context.bases[run_config.selection.base]
     custom_base = base_metadata.local_definition_dir.is_relative_to(CUSTOM_BASES_DIR)
     base_image = get_base_image_ref(run_config)
-    image_ref = run_config.selection.base_image_ref
+    image_ref = run_config.selection.agent_image_ref
     if custom_base:
         ensure_base_build(
             run_config.selection.base,
@@ -113,7 +113,7 @@ def setup_plan(
     base_metadata = run_config.context.bases[run_config.selection.base]
     custom_base = base_metadata.local_definition_dir.is_relative_to(CUSTOM_BASES_DIR)
     base_image = get_base_image_ref(run_config)
-    image_ref = run_config.selection.base_image_ref
+    image_ref = run_config.selection.agent_image_ref
     if custom_base:
         if base_build_needed(
             run_config.selection.base,

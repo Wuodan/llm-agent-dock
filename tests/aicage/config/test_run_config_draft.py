@@ -170,5 +170,5 @@ def _selection(base: str) -> ImageSelection:
         image_ref=f"aicage:codex-{base}",
         base=base,
         extensions=[],
-        base_image_ref=f"aicage:codex-{base}",
+        agent_image_ref=f"aicage:codex-{base}",
     )
