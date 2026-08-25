@@ -7,6 +7,7 @@ from aicage.config.run_config import RunConfig
 from aicage.docker.build.agent import run
 from aicage.docker.query import (
     cleanup_old_digest,
+    get_local_image_id,
     get_local_repo_digest_for_repo,
     local_image_exists,
 )
@@ -99,6 +100,7 @@ def ensure(
                 base_image=base_image,
                 image_ref=image_ref,
                 built_at=now_iso(),
+                image_id=get_local_image_id(image_ref) or "",
             )
         ),
     )

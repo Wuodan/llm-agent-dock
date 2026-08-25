@@ -266,6 +266,7 @@ def force_record_agent_version(
         base_image=record.base_image,
         image_ref=record.image_ref,
         built_at=record.built_at,
+        image_id=record.image_id,
     )
     store.save(updated)
 

@@ -18,6 +18,18 @@ def local_image_exists(image_ref: str) -> bool:
     return True
 
 
+def get_local_image_id(image_ref: str) -> str | None:
+    try:
+        client = _docker_client.get_docker_client()
+        image = client.images.get(image_ref)
+    except (ImageNotFound, DockerException):
+        return None
+    image_id = image.attrs.get("Id")
+    if not isinstance(image_id, str):
+        return None
+    return image_id
+
+
 def get_local_repo_digest(image: ImageRefRepository) -> str | None:
     return get_local_repo_digest_for_repo(image.image_ref, image.repository)
 

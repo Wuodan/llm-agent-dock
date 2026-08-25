@@ -16,6 +16,7 @@ from aicage.registry.agent_build._store import (
     _BASE_IMAGE_KEY,
     _BASE_KEY,
     _BUILT_AT_KEY,
+    _IMAGE_ID_KEY,
     _IMAGE_REF_KEY,
 )
 from aicage.registry.agent_build.ensure import AgentBuildSetupAction
@@ -194,6 +195,10 @@ class EnsureLocalImageTests(TestCase):
                     return_value="sha256:old",
                 ),
                 mock.patch(
+                    "aicage.registry.agent_build.ensure.get_local_image_id",
+                    return_value="sha256:new",
+                ),
+                mock.patch(
                     "aicage.registry.agent_build.ensure.cleanup_old_digest"
                 ) as cleanup_mock,
                 mock.patch(
@@ -218,6 +223,7 @@ class EnsureLocalImageTests(TestCase):
             record_path = state_dir / "claude-ubuntu.yml"
             payload = yaml.safe_load(record_path.read_text(encoding="utf-8"))
             self.assertEqual("1.2.3", payload[_AGENT_VERSION_KEY])
+            self.assertEqual("sha256:new", payload[_IMAGE_ID_KEY])
 
     @staticmethod
     def test_ensure_skips_when_up_to_date() -> None:
@@ -236,6 +242,7 @@ class EnsureLocalImageTests(TestCase):
                         _AGENT_VERSION_KEY: "1.2.3",
                         _BASE_IMAGE_KEY: "ghcr.io/aicage/aicage-image-base:ubuntu",
                         _IMAGE_REF_KEY: "aicage:claude-ubuntu",
+                        _IMAGE_ID_KEY: "sha256:current",
                         _BUILT_AT_KEY: "2024-01-01T00:00:00+00:00",
                     }
                 ),
@@ -254,6 +261,10 @@ class EnsureLocalImageTests(TestCase):
                 mock.patch(
                     "aicage.registry.agent_build._plan.local_image_exists",
                     return_value=True,
+                ),
+                mock.patch(
+                    "aicage.registry.agent_build._plan.get_local_image_id",
+                    return_value="sha256:current",
                 ),
                 mock.patch(
                     "aicage.registry.agent_build.ensure.refresh_base_image",

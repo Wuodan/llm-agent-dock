@@ -6,6 +6,7 @@ from aicage.docker.query import (
     _remove_image_ref,
     _remove_old_image_digest,
     cleanup_old_digest,
+    get_local_image_id,
     get_local_repo_digest,
     get_local_repo_digest_for_repo,
     get_local_rootfs_layers,
@@ -15,8 +16,13 @@ from aicage.docker.types import ImageRefRepository
 
 
 class FakeImage:
-    def __init__(self, repo_digests: object, rootfs: object | None = None):
-        self.attrs = {"RepoDigests": repo_digests}
+    def __init__(
+        self,
+        repo_digests: object,
+        rootfs: object | None = None,
+        image_id: object = "sha256:local",
+    ):
+        self.attrs = {"Id": image_id, "RepoDigests": repo_digests}
         if rootfs is not None:
             self.attrs["RootFS"] = rootfs
 
@@ -145,6 +151,25 @@ class LocalQueryTests(TestCase):
         ):
             exists = local_image_exists("aicage:claude-ubuntu")
         self.assertFalse(exists)
+
+    def test_get_local_image_id(self) -> None:
+        with mock.patch(
+            "aicage.docker.execution.client.get_docker_client",
+            return_value=FakeClient(FakeImage(repo_digests=[], image_id="sha256:abc")),
+        ):
+            self.assertEqual("sha256:abc", get_local_image_id("repo:tag"))
+
+        with mock.patch(
+            "aicage.docker.execution.client.get_docker_client",
+            return_value=FakeClient(FakeImage(repo_digests=[], image_id={})),
+        ):
+            self.assertIsNone(get_local_image_id("repo:tag"))
+
+        with mock.patch(
+            "aicage.docker.execution.client.get_docker_client",
+            return_value=FakeClient(None),
+        ):
+            self.assertIsNone(get_local_image_id("repo:tag"))
 
     @staticmethod
     def test_remove_old_image_digest_removes_image() -> None:

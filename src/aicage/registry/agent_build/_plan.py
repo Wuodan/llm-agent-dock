@@ -1,5 +1,5 @@
 from aicage.config.run_config import RunConfig
-from aicage.docker.query import local_image_exists
+from aicage.docker.query import get_local_image_id, local_image_exists
 from aicage.registry._layers import base_layer_missing
 
 from ._store import BuildRecord
@@ -17,5 +17,9 @@ def should_rebuild(
     if record is None:
         return True
     if record.agent_version != agent_version:
+        return True
+    if not record.image_id:
+        return True
+    if record.image_id != get_local_image_id(image_ref):
         return True
     return base_layer_missing(base_image_ref, image_ref)
