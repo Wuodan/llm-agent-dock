@@ -16,6 +16,7 @@ def build_run_args(config: RunConfig, parsed: ParsedArgs) -> DockerRunArgs:
         agent_args=parsed.agent_args,
         env=[*config.env, *_host_timezone_env(config.env), *proxy_env_vars_from_host()],
         mounts=list(config.mounts),
+        stdio=parsed.stdio,
     )
 
 

@@ -192,6 +192,26 @@ class ParseCliTests(TestCase):
         self.assertEqual("simple", parsed.menu)
         self.assertEqual("codex", parsed.agent)
 
+    def test_parse_cli_with_stdio_preserves_menu(self) -> None:
+        parsed = parse_cli(["--stdio", "codex", "exec", "--experimental-json"])
+        self.assertTrue(parsed.stdio)
+        self.assertEqual("ui", parsed.menu)
+        self.assertEqual("codex", parsed.agent)
+        self.assertEqual(["exec", "--experimental-json"], parsed.agent_args)
+
+    def test_parse_cli_with_stdio_and_menu_none(self) -> None:
+        parsed = parse_cli(
+            ["--stdio", "--menu", "none", "codex", "exec", "--experimental-json"]
+        )
+        self.assertTrue(parsed.stdio)
+        self.assertEqual("none", parsed.menu)
+        self.assertEqual("codex", parsed.agent)
+        self.assertEqual(["exec", "--experimental-json"], parsed.agent_args)
+
+    def test_parse_cli_stdio_rejects_config_action(self) -> None:
+        with self.assertRaises(CliError):
+            parse_cli(["--stdio", "--config", "info"])
+
     def test_parse_cli_config_rejects_share(self) -> None:
         with self.assertRaises(CliError):
             parse_cli(["--config", "info", "--share", "data"])
@@ -212,3 +232,4 @@ class ParseCliTests(TestCase):
             output,
         )
         self.assertIn("--menu <mode>", output)
+        self.assertIn("--stdio", output)

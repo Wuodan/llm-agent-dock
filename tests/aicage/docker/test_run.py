@@ -168,3 +168,29 @@ class RunCommandTests(TestCase):
         container_mount = PurePosixPath("/opt/one").as_posix()
         self.assertIn(f"type=bind,src={host_mount},dst={container_mount},readonly", cmd)
         self.assertNotIn("AICAGE_AGENT_CONFIG_PATH", " ".join(cmd))
+
+    def test_assemble_uses_interactive_tty_by_default(self) -> None:
+        with mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]):
+            cmd = run._assemble_docker_run(
+                DockerRunArgs(
+                    image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                    merged_docker_args="",
+                    agent_args=[],
+                )
+            )
+
+        self.assertIn("-it", cmd)
+
+    def test_assemble_uses_stdin_without_tty_for_stdio(self) -> None:
+        with mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]):
+            cmd = run._assemble_docker_run(
+                DockerRunArgs(
+                    image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
+                    merged_docker_args="",
+                    agent_args=["exec", "--experimental-json"],
+                    stdio=True,
+                )
+            )
+
+        self.assertIn("-i", cmd)
+        self.assertNotIn("-it", cmd)

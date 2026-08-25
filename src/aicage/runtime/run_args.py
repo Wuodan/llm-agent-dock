@@ -22,6 +22,7 @@ class DockerRunArgs:
     agent_args: list[str]
     env: list[EnvVar] = field(default_factory=list)
     mounts: list[MountSpec] = field(default_factory=list)
+    stdio: bool = False
 
 
 def _merge_docker_args(*args: str) -> str:

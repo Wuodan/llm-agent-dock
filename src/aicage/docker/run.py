@@ -73,7 +73,7 @@ def run_builder_version_check(
 
 
 def _assemble_docker_run(args: DockerRunArgs) -> list[str]:
-    cmd: list[str] = ["docker", "run", "--rm", "-it"]
+    cmd: list[str] = ["docker", "run", "--rm", "-i" if args.stdio else "-it"]
     cmd.extend(resolve_user_ids())
     for env in args.env:
         cmd.extend(["-e", f"{env.name}={env.value}"])
