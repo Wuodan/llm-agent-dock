@@ -10,15 +10,17 @@ class ConsoleOperationReporterTests(TestCase):
     def test_on_phase_started_prints_message_with_log_path(self) -> None:
         reporter = reporting.ConsoleOperationReporter()
         stdout = io.StringIO()
+        stderr = io.StringIO()
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
-            with mock.patch("sys.stdout", stdout):
+            with mock.patch("sys.stdout", stdout), mock.patch("sys.stderr", stderr):
                 reporter.on_phase_started("pull", "Pulling image repo:tag", log_path)
 
+        self.assertEqual("", stdout.getvalue())
         self.assertEqual(
             f"[aicage] Pulling image repo:tag (logs: {log_path})...\n",
-            stdout.getvalue(),
+            stderr.getvalue(),
         )
 
     def test_on_phase_progress_does_not_print(self) -> None:

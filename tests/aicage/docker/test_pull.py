@@ -47,6 +47,7 @@ class DockerPullTests(TestCase):
             },
         ]
         stdout = io.StringIO()
+        stderr = io.StringIO()
         with tempfile.TemporaryDirectory() as tmp_dir:
             log_path = Path(tmp_dir) / "pull.log"
             with (
@@ -55,6 +56,7 @@ class DockerPullTests(TestCase):
                     return_value=client,
                 ),
                 mock.patch("sys.stdout", stdout),
+                mock.patch("sys.stderr", stderr),
                 mock.patch.object(stdout, "isatty", return_value=True),
                 mock.patch(
                     "aicage.docker.image.progress.shutil.get_terminal_size",
@@ -74,7 +76,7 @@ class DockerPullTests(TestCase):
 
         self.assertIn('"status": "Downloading"', payload)
         rendered = stdout.getvalue()
-        self.assertIn("Pulling image ghcr.io/aicage/aicage:latest", rendered)
+        self.assertIn("Pulling image ghcr.io/aicage/aicage:latest", stderr.getvalue())
         self.assertIn("100%", rendered)
         self.assertTrue(rendered.endswith("\n"))
 

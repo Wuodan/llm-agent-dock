@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import Protocol
 
@@ -23,7 +24,7 @@ class OperationReporter(Protocol):
 class ConsoleOperationReporter(OperationReporter):
     def on_phase_started(self, phase: str, message: str, log_path: Path) -> None:
         del self, phase
-        print(f"[aicage] {message} (logs: {log_path})...")
+        print(f"[aicage] {message} (logs: {log_path})...", file=sys.stderr)
 
     def on_phase_progress(
         self,
