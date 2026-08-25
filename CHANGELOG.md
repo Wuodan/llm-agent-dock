@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.13] - 2026-08-25
+
+### Fixed
+
+- Claude agent images on Arch Linux now work around the Claude 2.1.242/2.1.243 startup crash with glibc 2.44.
+
+### Changed
+
+- Extension documentation now describes `shares` entries for mounting existing host paths.
+
+### Internal
+
+- Updated CI linting configuration, and development dependencies.
+
 ## [1.4.12] - 2026-08-11
 
 ### Changed
