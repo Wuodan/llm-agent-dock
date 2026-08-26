@@ -75,10 +75,16 @@ class RuntimeConfigTests(TestCase):
         self.assertEqual(mounts, run_config.mounts)
         self.assertEqual(env, run_config.env)
 
-    def test_load_run_config_persists_new_docker_args(self) -> None:
+    def test_load_run_config_does_not_persist_config_for_none_menu(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             project_path = Path(tmp_dir) / "project"
             project_path.mkdir()
+            projects_dir = Path(tmp_dir) / "configs"
+            projects_dir_patch = mock.patch(
+                "aicage.config.config_store.PROJECTS_DIR", projects_dir
+            )
+            projects_dir_patch.start()
+            self.addCleanup(projects_dir_patch.stop)
 
             store = SettingsStore()
             project_cfg = store.load_project(project_path)
@@ -142,7 +148,10 @@ class RuntimeConfigTests(TestCase):
                     parsed,
                 )
 
+                updated_cfg = store.load_project(project_path)
+
         self.assertEqual("--existing", run_config.project_docker_args)
+        self.assertEqual("--existing", updated_cfg.agents["codex"].docker_args)
 
     def test_load_run_config_defaults_base_when_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -274,7 +283,7 @@ class RuntimeConfigTests(TestCase):
         )
         self.assertEqual("aicage:claude-ubuntu", updated_cfg.agents["claude"].image_ref)
 
-    def test_load_run_config_persists_share_mounts(self) -> None:
+    def test_load_run_config_does_not_persist_share_mounts_for_none_menu(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             projects_dir = Path(tmp_dir) / "configs"
             project_path = Path(tmp_dir) / "project"
@@ -345,12 +354,12 @@ class RuntimeConfigTests(TestCase):
 
         expected_data = str(project_path / "data")
         expected_logs = f"{project_path / 'logs'}:ro"
-        self.assertEqual(
-            [expected_data, expected_logs], updated_cfg.agents["codex"].shares
-        )
+        self.assertEqual([], updated_cfg.agents["codex"].shares)
         self.assertEqual([expected_data, expected_logs], parsed.shares)
 
-    def test_load_run_config_merges_share_mounts(self) -> None:
+    def test_load_run_config_merges_share_mounts_without_persisting_for_none_menu(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             projects_dir = Path(tmp_dir) / "configs"
             project_path = Path(tmp_dir) / "project"
@@ -432,7 +441,7 @@ class RuntimeConfigTests(TestCase):
             [expected_shared, expected_new, expected_existing], parsed.shares
         )
         self.assertEqual(
-            [expected_existing, f"{expected_shared}:ro", expected_new],
+            [expected_existing, f"{expected_shared}:ro"],
             updated_cfg.agents["codex"].shares,
         )
 

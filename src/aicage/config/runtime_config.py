@@ -40,7 +40,8 @@ def load_run_config(
     _remove_missing_extensions(agent, context.project_cfg, context.extensions)
     result = interaction.configure_run(draft, context, agent)
     mounts, env = resolve_docker_args(context, agent, parsed)
-    store.save_project(project_path, draft.project_cfg)
+    if parsed is None or parsed.menu != "none":
+        store.save_project(project_path, draft.project_cfg)
 
     return RunConfig(
         project_path=project_path,

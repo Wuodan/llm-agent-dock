@@ -37,12 +37,18 @@ class ConfigureRunTests(TestCase):
             mock.patch(
                 "aicage.runtime.menu._none_interaction.apply_mount_preferences"
             ) as mount_mock,
+            mock.patch.object(draft, "persist_docker_args") as persist_docker_args_mock,
+            mock.patch.object(
+                draft, "persist_shares", wraps=draft.persist_shares
+            ) as persist_shares_mock,
         ):
             result = resolved.configure_run(draft, _build_context(), "codex")
 
         self.assertIs(selection, result.selection)
         apply_mock.assert_called_once_with(selection)
         mount_mock.assert_called_once()
+        persist_docker_args_mock.assert_not_called()
+        persist_shares_mock.assert_called_once_with(False)
 
 
 class ExecuteImageSetupTests(TestCase):

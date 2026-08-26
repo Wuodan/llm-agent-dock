@@ -28,8 +28,7 @@ class _NoneInteraction:
             _NonInteractiveSelectionInteraction(),
         )
         draft.apply_selection(selection)
-        _persist_docker_args(draft)
-        _persist_shares(draft)
+        draft.persist_shares(False)
         apply_mount_preferences(
             context,
             agent,
@@ -79,24 +78,6 @@ class _NonInteractiveSelectionInteraction:
 
     def choose_image_ref(self, default_ref: str) -> str:
         return default_ref
-
-
-def _persist_docker_args(draft: RunConfigDraft) -> None:
-    if draft.parsed is None or not draft.parsed.docker_args:
-        return
-    existing = draft.agent_cfg.docker_args
-    if existing == draft.parsed.docker_args:
-        return
-    draft.persist_docker_args(True)
-
-
-def _persist_shares(draft: RunConfigDraft) -> None:
-    if draft.parsed is None:
-        return
-    new_shares = draft.persist_shares(False)
-    if not new_shares:
-        return
-    draft.persist_shares(True)
 
 
 def _always_confirm(*args: object) -> bool:

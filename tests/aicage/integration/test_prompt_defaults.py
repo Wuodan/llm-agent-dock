@@ -37,7 +37,7 @@ def test_git_support_prompt_persists_selected_mounts(
     assert agent_cfg.mounts.gitroot is False
 
 
-def test_yes_uses_default_mount_selection_without_prompt_output(
+def test_none_uses_default_mount_selection_without_saving(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -60,9 +60,12 @@ def test_yes_uses_default_mount_selection_without_prompt_output(
     assert (
         "Select mounts (comma-separated numbers) [all, default on Enter]:" not in output
     )
+    gitconfig = Path(env["HOME"]) / ".gitconfig"
+    assert f"--mount type=bind,src={gitconfig},dst={gitconfig}" in output
+    assert f"--mount type=bind,src={workspace},dst={workspace}" in output
     agent_cfg = SettingsStore().load_project(project_dir).agents["codex"]
-    assert agent_cfg.mounts.gitconfig is True
-    assert agent_cfg.mounts.gitroot is True
+    assert agent_cfg.mounts.gitconfig is None
+    assert agent_cfg.mounts.gitroot is None
 
 
 def _write_global_gitconfig(home_dir: Path) -> None:
