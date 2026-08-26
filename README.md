@@ -104,6 +104,9 @@ If you want the agent to run Docker commands, enable `Docker socket` in the setu
 The complete user documentation lives in the wiki:
 [aicage.wiki](https://github.com/aicage/aicage/wiki)
 
+To use aicage from a JetBrains agent plugin, see
+[Use aicage from IDE plugins](https://github.com/aicage/aicage/wiki/IDE-Plugins).
+
 ## Common scenarios
 
 - Pass arguments to the agent:
