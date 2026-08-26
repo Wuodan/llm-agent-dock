@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.15] - 2026-08-26
+
+### Added
+
+- Added `--stdio` to run agents with stdin but without a Docker TTY, for SDK and protocol use.
+
+### Changed
+
+- Operational setup messages now use stderr, keeping stdout available for agent and protocol output.
+- Arguments after the agent name are now forwarded verbatim to the agent.
+- `--menu none` now applies Docker arguments, shares, and mount choices only to the current run instead of saving them
+  to the project configuration.
+
+### Fixed
+
+- Local agent images that have been replaced or become stale are now rebuilt before use.
+
 ## [1.4.14] - 2026-08-25
 
 ### Fixed
