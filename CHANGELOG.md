@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.16] - 2026-08-27
+
+### Changed
+
+- Project configuration files now indent list items for easier reading.
+
+### Documentation
+
+- Added guidance for using aicage from JetBrains agent plugins.
+
 ## [1.4.15] - 2026-08-26
 
 ### Added
