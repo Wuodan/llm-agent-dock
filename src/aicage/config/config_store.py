@@ -10,6 +10,11 @@ from ._yaml_loader import load_yaml
 from .project_config import _ProjectConfig
 
 
+class _IndentedSafeDumper(yaml.SafeDumper):
+    def increase_indent(self, flow: bool = False, indentless: bool = False) -> None:
+        super().increase_indent(flow, False)
+
+
 class SettingsStore:
     """
     Persists per-project configuration under ~/.aicage.
@@ -23,7 +28,7 @@ class SettingsStore:
     def _save_yaml(path: Path, data: dict[str, Any]) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w", encoding="utf-8") as handle:
-            yaml.safe_dump(data, handle, sort_keys=True)
+            yaml.dump(data, handle, Dumper=_IndentedSafeDumper, sort_keys=True)
 
     def _project_path(self, project_realpath: Path) -> Path:
         digest = hashlib.sha256(str(project_realpath).encode("utf-8")).hexdigest()
