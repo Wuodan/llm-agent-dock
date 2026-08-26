@@ -39,8 +39,9 @@ class ConfigureRunTests(TestCase):
             ) as mount_mock,
             mock.patch.object(draft, "persist_docker_args") as persist_docker_args_mock,
             mock.patch.object(
-                draft, "persist_shares", wraps=draft.persist_shares
-            ) as persist_shares_mock,
+                draft, "merge_shares", wraps=draft.merge_shares
+            ) as merge_shares_mock,
+            mock.patch.object(draft, "persist_shares") as persist_shares_mock,
         ):
             result = resolved.configure_run(draft, _build_context(), "codex")
 
@@ -48,7 +49,8 @@ class ConfigureRunTests(TestCase):
         apply_mock.assert_called_once_with(selection)
         mount_mock.assert_called_once()
         persist_docker_args_mock.assert_not_called()
-        persist_shares_mock.assert_called_once_with(False)
+        merge_shares_mock.assert_called_once_with()
+        persist_shares_mock.assert_not_called()
 
 
 class ExecuteImageSetupTests(TestCase):

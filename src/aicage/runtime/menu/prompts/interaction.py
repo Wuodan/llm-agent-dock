@@ -120,9 +120,8 @@ def _persist_docker_args(
     existing = draft.agent_cfg.docker_args
     if existing == draft.parsed.docker_args:
         return
-    draft.persist_docker_args(
-        confirm_persist(draft.parsed.docker_args, existing),
-    )
+    if confirm_persist(draft.parsed.docker_args, existing):
+        draft.persist_docker_args()
 
 
 def _persist_shares(
@@ -131,8 +130,9 @@ def _persist_shares(
 ) -> None:
     if draft.parsed is None:
         return
-    existing_shares = list(draft.agent_cfg.shares)
-    new_shares = draft.persist_shares(False)
+    agent_shares = list(draft.agent_cfg.shares)
+    new_shares = draft.merge_shares()
     if not new_shares:
         return
-    draft.persist_shares(confirm_persist(new_shares, existing_shares))
+    if confirm_persist(new_shares, agent_shares):
+        draft.persist_shares(new_shares)

@@ -28,7 +28,7 @@ class _NoneInteraction:
             _NonInteractiveSelectionInteraction(),
         )
         draft.apply_selection(selection)
-        draft.persist_shares(False)
+        draft.merge_shares()
         apply_mount_preferences(
             context,
             agent,

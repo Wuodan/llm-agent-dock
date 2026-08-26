@@ -45,23 +45,20 @@ class RunConfigDraftTests(TestCase):
         self.assertIsInstance(draft.agent_cfg, AgentConfig)
         self.assertEqual({}, draft.agent_cfg.to_mapping())
 
-    def test_persist_docker_args_updates_config_only_when_enabled(self) -> None:
+    def test_persist_docker_args_updates_config(self) -> None:
         draft = _build_draft(AgentConfig(docker_args="--existing"), docker_args="--new")
 
-        draft.persist_docker_args(False)
-        self.assertEqual("--existing", draft.agent_cfg.docker_args)
-
-        draft.persist_docker_args(True)
+        draft.persist_docker_args()
         self.assertEqual("--new", draft.agent_cfg.docker_args)
 
-    def test_persist_shares_normalizes_parsed_and_returns_only_new_shares(self) -> None:
+    def test_merge_shares_normalizes_parsed_and_returns_only_new_shares(self) -> None:
         draft = _build_draft(
             AgentConfig(shares=["/repo/existing"]),
             shares=["existing", "new", "new:ro"],
             project_path=Path("/repo"),
         )
 
-        new_shares = draft.persist_shares(False)
+        new_shares = draft.merge_shares()
         parsed = draft.parsed
         if parsed is None:
             self.fail("Expected parsed args to be available.")
@@ -70,14 +67,15 @@ class RunConfigDraftTests(TestCase):
         self.assertEqual(["/repo/existing", "/repo/new"], parsed.shares)
         self.assertEqual(["/repo/existing"], draft.agent_cfg.shares)
 
-    def test_persist_shares_updates_config_when_enabled(self) -> None:
+    def test_persist_shares_updates_config(self) -> None:
         draft = _build_draft(
             AgentConfig(shares=["/repo/existing"]),
             shares=["new:ro"],
             project_path=Path("/repo"),
         )
 
-        draft.persist_shares(True)
+        new_shares = draft.merge_shares()
+        draft.persist_shares(new_shares)
 
         self.assertEqual(["/repo/existing", "/repo/new:ro"], draft.agent_cfg.shares)
 

@@ -26,15 +26,14 @@ class RunConfigDraft:
         if self.agent_cfg.base is None:
             self.agent_cfg.base = selection.base
 
-    def persist_docker_args(self, persist: bool) -> None:
+    def persist_docker_args(self) -> None:
         if self.parsed is None or not self.parsed.docker_args:
             return
         if self.agent_cfg.docker_args == self.parsed.docker_args:
             return
-        if persist:
-            self.agent_cfg.docker_args = self.parsed.docker_args
+        self.agent_cfg.docker_args = self.parsed.docker_args
 
-    def persist_shares(self, persist: bool) -> list[str]:
+    def merge_shares(self) -> list[str]:
         if self.parsed is None:
             return []
         merged_shares, new_shares = merge_share_values(
@@ -43,9 +42,12 @@ class RunConfigDraft:
             self.project_path,
         )
         self.parsed.shares = merged_shares
-        if persist and new_shares:
-            self.agent_cfg.shares = [*self.agent_cfg.shares, *new_shares]
         return new_shares
+
+    def persist_shares(self, new_shares: list[str]) -> None:
+        if not new_shares:
+            return
+        self.agent_cfg.shares = [*self.agent_cfg.shares, *new_shares]
 
     def prefill_for_overview(self) -> None:
         if self.parsed is None:
