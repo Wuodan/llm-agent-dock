@@ -24,7 +24,9 @@ RUN --mount=type=bind,source=agents/,target=/tmp/agents,readonly \
       chmod +x "$script"; \
     done && \
     /tmp/agents-run/${AGENT}/install.sh && \
-    rm -rf /tmp/agents-run
+    rm -rf /tmp/agents-run && \
+    npm cache clean --force && \
+    pip cache purge
 
 ENV AGENT=${AGENT}
 
