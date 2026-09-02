@@ -175,15 +175,6 @@ After adding or changing custom definitions, restart `aicage`.
 
 Image updates are handled automatically; see [Updates](https://github.com/aicage/aicage/wiki/Updates).
 
-## aicage options
-
-- `--dry-run` prints the composed `docker run` command without executing it.
-- `--share <path>` mounts a host path into the container at the same path. Repeatable; add `:ro` for read-only.
-- Extensions can also request grouped host mounts during setup.
-
-Configuration file formats are documented in [CONFIG.md](CONFIG.md). Extension authoring is documented in
-[doc/extensions.md](doc/extensions.md).
-
 ## Why cage agents?
 
 AI coding agents read your code, run shells, install packages, and edit files. That power is useful,
