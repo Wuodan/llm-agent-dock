@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.17] - 2026-09-03
+
+### Changed
+
+- Custom agent images now remove installer artifacts and package caches after installation, reducing image size.
+
 ## [1.4.16] - 2026-08-27
 
 ### Changed
