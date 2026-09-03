@@ -19,6 +19,9 @@ elif command -v agy >/dev/null 2>&1; then
   install -m 0755 "$(command -v agy)" /usr/local/bin/agy
 fi
 
+# Remove root-home artifacts left by the installer; the image uses /usr/local/bin.
+rm -f /root/.local/bin/agy
+
 if ! command -v agy >/dev/null 2>&1; then
   echo "[install_agy] 'agy' executable not found after installation." >&2
   exit 1

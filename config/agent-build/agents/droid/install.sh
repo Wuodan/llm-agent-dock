@@ -14,6 +14,9 @@ elif command -v droid >/dev/null 2>&1; then
   install -m 0755 "$(command -v droid)" /usr/local/bin/droid
 fi
 
+# Remove root-home artifacts left by the installer; the image uses /usr/local/bin.
+rm -f /root/.local/bin/droid
+
 if ! command -v droid >/dev/null 2>&1; then
   echo "[install_droid] 'droid' executable not found after installation." >&2
   exit 1
