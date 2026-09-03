@@ -15,4 +15,3 @@ class ParsedArgs:
     config_action: str | None
     config_agent: str | None = None
     menu: MenuMode = "ui"
-    stdio: bool = False

@@ -37,11 +37,6 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
         help="Select menu mode: ui, simple, or none.",
     )
     parser.add_argument(
-        "--stdio",
-        action="store_true",
-        help="Run without Docker TTY allocation for SDK/protocol use.",
-    )
-    parser.add_argument(
         "--docker",
         action="store_true",
         help="Mount the host Docker socket into the container.",
@@ -78,7 +73,6 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "Usage:\n"
             "  aicage <agent>\n"
             "  aicage [--menu <mode>] [--dry-run] [--docker] [--share <path>...] <agent> [<agent-args>]\n"
-            "  aicage [--stdio] [--menu <mode>] [--dry-run] [--docker] [--share <path>...] <agent> [<agent-args>]\n"
             "  aicage [--menu <mode>] [--dry-run] [--docker] [--share <path>...] <docker-args> -- <agent>"
             " [<agent-args>]\n"
             "  aicage --config\n"
@@ -88,7 +82,6 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "Arguments:\n"
             "  --dry-run        Print the generated docker run command and exit.\n"
             "  --menu <mode>    Choose menu mode: ui (default), simple, or none.\n"
-            "  --stdio          Disable Docker TTY allocation for SDK/protocol use.\n"
             "  --docker         Mount /run/docker.sock into the container.\n"
             "  --share <path>   Mount a host path into the container. Repeatable.\n"
             "  --config [<cmd>] Run config command: default info, or remove [agent].\n"
@@ -98,7 +91,7 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "  - '--menu ui' uses the default config overview.\n"
             "  - '--menu simple' uses the line-based setup prompts.\n"
             "  - '--menu none' skips menus and uses defaults.\n"
-            "  - '--stdio' uses 'docker run -i' instead of 'docker run -it'.\n"
+            "  - Docker TTY allocation is enabled only when stdin is a TTY.\n"
             "  - aicage options are parsed only before <agent>.\n"
             "  - <docker-args> are forwarded verbatim to docker run.\n"
             "  - If docker args are present, use '--' before <agent>.\n"
@@ -123,7 +116,6 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             config_action,
             config_agent,
             opts.menu,
-            opts.stdio,
         )
 
     docker_args, agent, agent_args = _parse_agent_section(remaining, post_argv)
@@ -141,7 +133,6 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
         None,
         None,
         opts.menu,
-        opts.stdio,
     )
 
 
@@ -208,7 +199,6 @@ def _validate_config_action(
         or opts.dry_run
         or opts.share
         or opts.menu != "ui"
-        or opts.stdio
     ):
         raise CliError("No additional arguments are allowed with --config.")
     return config_action, config_agent

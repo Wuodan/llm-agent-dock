@@ -47,40 +47,6 @@ class RunPlanTests(TestCase):
 
         self.assertEqual("--project --cli", run_args.merged_docker_args)
         self.assertEqual(["--flag"], run_args.agent_args)
-        self.assertFalse(run_args.stdio)
-
-    def test_build_run_args_carries_stdio_mode(self) -> None:
-        project_path = Path("/test-tmp/project")
-        config = RunConfig(
-            project_path=project_path,
-            agent="codex",
-            context=ConfigContext(
-                store=mock.Mock(),
-                project_cfg=_ProjectConfig(path=str(project_path), agents={}),
-                agents=self._get_agents(),
-                bases=self._get_bases(),
-                extensions={},
-            ),
-            selection=ImageSelection(
-                image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
-                base="ubuntu",
-                extensions=[],
-                agent_image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
-            ),
-            project_docker_args="",
-            mounts=[],
-            env=[],
-        )
-        parsed = ParsedArgs(False, "", "codex", [], False, [], None, stdio=True)
-        with (
-            mock.patch.dict(os.environ, {}, clear=True),
-            mock.patch(
-                "aicage.runtime.run_plan.resolve_host_timezone", return_value=None
-            ),
-        ):
-            run_args = build_run_args(config, parsed)
-
-        self.assertTrue(run_args.stdio)
 
     def test_build_run_args_uses_mounts_from_config(self) -> None:
         project_path = Path("/test-tmp/project")

@@ -169,8 +169,11 @@ class RunCommandTests(TestCase):
         self.assertIn(f"type=bind,src={host_mount},dst={container_mount},readonly", cmd)
         self.assertNotIn("AICAGE_AGENT_CONFIG_PATH", " ".join(cmd))
 
-    def test_assemble_uses_interactive_tty_by_default(self) -> None:
-        with mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]):
+    def test_assemble_uses_interactive_tty_when_stdin_is_tty(self) -> None:
+        with (
+            mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]),
+            mock.patch("sys.stdin.isatty", return_value=True),
+        ):
             cmd = run._assemble_docker_run(
                 DockerRunArgs(
                     image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
@@ -181,14 +184,16 @@ class RunCommandTests(TestCase):
 
         self.assertIn("-it", cmd)
 
-    def test_assemble_uses_stdin_without_tty_for_stdio(self) -> None:
-        with mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]):
+    def test_assemble_uses_stdin_without_tty_when_stdin_is_not_tty(self) -> None:
+        with (
+            mock.patch("aicage.docker.run.resolve_user_ids", return_value=[]),
+            mock.patch("sys.stdin.isatty", return_value=False),
+        ):
             cmd = run._assemble_docker_run(
                 DockerRunArgs(
                     image_ref="ghcr.io/aicage/aicage:codex-ubuntu",
                     merged_docker_args="",
                     agent_args=["exec", "--experimental-json"],
-                    stdio=True,
                 )
             )
 

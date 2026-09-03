@@ -1,5 +1,6 @@
 import shlex
 import subprocess  # nosec B404 -- subprocess is required for Docker CLI execution and result handling.
+import sys
 from pathlib import Path
 
 from aicage._proxy import proxy_run_env_args_from_host
@@ -73,7 +74,7 @@ def run_builder_version_check(
 
 
 def _assemble_docker_run(args: DockerRunArgs) -> list[str]:
-    cmd: list[str] = ["docker", "run", "--rm", "-i" if args.stdio else "-it"]
+    cmd: list[str] = ["docker", "run", "--rm", "-it" if sys.stdin.isatty() else "-i"]
     cmd.extend(resolve_user_ids())
     for env in args.env:
         cmd.extend(["-e", f"{env.name}={env.value}"])
