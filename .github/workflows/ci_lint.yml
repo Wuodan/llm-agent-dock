@@ -1,7 +1,7 @@
 name: "CI: lint"
 
 "on":
-  workflow_call:
+  workflow_call: {}
   workflow_dispatch:
     inputs:
       fix_mode:

@@ -1,8 +1,8 @@
 name: Integration Tests (Proxy E2E)
 
 "on":
-  workflow_dispatch:
-  workflow_call:
+  workflow_dispatch: {}
+  workflow_call: {}
 
 permissions:
   contents: read

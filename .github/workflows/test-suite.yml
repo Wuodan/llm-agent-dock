@@ -1,7 +1,7 @@
 name: Test Suite
 
 "on":
-  workflow_call:
+  workflow_call: {}
 
 permissions:
   contents: read
