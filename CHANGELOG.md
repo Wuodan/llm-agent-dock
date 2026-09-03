@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.18] - 2026-09-03
+
+### Changed
+
+- Docker TTY allocation is now detected automatically. `aicage` uses `docker run -it` when stdin is a TTY and
+  `docker run -i` for non-TTY callers such as IDE plugins, so the previous `--stdio` option is no longer needed.
+
 ## [1.4.17] - 2026-09-03
 
 ### Changed
