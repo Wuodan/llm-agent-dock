@@ -16,7 +16,8 @@ class ParseCliTests(TestCase):
         )
 
     def test_parse_cli_with_separator(self) -> None:
-        parsed = parse_cli(["--dry-run", "--", "codex", "--bar"])
+        with mock.patch("sys.stdin.isatty", return_value=True):
+            parsed = parse_cli(["--dry-run", "--", "codex", "--bar"])
         self.assertTrue(parsed.dry_run)
         self.assertEqual("ui", parsed.menu)
         self.assertEqual("", parsed.docker_args)
@@ -25,16 +26,17 @@ class ParseCliTests(TestCase):
         self.assertEqual([], parsed.shares)
 
     def test_parse_cli_with_separator_and_docker_args(self) -> None:
-        parsed = parse_cli(
-            [
-                "--dry-run",
-                "-v",
-                "/run/docker.sock:/run/docker.sock",
-                "--",
-                "codex",
-                "--bar",
-            ]
-        )
+        with mock.patch("sys.stdin.isatty", return_value=True):
+            parsed = parse_cli(
+                [
+                    "--dry-run",
+                    "-v",
+                    "/run/docker.sock:/run/docker.sock",
+                    "--",
+                    "codex",
+                    "--bar",
+                ]
+            )
         self.assertTrue(parsed.dry_run)
         self.assertEqual("ui", parsed.menu)
         self.assertEqual("-v /run/docker.sock:/run/docker.sock", parsed.docker_args)
@@ -45,7 +47,8 @@ class ParseCliTests(TestCase):
         self.assertIsNone(parsed.config_action)
 
     def test_parse_cli_without_docker_args(self) -> None:
-        parsed = parse_cli(["codex", "--flag"])
+        with mock.patch("sys.stdin.isatty", return_value=True):
+            parsed = parse_cli(["codex", "--flag"])
         self.assertFalse(parsed.dry_run)
         self.assertEqual("ui", parsed.menu)
         self.assertEqual("", parsed.docker_args)
@@ -79,7 +82,8 @@ class ParseCliTests(TestCase):
         self.assertIsNone(parsed.config_action)
 
     def test_parse_cli_flags_after_agent_are_agent_args(self) -> None:
-        parsed = parse_cli(["codex", "--foo", "--menu", "none"])
+        with mock.patch("sys.stdin.isatty", return_value=True):
+            parsed = parse_cli(["codex", "--foo", "--menu", "none"])
         self.assertEqual("ui", parsed.menu)
         self.assertEqual("codex", parsed.agent)
         self.assertEqual(["--foo", "--menu", "none"], parsed.agent_args)
@@ -89,6 +93,18 @@ class ParseCliTests(TestCase):
         self.assertEqual("forge", parsed.agent)
         self.assertEqual(["exec", "--config", "custom=true"], parsed.agent_args)
         self.assertIsNone(parsed.config_action)
+
+    def test_parse_cli_uses_no_menu_without_tty(self) -> None:
+        with mock.patch("sys.stdin.isatty", return_value=False):
+            parsed = parse_cli(["codex"])
+
+        self.assertEqual("none", parsed.menu)
+
+    def test_parse_cli_preserves_explicit_ui_menu_without_tty(self) -> None:
+        with mock.patch("sys.stdin.isatty", return_value=False):
+            parsed = parse_cli(["--menu", "ui", "codex"])
+
+        self.assertEqual("ui", parsed.menu)
 
     def test_parse_cli_help_exits(self) -> None:
         with mock.patch("sys.stdout", new_callable=io.StringIO) as stdout:
@@ -155,8 +171,10 @@ class ParseCliTests(TestCase):
         self.assertEqual([], parsed.shares)
 
     def test_parse_cli_config_defaults_to_info(self) -> None:
-        parsed = parse_cli(["--config"])
+        with mock.patch("sys.stdin.isatty", return_value=False):
+            parsed = parse_cli(["--config"])
         self.assertEqual("info", parsed.config_action)
+        self.assertEqual("ui", parsed.menu)
         self.assertIsNone(parsed.config_agent)
         self.assertEqual("", parsed.docker_args)
         self.assertEqual("", parsed.agent)

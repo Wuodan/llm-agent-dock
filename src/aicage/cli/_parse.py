@@ -11,7 +11,8 @@ from aicage.config.base.loader import load_bases
 from aicage.config.errors import ConfigError
 
 _MAX_CONFIG_TOKENS = 2
-_OPTIONS_WITH_VALUES: set[str] = {"--menu", "--share"}
+_MENU_OPTION = "--" + "menu"
+_OPTIONS_WITH_VALUES: set[str] = {_MENU_OPTION, "--share"}
 _CONFIG_OPTION = "--" + "config"
 _CONFIG_ACTION_ALIASES: dict[str, str] = {
     "print": "info",
@@ -31,7 +32,7 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
         help="Print docker run command without executing.",
     )
     parser.add_argument(
-        "--menu",
+        _MENU_OPTION,
         choices=["ui", "simple", "none"],
         default="ui",
         help="Select menu mode: ui, simple, or none.",
@@ -67,6 +68,12 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
     option_argv, agent_argv = _split_before_agent_args(pre_argv, post_argv)
     opts, remaining = parser.parse_known_args(option_argv)
     remaining.extend(agent_argv)
+    if (
+        opts.config is None
+        and not sys.stdin.isatty()
+        and _MENU_OPTION not in option_argv
+    ):
+        opts.menu = "none"
 
     if opts.help:
         usage: str = (
@@ -81,7 +88,7 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "  aicage --version\n\n"
             "Arguments:\n"
             "  --dry-run        Print the generated docker run command and exit.\n"
-            "  --menu <mode>    Choose menu mode: ui (default), simple, or none.\n"
+            "  --menu <mode>    Choose menu mode: ui, simple, or none.\n"
             "  --docker         Mount /run/docker.sock into the container.\n"
             "  --share <path>   Mount a host path into the container. Repeatable.\n"
             "  --config [<cmd>] Run config command: default info, or remove [agent].\n"
@@ -91,6 +98,7 @@ def parse_cli(argv: Sequence[str]) -> ParsedArgs:
             "  - '--menu ui' uses the default config overview.\n"
             "  - '--menu simple' uses the line-based setup prompts.\n"
             "  - '--menu none' skips menus and uses defaults.\n"
+            "  - The default menu is 'ui' with a TTY and 'none' without one.\n"
             "  - Docker TTY allocation is enabled only when stdin is a TTY.\n"
             "  - aicage options are parsed only before <agent>.\n"
             "  - <docker-args> are forwarded verbatim to docker run.\n"
