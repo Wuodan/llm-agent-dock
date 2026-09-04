@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.19] - 2026-09-04
+
+### Changed
+
+- `aicage` now skips setup menus automatically when stdin is not a TTY, so IDE plugins no longer need to pass
+  `--menu none`. Interactive terminal runs continue to open the setup UI by default.
+
 ## [1.4.18] - 2026-09-03
 
 ### Changed
